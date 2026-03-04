@@ -1,0 +1,21 @@
+{
+  "name": "shell",
+  "filename": "remoteEntry.js",
+  "remotes": {
+    "dashboard": "dashboard@http://localhost:3001/remoteEntry.js"
+  },
+  "shared": {
+    "react": {
+      "singleton": true,
+      "requiredVersion": false
+    },
+    "react-dom": {
+      "singleton": true,
+      "requiredVersion": false
+    },
+    "@mfjs/event-bus": {
+      "singleton": true,
+      "requiredVersion": false
+    }
+  }
+}

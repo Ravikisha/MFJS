@@ -1,0 +1,127 @@
+import { rspack } from '@rspack/core';
+import path from 'node:path';
+import fs from 'node:fs';
+
+const federationFile = process.env.MFJS_FEDERATION_FILE || 'mfjs.federation.json';
+const federationPath = path.join(process.cwd(), federationFile);
+const federation = fs.existsSync(federationPath)
+  ? JSON.parse(fs.readFileSync(federationPath, 'utf8'))
+  : null;
+
+const sharedWithReactEager = federation?.shared
+  ? {
+    ...federation.shared,
+    react: {
+      ...(federation.shared.react || {}),
+      eager: true,
+      singleton: true,
+    },
+    'react-dom': {
+      ...(federation.shared['react-dom'] || {}),
+      eager: true,
+      singleton: true,
+    },
+  }
+  : undefined;
+
+// Proxy rules must be derived from the *original* federation file (mfjs.federation.json),
+// not from mfjs.federation.proxy.json (which points back to the host).
+const baseFederationPath = path.join(process.cwd(), 'mfjs.federation.json');
+const baseFederation = fs.existsSync(baseFederationPath)
+  ? JSON.parse(fs.readFileSync(baseFederationPath, 'utf8'))
+  : null;
+
+const proxy = baseFederation?.remotes
+  ? Object.entries(baseFederation.remotes).map(([remoteName, spec]) => {
+      const at = String(spec).indexOf('@');
+      const entryUrl = at >= 0 ? String(spec).slice(at + 1) : String(spec);
+      const target = entryUrl.replace(/\/remoteEntry\.js$/, '');
+
+      const ctx = `/mfjs/remotes/${remoteName}/remoteEntry.js`;
+      return {
+        context: [ctx],
+        target,
+        changeOrigin: true,
+        pathRewrite: { [`^${ctx}`]: '/remoteEntry.js' }
+      };
+    })
+  : [];
+
+export default {
+  mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+  entry: {
+    main: ['./src/mf-shim.js', './src/main.tsx'],
+  },
+  // Expose selected env vars to the client via import.meta.env
+  builtins: {
+    define: {
+      'import.meta.env.MFJS_FEDERATION_FILE': JSON.stringify(process.env.MFJS_FEDERATION_FILE || ''),
+    },
+  },
+  devServer: {
+    port: 3000,
+    static: [
+      // Serve /public/* (default) plus also allow fetching flat files like /mfjs.federation.json
+      // from the app root during dev.
+      { directory: path.join(process.cwd(), 'public') },
+      { directory: process.cwd() },
+    ],
+    historyApiFallback: {
+      disableDotRule: true,
+      rewrites: [
+        // Don't rewrite module/asset requests to index.html.
+        {
+          from: /^\/(src|@fs)\//,
+          to: (context) => context.parsedUrl.pathname,
+        },
+        {
+          from: /\.(mjs|js|cjs|css|json|map|wasm|png|jpe?g|gif|svg|ico|webp|avif|txt|xml)$/,
+          to: (context) => context.parsedUrl.pathname,
+        },
+        // SPA fallback for everything else.
+        { from: /./, to: "/index.html" },
+      ],
+    },
+    proxy,
+  },
+  output: {
+    uniqueName: 'shell',
+    publicPath: 'auto'
+  },
+  experiments: {
+    css: true
+  },
+  resolve: {
+  extensions: ['.tsx', '.ts', '.js'],
+  mainFields: ['module', 'browser', 'main']
+  },
+  module: {
+    rules: [
+      {
+        test: /\.(ts|tsx)$/,
+        exclude: /node_modules/,
+        loader: 'builtin:swc-loader',
+        options: {
+          jsc: {
+            parser: { syntax: 'typescript', tsx: true },
+            transform: { react: { runtime: 'automatic' } }
+          }
+        }
+      }
+    ]
+  },
+  plugins: [
+    new rspack.HtmlRspackPlugin({ template: './index.html', scriptLoading: 'module' }),
+    ...(federation
+      ? [
+          new rspack.container.ModuleFederationPlugin({
+            name: federation.name,
+            filename: federation.filename,
+            exposes: federation.exposes,
+            remotes: federation.remotes,
+            shared: sharedWithReactEager
+          })
+        ]
+      : [])
+  ]
+};

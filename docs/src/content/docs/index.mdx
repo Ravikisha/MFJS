@@ -1,0 +1,43 @@
+---
+title: MFJS
+description: Opinionated micro-frontend tooling with a workspace-aware CLI + runtime.
+template: splash
+# hero:
+# 	tagline: Build micro-frontends with Rspack + Module Federation.
+# 	image:
+# 		file: ../../assets/houston.webp
+# 	actions:
+# 		- text: Getting started
+# 			link: /guides/getting-started/
+# 			icon: right-arrow
+# 		- text: CLI reference
+# 			link: /guides/cli/
+# 			icon: right-arrow
+
+hero:
+  tagline: Build micro-frontends with Rspack + Module Federation.
+  image:
+    alt: Logo
+    file: ../../assets/houston.webp
+  actions:
+    - text: Getting started
+      link: /guides/getting-started/
+      icon: right-arrow
+    - text: CLI Reference
+      link: /guides/cli/
+      icon: right-arrow
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## Quick links
+
+<CardGrid stagger>
+	<Card title="Getting started" icon="rocket">
+		Create a new workspace, generate a host + remote, and run dev servers.
+	</Card>
+
+	<Card title="CLI" icon="terminal">
+		Reference for `mfjs init`, `mfjs generate`, `mfjs federation`, and `mfjs dev`.
+	</Card>
+</CardGrid>

@@ -1,0 +1,63 @@
+# Node modules
+node_modules/
+
+# Build output
+dist/
+build/
+out/
+public/build/
+.target/
+.tmp/
+.cache/
+.cache-loader/
+.next/
+.nuxt/
+.parcel-cache/
+storybook-static/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Runtime files
+.DS_Store
+Thumbs.db
+.recently-used.xbel
+
+# Environment variables (keep examples)
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Editor & IDE
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# TypeScript
+*.tsbuildinfo
+
+# Testing / coverage
+coverage/
+.nyc_output/
+jest-cache/
+jest-results.json
+
+# Package manager caches / lock files (optional - keep lockfiles if you want reproducible installs)
+.pnpm-store/
+.pnpm-debug.log
+
+# Misc
+*.tgz
+*.bak
+*.tmp
+.eslintcache

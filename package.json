@@ -1,0 +1,29 @@
+{
+  "name": "mfjs",
+  "private": true,
+  "packageManager": "pnpm@9.15.5",
+  "workspaces": [
+    "packages/*",
+    "apps/*",
+    "libs/*",
+    "docs",
+    "examples/*",
+    "examples/*/apps/*"
+  ],
+  "scripts": {
+    "dev": "pnpm -r --parallel --filter '!@mfjs/cli' dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test",
+    "coverage": "pnpm -r --parallel test:coverage",
+    "e2e": "node ./scripts/e2e.mjs",
+    "e2e:ci": "MFJS_E2E=1 node ./scripts/e2e.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.54.2",
+    "jsdom": "^28.1.0",
+    "@vitest/coverage-v8": "^2.1.9",
+    "vitest": "^2.1.9",
+    "wait-on": "^8.0.4"
+  }
+}
