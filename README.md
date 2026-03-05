@@ -42,6 +42,22 @@ This avoids common dev-time failures where the remote loads `remoteEntry.js` but
 
 Generated hosts call `connectMfjsDevReload()` (from `@mfjs/runtime`) when `MFJS_DEV_RELOAD_URL` is present, so when a remote recompiles the host refreshes automatically.
 
+## Routing (lightweight internal router)
+
+MFJS includes a tiny internal router in `@mfjs/runtime` based on the browser History API.
+
+Main APIs:
+
+- `createRouter()` — subscribe to `popstate` and imperative `navigate()` calls
+- `dispatchMfjsNavigate({ to })` — cross-app navigation via a DOM event (`mfjs:navigate`)
+- `resolveRoute(routes, pathname)` — pick the first matching route from a route table (supports `:params` and `*` splat)
+
+Generated host templates use this router to:
+
+- track the current path
+- mount a remote based on the matched path (for example `/dashboard/*`)
+- allow remotes to navigate by dispatching `mfjs:navigate`
+
 ### What you should expect right now
 
 - Remotes include `src/remote.tsx` which is intended to be exposed as `./App`.

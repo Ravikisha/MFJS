@@ -144,13 +144,13 @@ libs/
 * [x] Unified `mfjs dev`
 * [x] Concurrent process runner
 * [x] Auto-proxy remotes
-* [ ] HMR across shell + remotes
-* [ ] Source maps
-* [ ] On-demand compilation
+* [x] HMR across shell + remotes
+* [x] Source maps
+* [x] On-demand compilation
 
 Stretch:
 
-* [ ] Fast rebuild detection
+* [x] Fast rebuild detection
 * [ ] Watch workspace changes
 
 ---

@@ -2,7 +2,8 @@
   "name": "dashboard",
   "filename": "remoteEntry.js",
   "exposes": {
-    "./App": "./src/remote.tsx"
+    "./App": "./src/remote.tsx",
+    "./Routes": "./src/mfjs.routes.ts"
   },
   "shared": {
     "react": {

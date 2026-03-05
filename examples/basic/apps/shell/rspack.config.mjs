@@ -52,6 +52,10 @@ export default {
   entry: {
     main: ['./src/mf-shim.js', './src/main.tsx'],
   },
+  experiments: {
+    css: true,
+    lazyCompilation: false,
+  },
   // Expose selected env vars to the client via import.meta.env
   builtins: {
     define: {
@@ -69,6 +73,9 @@ export default {
     historyApiFallback: {
       disableDotRule: true,
       rewrites: [
+  // Rspack lazy compilation endpoints (avoid rewriting to index.html).
+  { from: /^\/lazy-compilation-using-/, to: (context) => context.parsedUrl.pathname },
+  { from: /lazy-compilation-proxy/, to: (context) => context.parsedUrl.pathname },
         // Don't rewrite module/asset requests to index.html.
         {
           from: /^\/(src|@fs)\//,
@@ -87,9 +94,6 @@ export default {
   output: {
     uniqueName: 'shell',
     publicPath: 'auto'
-  },
-  experiments: {
-    css: true
   },
   resolve: {
   extensions: ['.tsx', '.ts', '.js'],

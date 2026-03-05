@@ -83,6 +83,12 @@ Open:
 
 You should see the host render the remote.
 
+## Next: routing
+
+Generated hosts include a lightweight internal router (from `@mfjs/runtime`) that can mount remotes based on the current URL and supports cross-app navigation via `mfjs:navigate`.
+
+See: **Guides → Routing**.
+
 ## Troubleshooting
 
 ### Ports already in use

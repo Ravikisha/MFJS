@@ -28,6 +28,8 @@ if (process.env.MFJS_E2E !== '1') {
 
 const exampleDir = new URL('../examples/basic/', import.meta.url).pathname;
 
+const repoRoot = new URL('../', import.meta.url).pathname;
+
 const children = [];
 let exitCode = 0;
 
@@ -38,6 +40,9 @@ try {
 
   // Ensure federation configs exist.
   children.push(run('pnpm', ['-C', exampleDir, 'federation'], process.cwd()));
+
+  // Ensure routing manifests exist (host + remote routes module).
+  children.push(run('node', [new URL('../packages/cli/dist/index.js', import.meta.url).pathname, 'routes', '--dir', exampleDir], process.cwd()));
 } catch (e) {
   console.error(e);
 }
@@ -61,61 +66,103 @@ try {
   console.error('Failed to write mfjs.federation.proxy.json:', e);
 }
 
-const remote = run('pnpm', ['-C', `${exampleDir}apps/dashboard`, 'dev'], process.cwd());
+async function waitFor(urls) {
+  const waitOn = run(
+    'pnpm',
+    ['-w', 'exec', '--', 'wait-on', '-t', '60000', ...urls],
+    process.cwd()
+  );
+  children.push(waitOn);
 
-// Run the host with proxy-friendly federation so remotes can be fetched via same-origin paths.
-const host = run(
-  'pnpm',
-  ['-C', `${exampleDir}apps/shell`, 'dev'],
-  process.cwd(),
-  {
-    MFJS_FEDERATION_FILE: 'mfjs.federation.proxy.json'
-  }
-);
-children.push(remote, host);
-
-const waitOn = run(
-  'pnpm',
-  [
-    '-w',
-    'exec',
-    '--',
-    'wait-on',
-    '-t',
-    '60000',
-    'http://localhost:3000',
-    'http://localhost:3001/remoteEntry.js',
-    'http://localhost:3000/mfjs/remotes/dashboard/remoteEntry.js'
-  ],
-  process.cwd()
-);
-children.push(waitOn);
-
-console.log('\nWaiting for dev servers...');
-
-await new Promise((resolve) => {
-  waitOn.on('exit', (code) => {
-    exitCode = code ?? 1;
-    resolve();
-  });
-});
-
-if (exitCode !== 0) {
-  children.forEach(kill);
-  process.exit(exitCode);
+  await new Promise((resolve) =>
+    waitOn.on('exit', (code) => {
+      exitCode = code ?? 1;
+      resolve();
+    })
+  );
 }
 
-console.log('Dev servers are up. Running Playwright...');
+async function runPlaywright(grep) {
+  const args = ['-w', 'exec', '--', 'playwright', 'test'];
+  if (grep) args.push('--grep', grep);
+  const pw = run('pnpm', args, process.cwd(), { PW_TEST_HTML_REPORT_OPEN: 'never' });
+  children.push(pw);
+  await new Promise((resolve) =>
+    pw.on('exit', (code) => {
+      exitCode = code ?? 1;
+      resolve();
+    })
+  );
+}
 
-const pw = run('pnpm', ['-w', 'exec', '--', 'playwright', 'test'], process.cwd());
-children.push(pw);
+async function runScenario(name, opts) {
+  console.log(`\n=== Scenario: ${name} ===`);
 
-await new Promise((resolve) => {
-  pw.on('exit', (code) => {
-    exitCode = code ?? 1;
-    resolve();
-  });
-});
+  // Start processes based on scenario.
+  // - direct/proxy: start remote + host directly
+  // - on-demand: start only the orchestrator and let it spawn remotes
+  const startRemoteDirectly = opts.mode !== 'on-demand';
 
-children.forEach(kill);
-process.exit(exitCode);
+  if (startRemoteDirectly) {
+    const remote = run('pnpm', ['-C', `${exampleDir}apps/dashboard`, 'dev'], process.cwd());
+    children.push(remote);
+  }
+
+  const hostEnv = {};
+
+  if (opts.mode === 'proxy') {
+    hostEnv.MFJS_FEDERATION_FILE = 'mfjs.federation.proxy.json';
+  }
+
+  if (opts.mode === 'on-demand') {
+    // Use the CLI orchestrator so it can start remotes lazily.
+    // We also use proxy-remotes so the host requests go through the starter hook.
+    const orchestrator = run(
+      'node',
+      [
+        new URL('../packages/cli/dist/index.js', import.meta.url).pathname,
+        'dev',
+        '--dir',
+        exampleDir,
+        '--proxy-remotes',
+        '--on-demand'
+      ],
+      repoRoot,
+      hostEnv
+    );
+    children.push(orchestrator);
+  } else {
+    const host = run('pnpm', ['-C', `${exampleDir}apps/shell`, 'dev'], process.cwd(), hostEnv);
+    children.push(host);
+  }
+
+  const urls = ['http://localhost:3000'];
+  if (opts.mode !== 'on-demand') {
+    // Remote entry is expected to be reachable.
+    urls.push('http://localhost:3001/remoteEntry.js');
+  }
+  if (opts.mode !== 'direct') urls.push('http://localhost:3000/mfjs/remotes/dashboard/remoteEntry.js');
+
+  console.log('Waiting for dev servers...');
+  await waitFor(urls);
+  if (exitCode !== 0) throw new Error('wait-on failed');
+
+  console.log('Dev servers are up. Running Playwright...');
+  await runPlaywright(opts.grep);
+  if (exitCode !== 0) throw new Error('playwright failed');
+
+  // Clean up between scenarios.
+  children.splice(0).forEach(kill);
+}
+
+try {
+  await runScenario('direct', { mode: 'direct', grep: '@direct' });
+  await runScenario('proxy-remotes', { mode: 'proxy', grep: '@proxy' });
+  await runScenario('on-demand', { mode: 'on-demand', grep: '@ondemand' });
+
+  process.exit(0);
+} catch (e) {
+  console.error(e);
+  children.forEach(kill);
+  process.exit(exitCode || 1);
+}

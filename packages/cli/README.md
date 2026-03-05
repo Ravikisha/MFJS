@@ -37,6 +37,14 @@ Starts a small reload server. When a remote recompiles, the CLI broadcasts a rel
 
 Generated host templates include a demo that calls `connectMfjsDevReload()` (from `@mfjs/runtime`) when `MFJS_DEV_RELOAD_URL` is present.
 
+## Routing in generated templates
+
+Generated hosts include a small, framework-provided router (from `@mfjs/runtime`):
+
+- `createRouter()` to track the current URL
+- `resolveRoute()` to pick which remote to mount based on the pathname
+- `dispatchMfjsNavigate()` to support cross-app navigation via `window.dispatchEvent(new CustomEvent('mfjs:navigate', ...))`
+
 ## Status
 
 Module Federation is wired through **Rspack ModuleFederationPlugin** using `mfjs.federation.json`, and the host demo loads remotes dynamically using `@mfjs/runtime`.

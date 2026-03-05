@@ -26,11 +26,22 @@ const sharedWithReactEager = federation?.shared
 export default {
   mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
   entry: './src/main.tsx',
+  experiments: {
+    css: true,
+    // Lazy compilation proxies have been causing runtime HMR crashes in this repo's setup
+    // ("currentUpdate is undefined" in *lazy-compilation-proxy* hot-update modules).
+    // Disable it so routes/pages can be code-split normally without proxy endpoints.
+    lazyCompilation: false,
+  },
   devServer: {
     port: 3001,
   historyApiFallback: {
     disableDotRule: true,
     rewrites: [
+  // Rspack lazy compilation endpoints (avoid rewriting to index.html).
+  // When rewritten, Firefox may show "XML Parsing Error" and HMR can crash.
+  { from: /^\/lazy-compilation-using-/, to: (context) => context.parsedUrl.pathname },
+  { from: /lazy-compilation-proxy/, to: (context) => context.parsedUrl.pathname },
       // Don't rewrite module/asset requests to index.html.
       {
         from: /^\/(src|@fs)\//,
@@ -48,9 +59,6 @@ export default {
   output: {
     uniqueName: 'dashboard',
     publicPath: 'auto'
-  },
-  experiments: {
-    css: true
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js']
