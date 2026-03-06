@@ -6,16 +6,17 @@ import starlight from '@astrojs/starlight';
 export default defineConfig({
 	integrations: [
 		starlight({
-			title: 'My Docs',
+			title: 'MFJS',
 			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/withastro/starlight' }],
 			sidebar: [
 				{
 					label: 'Guides',
 					items: [
-						// Each item here is one entry in the navigation menu.
 						{ label: 'Getting started', slug: 'guides/getting-started' },
+						{ label: 'Routing', slug: 'guides/routing' },
+						{ label: 'EventBus & Shared State', slug: 'guides/event-bus' },
 						{ label: 'CLI', slug: 'guides/cli' },
-						{ label: 'Example Guide', slug: 'guides/example' },
+						{ label: 'Example', slug: 'guides/example' },
 					],
 				},
 				{

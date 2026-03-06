@@ -141,11 +141,11 @@ export default {
       'import.meta.env.MFJS_ON_DEMAND_STARTER_URL': JSON.stringify(process.env.MFJS_ON_DEMAND_STARTER_URL || ''),
     },
   },
+  lazyCompilation: false,
   experiments: {
     css: true,
     // Lazy compilation proxy endpoints cause hot-update crashes inside Module Federation
     // containers ("currentUpdate is undefined"). Always disable.
-    lazyCompilation: false,
   },
   devServer: {
     port: ${port},

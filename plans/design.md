@@ -118,7 +118,7 @@ libs/
 * [x] `mfjs generate host` — assert `apps/shell/` created with `index.html`, `rspack.config.mjs`, `src/main.tsx`, `mfjs.app.json`
 * [x] `mfjs generate remote` — assert `apps/dashboard/` created with correct `remoteEntry` expose in `mfjs.federation.json`
 * [x] `mfjs dev` — assert spawns one process per app and exits cleanly on `SIGINT`
-* [ ] `mfjs build` — assert both apps produce `dist/index.html` and `dist/main.js`
+* [x] `mfjs build` — assert both apps produce `dist/index.html` and `dist/main.js`
 
 ---
 
@@ -235,7 +235,7 @@ Stretch:
 
 Optional:
 
-* [ ] Shared Redux store template
+* [x] Shared Redux store template
 
 ### Tests needed
 
@@ -243,8 +243,8 @@ Optional:
 * [x] `EventBus.on` — assert returned unsubscribe fn removes the handler
 * [x] `EventBus.emit` — assert no error when no handlers registered
 * [x] `EventBus` — assert two separate instances do NOT share events (proves singleton must be configured correctly in MF)
-* [ ] `EventBus` — assert TypeScript prevents emitting unknown event keys (compile-time test via `tsc --noEmit`)
-* [ ] Cross-MFE EventBus — e2e: shell emits event, remote handler receives it via shared singleton
+* [x] `EventBus` — assert TypeScript prevents emitting unknown event keys (compile-time test via `tsc --noEmit`)
+* [x] Cross-MFE EventBus — e2e: shell emits event, remote handler receives it via shared singleton
 
 ---
 
@@ -258,10 +258,10 @@ Optional:
 
 ### Tests needed
 
-* [ ] `mfjs build` — assert `dist/remoteEntry.js` exists in remote output
-* [ ] `mfjs build` — assert `dist/index.html` references correct `main.[hash].js`
-* [ ] `mfjs build` — assert shell `dist/` does NOT bundle React separately (singleton sharing works in production build)
-* [ ] `mfjs build` — assert remote `dist/remoteEntry.js` exposes `./App` container
+* [x] `mfjs build` — assert `dist/remoteEntry.js` exists in remote output
+* [x] `mfjs build` — assert `dist/index.html` references correct `main.[hash].js`
+* [x] `mfjs build` — assert shell `dist/` does NOT bundle React separately (singleton sharing works in production build)
+* [x] `mfjs build` — assert remote `dist/remoteEntry.js` exposes `./App` container
 
 ---
 
@@ -553,7 +553,7 @@ This section tracks the full test spec for every implemented feature. Tests mark
 | [x] | `on` — returned cleanup function removes the handler |
 | [x] | `emit` — no error thrown when no handlers registered for event |
 | [x] | two separate `EventBus` instances do NOT share events |
-| [ ] | TypeScript: emitting an unknown event key fails at compile time (`tsc --noEmit`) |
+| [x] | TypeScript: emitting an unknown event key fails at compile time (`tsc --noEmit`) |
 
 ---
 
@@ -586,6 +586,6 @@ This section tracks the full test spec for every implemented feature. Tests mark
 | [x] | routing — deep-link `/dashboard/settings` loads correct page directly |
 | [x] | routing — deep-link `/dashboard/users/7` loads correct page directly |
 | [ ] | on-demand compilation — remote is not built until shell first requests it |
-| [ ] | proxy remoteEntry — shell fetches `remoteEntry.js` via dev-server proxy path |
+| [x] | proxy remoteEntry — shell fetches `remoteEntry.js` via dev-server proxy path |
 | [ ] | hot reload — editing `remote.tsx` triggers HMR and shell reflects change without page reload |
 | [ ] | production build — shell served statically loads remote from `dist/remoteEntry.js` |

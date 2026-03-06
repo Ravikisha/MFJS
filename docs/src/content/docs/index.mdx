@@ -14,6 +14,9 @@ hero:
     - text: Routing guide
       link: /guides/routing/
       icon: right-arrow
+    - text: EventBus & State
+      link: /guides/event-bus/
+      icon: right-arrow
     - text: CLI Reference
       link: /guides/cli/
       icon: right-arrow
@@ -30,6 +33,10 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 
 	<Card title="Routing" icon="open-book" href="/guides/routing/">
 		Two-tier routing with `NavLink`, `RemoteOutlet`, `RemoteApp`, and file-based page generation.
+	</Card>
+
+	<Card title="EventBus & Shared State" icon="puzzle" href="/guides/event-bus/">
+		Cross-MFE communication with typed events and a Redux-style shared store — zero coupling.
 	</Card>
 
 	<Card title="CLI" icon="terminal" href="/guides/cli/">

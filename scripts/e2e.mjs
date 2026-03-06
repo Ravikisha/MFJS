@@ -37,6 +37,9 @@ try {
   // Ensure local workspace packages are built so app dev servers don't pick up stale dist/.
   children.push(run('pnpm', ['-C', new URL('../packages/cli/', import.meta.url).pathname, 'build'], process.cwd()));
   children.push(run('pnpm', ['-C', new URL('../libs/runtime/', import.meta.url).pathname, 'build'], process.cwd()));
+  children.push(run('pnpm', ['-C', new URL('../libs/event-bus/', import.meta.url).pathname, 'build'], process.cwd()));
+  children.push(run('pnpm', ['-C', new URL('../libs/events/', import.meta.url).pathname, 'build'], process.cwd()));
+  children.push(run('pnpm', ['-C', new URL('../libs/state/', import.meta.url).pathname, 'build'], process.cwd()));
 
   // Ensure federation configs exist.
   children.push(run('pnpm', ['-C', exampleDir, 'federation'], process.cwd()));
@@ -159,6 +162,13 @@ try {
   await runScenario('direct', { mode: 'direct', grep: '@direct' });
   await runScenario('proxy-remotes', { mode: 'proxy', grep: '@proxy' });
   await runScenario('on-demand', { mode: 'on-demand', grep: '@ondemand' });
+
+  // Run build output tests (no dev server needed — reads dist/ directly).
+  console.log('\n=== Scenario: build-output ===');
+  console.log('Running production builds...');
+  run('pnpm', ['-C', `${exampleDir}apps/dashboard`, 'build'], process.cwd(), { NODE_ENV: 'production' });
+  run('pnpm', ['-C', `${exampleDir}apps/shell`, 'build'], process.cwd(), { NODE_ENV: 'production' });
+  await runPlaywright('@build');
 
   process.exit(0);
 } catch (e) {

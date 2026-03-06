@@ -397,3 +397,84 @@ if (process.env.MFJS_DEV_RELOAD_URL) {
   connectMfjsDevReload(process.env.MFJS_DEV_RELOAD_URL);
 }
 ```
+
+---
+
+## `@mfjs/event-bus` API Reference
+
+Full reference for the `@mfjs/event-bus` package.
+
+### Types
+
+```ts
+type EventMap    = Record<string, unknown>;
+type Handler<T>  = (payload: T) => void;
+type Unsubscribe = () => void;
+```
+
+### `EventBus<Events extends EventMap>`
+
+A typed publish/subscribe event bus. Instantiate directly or retrieve the singleton via `getEventBus()`.
+
+| Method | Signature | Description |
+|---|---|---|
+| `on` | `(event, handler) → Unsubscribe` | Subscribe; returns unsubscribe fn |
+| `once` | `(event, handler) → Unsubscribe` | Subscribe for exactly one invocation |
+| `off` | `(event, handler) → void` | Remove a specific handler reference |
+| `emit` | `(event, payload) → void` | Publish; all handlers called synchronously |
+| `clear` | `(event?) → void` | Remove all handlers for one event, or all events |
+| `listenerCount` | `(event) → number` | Count of active handlers for an event |
+
+### `getEventBus<Events>() → EventBus<Events>`
+
+Returns the process-level singleton `EventBus`.  
+Share `@mfjs/event-bus` as `singleton: true` in Module Federation so every MFE gets the same instance.
+
+### `_resetEventBus() → void`
+
+Destroys the singleton and resets it. **Testing only.**
+
+---
+
+## `@mfjs/state` API Reference
+
+Full reference for the `@mfjs/state` package.
+
+### Types
+
+```ts
+type StoreListener<T> = (value: T) => void;
+type Unsubscribe      = () => void;
+type Reducer<S, A>    = (state: S, action: A) => S;
+```
+
+### `SimpleStore<T>`
+
+A value-box with subscriber notifications.
+
+| Member | Signature | Description |
+|---|---|---|
+| `get` | `() → T` | Return current value |
+| `set` | `(next: T) → void` | Update value; notifies if value changed |
+| `subscribe` | `(listener) → Unsubscribe` | Register a listener |
+| `listenerCount` | `number` (getter) | Number of active listeners |
+
+### `createStore<S, A>(initialState, reducer) → Store<S, A>`
+
+Create a Redux-style store.
+
+| Member | Signature | Description |
+|---|---|---|
+| `getState` | `() → S` | Current state snapshot |
+| `dispatch` | `(action: A) → void` | Run reducer; notify if state changed |
+| `subscribe` | `(listener) → Unsubscribe` | Register a listener |
+| `replaceReducer` | `(fn: Reducer<S,A>) → void` | Swap reducer at runtime |
+| `listenerCount` | `number` (getter) | Number of active listeners |
+
+### `getStore<S, A>(key, initialState, reducer) → Store<S, A>`
+
+Get or create a named singleton store.  On the first call the store is created; subsequent calls return the same instance — including from other MFEs sharing `@mfjs/state` as a singleton.
+
+### `_resetStore(key?) → void`
+
+Remove one named store (or all stores) from the registry. **Testing only.**
