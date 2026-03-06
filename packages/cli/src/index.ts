@@ -6,6 +6,7 @@ import { generateCommand } from './commands/generate.js';
 import { devCommand } from './commands/dev.js';
 import { buildCommand } from './commands/build.js';
 import { federationCommand } from './commands/federation.js';
+import { routesCommand } from './commands/routes.js';
 
 const program = new Command();
 
@@ -19,6 +20,7 @@ program.addCommand(generateCommand);
 program.addCommand(devCommand);
 program.addCommand(buildCommand);
 program.addCommand(federationCommand);
+program.addCommand(routesCommand);
 
 program.showHelpAfterError();
 

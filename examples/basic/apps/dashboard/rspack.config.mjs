@@ -12,26 +12,18 @@ const sharedWithReactEager = federation?.shared
     ...federation.shared,
     react: {
       ...(federation.shared.react || {}),
-      eager: true,
       singleton: true,
-      strictVersion: true,
-      requiredVersion: '^18.3.1',
     },
     'react-dom': {
       ...(federation.shared['react-dom'] || {}),
-      eager: true,
       singleton: true,
-      strictVersion: true,
-      requiredVersion: '^18.3.1',
     },
     '@mfjs/event-bus': {
       ...(federation.shared['@mfjs/event-bus'] || {}),
-      eager: true,
       singleton: true,
     },
     '@mfjs/runtime': {
       ...(federation.shared['@mfjs/runtime'] || {}),
-      eager: true,
       singleton: true,
     },
   }
@@ -42,14 +34,17 @@ export default {
   entry: {
     main: ['./src/mf-shim.js', './src/main.tsx'],
   },
+  // Top-level lazyCompilation:false is required in Rspack ≥1.7 (experiments.lazyCompilation is deprecated).
+  // Lazy compilation proxies crash HMR with remoteEntry and break eager shared modules.
+  lazyCompilation: false,
   experiments: {
     css: true,
-    // Lazy compilation proxies crash hot-update modules when remoteEntry is used.
-    // Keep it off for all entry points and async chunks inside this remote.
-    lazyCompilation: false,
   },
   devServer: {
     port: 3001,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+    },
   historyApiFallback: {
     disableDotRule: true,
     rewrites: [
@@ -76,7 +71,10 @@ export default {
     publicPath: 'auto'
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js']
+    extensions: ['.tsx', '.ts', '.js'],
+    extensionAlias: {
+      '.js': ['.tsx', '.ts', '.js'],
+    },
   },
   module: {
     rules: [

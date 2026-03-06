@@ -66,9 +66,11 @@ export default {
   entry: {
     main: ['./src/mf-shim.js', './src/main.tsx'],
   },
+  // Top-level lazyCompilation:false is required in Rspack ≥1.7 (experiments.lazyCompilation is deprecated).
+  // Lazy compilation proxies break eager shared modules (react factory is undefined).
+  lazyCompilation: false,
   experiments: {
     css: true,
-    lazyCompilation: false,
   },
   // Expose selected env vars to the client via import.meta.env
   builtins: {

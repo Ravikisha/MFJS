@@ -3,6 +3,9 @@
 import type { RemotePageRoute } from '@mfjs/runtime';
 
 export const pages: RemotePageRoute[] = [
+  { path: "/users/:id", load: () => import("./pages/users/[id].tsx") },
+  { path: "/settings", load: () => import("./pages/settings.tsx") },
+  { path: "/", load: () => import("./pages/index.tsx") },
 ];
 
 export default pages;

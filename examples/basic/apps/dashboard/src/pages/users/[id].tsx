@@ -1,11 +1,16 @@
 import React from 'react';
 import { dispatchMfjsNavigate } from '@mfjs/runtime';
 
-export default function SettingsPage() {
+type Props = { params?: Record<string, string> };
+
+export default function UserProfilePage({ params = {} }: Props) {
+  const id = params['id'] ?? 'unknown';
   return (
-    <div data-testid="page-settings" style={{ padding: 16 }}>
-      <h2 style={{ marginTop: 0, color: '#4f46e5' }}>⚙️ Settings</h2>
-      <p>Manage your application settings here.</p>
+    <div data-testid="page-user" style={{ padding: 16 }}>
+      <h2 style={{ marginTop: 0, color: '#4f46e5' }}>👤 User Profile</h2>
+      <p>
+        Viewing user: <strong data-testid="user-id">{id}</strong>
+      </p>
       <button
         data-testid="back-home"
         onClick={() => dispatchMfjsNavigate({ to: '/' })}

@@ -1,5 +1,18 @@
 {
   "app": "dashboard",
   "basePath": "/dashboard",
-  "routes": []
+  "routes": [
+    {
+      "path": "/",
+      "file": "src/pages/index.tsx"
+    },
+    {
+      "path": "/settings",
+      "file": "src/pages/settings.tsx"
+    },
+    {
+      "path": "/users/:id",
+      "file": "src/pages/users/[id].tsx"
+    }
+  ]
 }
