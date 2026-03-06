@@ -35,6 +35,11 @@ const sharedWithReactEager = federation?.shared
       eager: true,
       singleton: true,
     },
+    '@mfjs/state': {
+      ...(federation.shared['@mfjs/state'] || {}),
+      eager: true,
+      singleton: true,
+    },
   }
   : undefined;
 
@@ -61,8 +66,10 @@ const proxy = baseFederation?.remotes
     })
   : [];
 
+const isProd = process.env.NODE_ENV === 'production';
+
 export default {
-  mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+  mode: isProd ? 'production' : 'development',
   entry: {
     main: ['./src/mf-shim.js', './src/main.tsx'],
   },
@@ -109,7 +116,10 @@ export default {
   },
   output: {
     uniqueName: 'shell',
-    publicPath: 'auto'
+    publicPath: 'auto',
+    // Content hashes in production for cache-busting.
+    filename: isProd ? '[name].[contenthash:8].js' : '[name].js',
+    chunkFilename: isProd ? '[id].[contenthash:8].js' : '[id].js',
   },
   resolve: {
   extensions: ['.tsx', '.ts', '.js'],

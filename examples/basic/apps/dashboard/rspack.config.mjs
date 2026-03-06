@@ -26,11 +26,17 @@ const sharedWithReactEager = federation?.shared
       ...(federation.shared['@mfjs/runtime'] || {}),
       singleton: true,
     },
+    '@mfjs/state': {
+      ...(federation.shared['@mfjs/state'] || {}),
+      singleton: true,
+    },
   }
   : undefined;
 
+const isProd = process.env.NODE_ENV === 'production';
+
 export default {
-  mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+  mode: isProd ? 'production' : 'development',
   entry: {
     main: ['./src/mf-shim.js', './src/main.tsx'],
   },
@@ -68,7 +74,10 @@ export default {
   },
   output: {
     uniqueName: 'dashboard',
-    publicPath: 'auto'
+    publicPath: 'auto',
+    // Use content hashes in production so browsers can cache aggressively.
+    filename: isProd ? '[name].[contenthash:8].js' : '[name].js',
+    chunkFilename: isProd ? '[id].[contenthash:8].js' : '[id].js',
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],

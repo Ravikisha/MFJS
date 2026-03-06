@@ -20,6 +20,10 @@
     "@mfjs/runtime": {
       "singleton": true,
       "requiredVersion": false
+    },
+    "@mfjs/state": {
+      "singleton": true,
+      "requiredVersion": false
     }
   }
 }

@@ -1,6 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import { NavLink, RemoteOutlet, usePathname, getRouter, type RouteTarget } from '@mfjs/runtime';
+import { getEventBus } from '@mfjs/event-bus';
+import { getSimpleStore } from '@mfjs/state';
+import type { MfAppEvents } from '@mfjs/events';
+
+// ── Replay store: shell:ready ─────────────────────────────────────────────────
+// The shell writes its ready timestamp here. Remotes that mount after the event
+// was emitted read the current value from the store (no missed-event problem).
+// Key is shared with dashboard/src/pages/index.tsx via the @mfjs/state singleton.
+const SHELL_READY_KEY = 'shell:ready:ts';
 
 // ── Route table ───────────────────────────────────────────────────────────────
 
@@ -10,21 +19,26 @@ const HOST_ROUTES: RouteTarget[] = [
 ];
 
 // ── Remote importers ──────────────────────────────────────────────────────────
-// Each key matches a `remote` name in HOST_ROUTES.
-// Uses Rspack's native federation import so the host's React singleton is shared.
-
 const REMOTES = {
   dashboard: () => import('dashboard/App'),
 };
 
-// ── Initialise the router at module level (outside React) ─────────────────────
-// This prevents React StrictMode's double-effect from removing window listeners.
+// ── Initialise at module level ────────────────────────────────────────────────
 getRouter();
 
 // ── App ───────────────────────────────────────────────────────────────────────
 
 function App() {
   const pathname = usePathname();
+
+  // Emit shell:ready once when the host mounts.
+  // Also write the timestamp to the replay store so late-joining remotes
+  // can read it directly without waiting for the next emission.
+  useEffect(() => {
+    const ts = Date.now();
+    getSimpleStore<number | null>(SHELL_READY_KEY, null).set(ts);
+    getEventBus<MfAppEvents>().emit('shell:ready', { timestamp: ts });
+  }, []);
 
   return (
     <div style={{ fontFamily: 'system-ui, sans-serif', minHeight: '100vh' }}>
