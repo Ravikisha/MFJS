@@ -1,5 +1,6 @@
 import { describe, expect, it, vi, afterEach } from 'vitest';
 import { MFJS_NAVIGATE_EVENT, createRouter, dispatchMfjsNavigate } from '../src/router.js';
+import { loadRemoteModule } from '../src/remote-loader.js';
 
 afterEach(() => {
   // Reset location so each test starts clean.
@@ -225,6 +226,141 @@ describe('router (legacy combined)', () => {
     // Should be accepted
     router.navigate({ to: '/dashboard/reports' });
     expect(cb).toHaveBeenLastCalledWith('/dashboard/reports');
+
+    router.destroy();
+  });
+});
+
+// ── Shell: mfjs:navigate → loadRemoteModule ───────────────────────────────────
+//
+// Simulates the shell pattern where a router subscriber resolves which remote
+// to load based on the new path and calls loadRemoteModule.
+
+vi.mock('../src/remote-loader.js', () => ({
+  loadRemoteModule: vi.fn(),
+}));
+
+type RouteConfig = {
+  pattern: string;
+  remote: { name: string; entryUrl: string };
+  exposedModule: string;
+};
+
+/**
+ * Minimal shell-side route resolver: given a list of route configs and a
+ * pathname, returns the first config whose pattern is a prefix match.
+ */
+function resolveRemoteForPath(
+  routes: RouteConfig[],
+  pathname: string
+): RouteConfig | undefined {
+  return routes.find((r) => pathname === r.pattern || pathname.startsWith(r.pattern + '/'));
+}
+
+describe('shell mfjs:navigate → loadRemoteModule', () => {
+  afterEach(() => {
+    vi.mocked(loadRemoteModule).mockClear();
+    window.history.replaceState(null, '', '/');
+  });
+
+  it('dispatching mfjs:navigate to /dashboard causes the shell router to load the dashboard remote module', async () => {
+    window.history.replaceState(null, '', '/');
+
+    const routes: RouteConfig[] = [
+      {
+        pattern: '/dashboard',
+        remote: { name: 'dashboard', entryUrl: 'http://localhost:3001/remoteEntry.js' },
+        exposedModule: './App',
+      },
+    ];
+
+    // Stub loadRemoteModule to return a fake module.
+    const fakeModule = { default: () => null };
+    vi.mocked(loadRemoteModule).mockResolvedValue(fakeModule);
+
+    const loadedModules: unknown[] = [];
+
+    // Shell-side: subscribe to router, call loadRemoteModule when path matches a remote.
+    // Guard against duplicate calls for the same path (queueMicrotask re-emit after navigation).
+    let lastLoaded = '';
+    const router = createRouter();
+    router.subscribe(async (path) => {
+      if (path === lastLoaded) return;
+      const match = resolveRemoteForPath(routes, path);
+      if (match) {
+        lastLoaded = path;
+        const mod = await loadRemoteModule(match.remote, match.exposedModule);
+        loadedModules.push(mod);
+      }
+    });
+
+    // A remote fires cross-app navigation to /dashboard.
+    dispatchMfjsNavigate({ to: '/dashboard' });
+
+    // Allow the async subscriber to complete.
+    await vi.waitFor(() => expect(loadedModules).toHaveLength(1));
+
+    expect(loadRemoteModule).toHaveBeenCalledWith(
+      { name: 'dashboard', entryUrl: 'http://localhost:3001/remoteEntry.js' },
+      './App'
+    );
+    expect(loadedModules[0]).toBe(fakeModule);
+
+    router.destroy();
+  });
+
+  it('navigating to a path with no matching remote does NOT call loadRemoteModule', () => {
+    window.history.replaceState(null, '', '/');
+
+    const routes: RouteConfig[] = [
+      {
+        pattern: '/dashboard',
+        remote: { name: 'dashboard', entryUrl: 'http://localhost:3001/remoteEntry.js' },
+        exposedModule: './App',
+      },
+    ];
+
+    const router = createRouter();
+    router.subscribe((path) => {
+      const match = resolveRemoteForPath(routes, path);
+      if (match) loadRemoteModule(match.remote, match.exposedModule);
+    });
+
+    // Navigate to a path that has no configured remote.
+    router.navigate({ to: '/about' });
+
+    expect(loadRemoteModule).not.toHaveBeenCalled();
+
+    router.destroy();
+  });
+
+  it('navigating to /dashboard/settings (sub-path) also loads the dashboard remote', async () => {
+    window.history.replaceState(null, '', '/');
+
+    const routes: RouteConfig[] = [
+      {
+        pattern: '/dashboard',
+        remote: { name: 'dashboard', entryUrl: 'http://localhost:3001/remoteEntry.js' },
+        exposedModule: './App',
+      },
+    ];
+
+    vi.mocked(loadRemoteModule).mockResolvedValue({ default: () => null });
+
+    const router = createRouter();
+    router.subscribe((path) => {
+      const match = resolveRemoteForPath(routes, path);
+      if (match) loadRemoteModule(match.remote, match.exposedModule);
+    });
+
+    router.navigate({ to: '/dashboard/settings' });
+
+    await vi.waitFor(() =>
+      expect(loadRemoteModule).toHaveBeenCalledWith(
+        { name: 'dashboard', entryUrl: 'http://localhost:3001/remoteEntry.js' },
+        './App'
+      )
+    );
 
     router.destroy();
   });

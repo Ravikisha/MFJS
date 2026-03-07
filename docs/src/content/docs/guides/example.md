@@ -63,10 +63,12 @@ The shell is a small React app. Its three responsibilities are:
 3. **Mount the matching remote** using `RemoteOutlet`.
 
 ```tsx
-import React from 'react';
+import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
-import { NavLink, RemoteOutlet, usePathname, getRouter } from '@mfjs/runtime';
-import type { RouteTarget } from '@mfjs/runtime';
+import { NavLink, RemoteOutlet, usePathname, getRouter, type RouteTarget } from '@mfjs/runtime';
+import { getEventBus } from '@mfjs/event-bus';
+import { getSimpleStore } from '@mfjs/state';
+import type { MfAppEvents } from '@mfjs/events';
 
 const HOST_ROUTES: RouteTarget[] = [
   { path: '/dashboard/*', remote: 'dashboard', module: './App' },
@@ -77,11 +79,20 @@ const REMOTES = {
   dashboard: () => import('dashboard/App'),
 };
 
+const SHELL_READY_KEY = 'shell:ready:ts';
+
 // Call at module level so the singleton survives StrictMode double-invocation
 getRouter();
 
 function App() {
   const pathname = usePathname();
+
+  useEffect(() => {
+    const ts = Date.now();
+    getSimpleStore<number | null>(SHELL_READY_KEY, null).set(ts);
+    getEventBus<MfAppEvents>().emit('shell:ready', { timestamp: ts });
+  }, []);
+
   return (
     <div>
       <header data-testid="shell-header">
@@ -178,18 +189,45 @@ export const pages: RemotePageRoute[] = [
 
 ### `pages/index.tsx`
 
-Renders with `data-testid="page-home"`. Includes buttons that navigate to settings and to a user page:
+Renders with `data-testid="page-home"`. Uses the **replay store** pattern to detect `shell:ready` regardless of mounting order, emits a `dashboard:action` event, and includes navigation buttons:
 
 ```tsx
+import React, { useState, useEffect } from 'react';
 import { dispatchMfjsNavigate } from '@mfjs/runtime';
+import { getEventBus } from '@mfjs/event-bus';
+import { getSimpleStore } from '@mfjs/state';
+import type { MfAppEvents } from '@mfjs/events';
+
+const SHELL_READY_KEY = 'shell:ready:ts';
 
 export default function HomePage() {
+  const [shellReady, setShellReady] = useState(() =>
+    getSimpleStore<number | null>(SHELL_READY_KEY, null).get() !== null
+  );
+
+  useEffect(() => {
+    if (getSimpleStore<number | null>(SHELL_READY_KEY, null).get() !== null) {
+      setShellReady(true);
+      return;
+    }
+    const unsub = getEventBus<MfAppEvents>().on('shell:ready', () => setShellReady(true));
+    return unsub;
+  }, []);
+
+  function handleGoToSettings() {
+    getEventBus<MfAppEvents>().emit('dashboard:action', { action: 'navigate', payload: '/dashboard/settings' });
+    dispatchMfjsNavigate({ to: '/dashboard/settings' });
+  }
+
   return (
     <div data-testid="page-home">
       <h1>Home</h1>
+      {shellReady && (
+        <p data-testid="event-bus-received">✅ shell:ready received via EventBus</p>
+      )}
       <button
         data-testid="nav-to-settings"
-        onClick={() => dispatchMfjsNavigate({ to: '/dashboard/settings' })}
+        onClick={handleGoToSettings}
       >
         Go to Settings
       </button>
@@ -197,7 +235,7 @@ export default function HomePage() {
         data-testid="nav-to-user"
         onClick={() => dispatchMfjsNavigate({ to: '/dashboard/users/42' })}
       >
-        Go to User 42
+        View User 42
       </button>
     </div>
   );

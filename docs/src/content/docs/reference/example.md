@@ -19,6 +19,17 @@ function getRouter(opts?: RouterOptions): Router
 
 **Call at module level** in your host `bootstrap.tsx`, before `ReactDOM.createRoot`. This ensures the router singleton (and its `popstate` listener) is created once and survives React StrictMode's double-invocation of effects.
 
+#### `RouterOptions`
+
+```ts
+interface RouterOptions {
+  /** Restrict the router to a URL prefix. Events only fire when the current path starts with basePath. */
+  basePath?: string;
+  /** Whether to listen for mfjs:navigate cross-app events. Defaults to true. */
+  listenToNavigateEvents?: boolean;
+}
+```
+
 ```ts
 import { getRouter } from '@mfjs/runtime';
 
@@ -50,7 +61,9 @@ import { useRouter } from '@mfjs/runtime';
 
 function GoHomeButton() {
   const router = useRouter();
-  return <button onClick={() => router.navigate('/')}>Home</button>;
+  return (
+    <button onClick={() => router.navigate({ to: '/' })}>Home</button>
+  );
 }
 ```
 
@@ -58,7 +71,7 @@ function GoHomeButton() {
 
 ### `usePathname()`
 
-Hook that subscribes to the router and returns the current pathname string. Re-renders the component on every navigation.
+Hook that subscribes to the router and returns the current **pathname** string (without search or hash). Re-renders the component on every navigation.
 
 ```ts
 function usePathname(): string
@@ -89,17 +102,27 @@ import { NavLink } from '@mfjs/runtime';
 
 | Prop | Type | Required | Default | Description |
 |---|---|---|---|---|
-| `to` | `string` | ✅ | — | Target pathname. |
+| `to` | `string` | ✅ | — | Target pathname. Trailing `/*` is stripped before matching. |
 | `label` | `string` | — | — | Link text. Takes precedence over `children`. |
 | `children` | `ReactNode` | — | — | Custom link content (used when `label` is omitted). |
-| `currentPath` | `string` | — | `window.location.pathname` | Override the "active" comparison path. |
+| `currentPath` | `string` | — | `usePathname()` | Override the "active" comparison path. |
 | `className` | `string` | — | — | CSS class always applied to the `<a>`. |
 | `style` | `CSSProperties` | — | — | Inline style always applied to the `<a>`. |
-| `activeStyle` | `CSSProperties` | — | — | Additional inline style applied when `to === currentPath`. |
+| `activeStyle` | `CSSProperties` | — | — | Additional inline style applied when the link is active. |
+
+#### Active state
+
+A link is considered **active** when the current pathname equals `to` (for root `/`) or **starts with** `to` (for all other paths). The `/*` suffix is stripped from `to` before the comparison, so `to="/dashboard/*"` becomes `to="/dashboard"`.
 
 #### Auto-generated `data-testid`
 
-Every `NavLink` receives a `data-testid` of `nav-{to}`. For example, `to="/dashboard/settings"` produces `data-testid="nav-/dashboard/settings"`.
+Every `NavLink` receives a `data-testid` derived from the path by replacing `/` with `-` and stripping leading/trailing dashes. The root `/` maps to `nav-home`.
+
+| `to` | `data-testid` |
+|---|---|
+| `/` | `nav-home` |
+| `/dashboard` | `nav-dashboard` |
+| `/dashboard/settings` | `nav-dashboard-settings` |
 
 #### Example — active link highlighting
 
@@ -139,8 +162,10 @@ const REMOTES = {
 |---|---|---|---|
 | `routes` | `RouteTarget[]` | ✅ | Ordered route table. First match wins. |
 | `remotes` | `Record<string, () => Promise<{ default: ComponentType<any> }>>` | ✅ | Map from remote name to native federation import function. |
-| `fallback` | `ReactNode` | — | Shown while the remote module is loading. Defaults to `null`. |
-| `noMatch` | `ReactNode` | — | Shown when no route matches. Defaults to `null`. |
+| `fallback` | `ReactNode` | — | Shown while the remote module is loading. Defaults to `<p data-testid="loading-remote">Loading remote…</p>`. |
+| `noMatch` | `ReactNode` | — | Shown when no route matches. Defaults to `<p>404 — No route matched.</p>`. |
+
+If the remote import rejects, `RemoteOutlet` renders a `<pre>` with the error message in crimson.
 
 #### `RouteTarget` type
 
@@ -152,8 +177,8 @@ interface RouteTarget {
   /** Key in the `remotes` map */
   remote: string;
 
-  /** Exposed module path, e.g. './App' */
-  module: string;
+  /** Exposed module path. Defaults to './App' when omitted. */
+  module?: string;
 }
 ```
 
@@ -185,10 +210,10 @@ export default function RemoteRoot({ subpath = '/' }: { subpath?: string }) {
 |---|---|---|---|
 | `subpath` | `string` | — | The path segment the remote owns. Defaults to `'/'`. |
 | `pages` | `RemotePageRoute[]` | ✅ | Ordered list of page routes. |
-| `fallback` | `ReactNode` | — | Shown while the page module is loading. Defaults to `null`. |
-| `noMatch` | `ReactNode` | — | Shown when no page matches. Defaults to `null`. |
+| `fallback` | `ReactNode` | — | Shown while the page module is loading. Defaults to `<p data-testid="loading-page">Loading page…</p>`. |
+| `noMatch` | `ReactNode` | — | Shown when `subpath` matches no page. Defaults to `<p>404 — No page found for subpath: …</p>`. |
 
-The rendered page is wrapped in `<div data-testid="remote-loaded">`. Page components receive `{ params }` as props, where `params` is a `Record<string, string>` of the matched URL parameters.
+The rendered page is always wrapped in `<div data-testid="remote-loaded">`. Page components receive `{ params }` as props, where `params` is a `Record<string, string>` of matched URL parameters.
 
 #### `RemotePageRoute` type
 
@@ -208,38 +233,42 @@ interface RemotePageRoute {
 
 ### `createRouter(opts?)`
 
-Creates a new `Router` instance. Subscribes to `popstate` events and the `mfjs:navigate` custom event on `window`.
+Creates a new `Router` instance. Subscribes to `popstate` events and (by default) the `mfjs:navigate` custom event on `window`.
 
 ```ts
 function createRouter(opts?: RouterOptions): Router
 ```
 
-Prefer `getRouter()` over `createRouter()` in application code. Use `createRouter()` only if you need multiple independent routers (e.g., in tests).
-
-#### `RouterOptions`
-
-```ts
-interface RouterOptions {
-  /** Override the initial pathname (useful for SSR / tests). Defaults to window.location.pathname. */
-  initialPath?: string;
-}
-```
+Prefer `getRouter()` over `createRouter()` in application code. Use `createRouter()` only if you need multiple independent router instances (e.g., in tests).
 
 #### `Router` interface
 
 ```ts
 interface Router {
-  /** Current pathname. */
-  readonly pathname: string;
+  /** Returns the full current path including search and hash. */
+  getPath(): string;
 
-  /** Navigate to a new path, pushing a new history entry. */
-  navigate(to: string): void;
+  /** Navigate imperatively, pushing or replacing a history entry. */
+  navigate(detail: NavigateDetail): void;
 
-  /** Subscribe to pathname changes. Returns an unsubscribe function. */
-  subscribe(listener: (pathname: string) => void): () => void;
+  /** Subscribe to path changes. Fires immediately with the current path, then on every navigation. */
+  subscribe(cb: (path: string) => void): () => void;
 
-  /** Remove all event listeners and subscriptions. */
+  /** Remove popstate and mfjs:navigate listeners and clear all subscribers. */
   destroy(): void;
+}
+```
+
+#### `NavigateDetail`
+
+```ts
+interface NavigateDetail {
+  /** Target path (pathname + optional search + hash). */
+  to: string;
+  /** 'push' (default) or 'replace'. */
+  mode?: 'push' | 'replace';
+  /** Optional history state passed to pushState/replaceState. */
+  state?: any;
 }
 ```
 
@@ -247,18 +276,10 @@ interface Router {
 
 ### `dispatchMfjsNavigate(detail)`
 
-Dispatches the `mfjs:navigate` custom event on `window`. Both the host and remote listen for this event, so it works across the Module Federation boundary.
+Dispatches the `mfjs:navigate` custom event on `window`. Any `Router` instance listening for navigation events will react to it.
 
 ```ts
 function dispatchMfjsNavigate(detail: NavigateDetail): void
-```
-
-#### `NavigateDetail`
-
-```ts
-interface NavigateDetail {
-  to: string;   // Target pathname
-}
 ```
 
 ```tsx
@@ -273,6 +294,18 @@ import { dispatchMfjsNavigate } from '@mfjs/runtime';
 
 ```ts
 const MFJS_NAVIGATE_EVENT = 'mfjs:navigate';
+```
+
+---
+
+### `attachMfjsNavigateListener()`
+
+Attaches a lightweight window-level `mfjs:navigate` handler that converts cross-app navigation events into `history.pushState` calls and mirrors them as `popstate` events. Returns an unsubscribe function.
+
+Use this in shells that manage their own `popstate` subscription instead of using `createRouter`.
+
+```ts
+function attachMfjsNavigateListener(): () => void
 ```
 
 ---
@@ -327,8 +360,8 @@ function resolveRoute(
 
 ```ts
 interface ResolvedRoute {
-  route: RouteTarget;
-  match: RouteMatch;
+  target: RouteTarget;
+  params: Record<string, string>;
 }
 ```
 
@@ -336,65 +369,84 @@ interface ResolvedRoute {
 import { resolveRoute } from '@mfjs/runtime';
 
 const result = resolveRoute(HOST_ROUTES, '/dashboard/settings');
-// result.route  → { path: '/dashboard/*', remote: 'dashboard', module: './App' }
-// result.match  → { params: { '*': 'settings' } }
+// result.target  → { path: '/dashboard/*', remote: 'dashboard', module: './App' }
+// result.params  → { '*': 'settings' }
 ```
+
+---
+
+### `resolveRemotePage(pages, subpath)`
+
+Given a remote's page list and a subpath, finds the first matching page and returns its loaded component and matched params.
+
+```ts
+async function resolveRemotePage(
+  pages: RemotePageRoute[],
+  subpath: string,
+): Promise<{ Component: ComponentType<any>; params: Record<string, string> } | null>
+```
+
+This is the async core used by `RemoteApp`. Call it directly when you need to resolve a remote page outside a React component.
 
 ---
 
 ## Remote loading
 
-### `loadRemoteModule(remote, exposedPath)`
+### `loadRemoteModule(remote, exposedModule)`
 
 Dynamically injects `remoteEntry.js`, initialises the Module Federation share scope, and returns the exposed module.
 
 ```ts
-async function loadRemoteModule(
+async function loadRemoteModule<TModule = any>(
   remote: { name: string; entryUrl: string },
-  exposedPath: string,
-): Promise<any>
+  exposedModule: string,
+): Promise<TModule>
 ```
 
-> **Note**: Prefer native federation imports (`import('dashboard/App')`) over `loadRemoteModule()` in new code. Native imports allow Rspack to bridge the React share scope automatically, preventing React from being loaded twice. `loadRemoteModule()` is provided for cases where the remote URL is not known at build time.
+> **Prefer native federation imports.** Use `() => import('dashboard/App')` (passed to `RemoteOutlet`) rather than `loadRemoteModule()` for new code. Native imports allow Rspack's `ModuleFederationPlugin` to bridge the shared React scope automatically, preventing the `Invalid hook call` error caused by loading React twice. Reserve `loadRemoteModule()` for runtime-dynamic cases where the remote URL is not known at build time.
 
 ---
 
-### `loadRemoteEntry(entryUrl)`
+### `loadRemoteEntry(remote)`
 
-Injects a `<script>` tag for a remote entry URL and waits for it to load.
-
-```ts
-async function loadRemoteEntry(entryUrl: string): Promise<void>
-```
-
----
-
-### `initRemoteContainer(name, shareScope?)`
-
-Calls `window[name].init(shareScope)` to initialise the remote container's share scope.
+Injects a `<script>` tag for a remote entry and waits for it to load. Deduplicates — calling twice for the same URL injects only one script.
 
 ```ts
-async function initRemoteContainer(
-  name: string,
-  shareScope?: Record<string, any>,
+async function loadRemoteEntry(
+  remote: { name: string; entryUrl: string },
 ): Promise<void>
+```
+
+---
+
+### `initRemoteContainer(remoteName)`
+
+Initialises the remote container's Module Federation share scope. Prefers `__federation_init_sharing__` (Rspack) and falls back to `__webpack_init_sharing__`. Returns the container object.
+
+```ts
+async function initRemoteContainer(remoteName: string): Promise<Container>
 ```
 
 ---
 
 ## Dev reload
 
-### `connectMfjsDevReload(url?)`
+### `connectMfjsDevReload(options?)`
 
-Connects to a dev-reload server (a small WebSocket or SSE endpoint) and reloads the page when a remote signals it has recompiled. Called automatically in generated hosts when the `MFJS_DEV_RELOAD_URL` environment variable is present.
+Connects to the MFJS dev-reload WebSocket server started by `mfjs dev --hmr-remotes`. When a remote signals a rebuild, the page reloads automatically.
 
 ```ts
-function connectMfjsDevReload(url?: string): void
+function connectMfjsDevReload(options?: {
+  /** WebSocket URL. Falls back to window.__MFJS_DEV_RELOAD_URL__. */
+  url?: string;
+  /** Custom reload handler. Defaults to location.reload(). */
+  onReload?: (reason?: string) => void;
+}): { stop(): void } | undefined
 ```
 
 ```ts
 if (process.env.MFJS_DEV_RELOAD_URL) {
-  connectMfjsDevReload(process.env.MFJS_DEV_RELOAD_URL);
+  connectMfjsDevReload({ url: process.env.MFJS_DEV_RELOAD_URL });
 }
 ```
 
@@ -473,8 +525,210 @@ Create a Redux-style store.
 
 ### `getStore<S, A>(key, initialState, reducer) → Store<S, A>`
 
-Get or create a named singleton store.  On the first call the store is created; subsequent calls return the same instance — including from other MFEs sharing `@mfjs/state` as a singleton.
+Get or create a named singleton store. The first call creates the store; subsequent calls (including from other MFEs sharing `@mfjs/state` as a singleton) return the same instance.
+
+### `getSimpleStore<T>(key, initial) → SimpleStore<T>`
+
+Get or create a named singleton `SimpleStore<T>`. Useful for **replay stores** — the host writes a value before the remote mounts; the remote reads it synchronously on mount instead of waiting for the next event.
+
+```ts
+// host — write once on mount
+getSimpleStore<number | null>('shell:ready:ts', null).set(Date.now());
+
+// remote — read on mount (may already be set)
+const alreadyReady = getSimpleStore<number | null>('shell:ready:ts', null).get() !== null;
+```
 
 ### `_resetStore(key?) → void`
 
 Remove one named store (or all stores) from the registry. **Testing only.**
+
+### `_resetSimpleStore(key?) → void`
+
+Remove one named `SimpleStore` (or all) from the registry. **Testing only.**
+
+---
+
+## `@mfjs/ssr` API Reference
+
+Full reference for the `@mfjs/ssr` package — server rendering, streaming SSR, static export, and edge adapter.
+
+Import from `@mfjs/ssr`:
+
+```ts
+import {
+  renderRouteToString,
+  injectIntoTemplate,
+  renderRouteToStream,
+  collectStream,
+  staticExport,
+  createEdgeAdapter,
+  ssrLoadRemote,
+  ssrRenderRemote,
+  createSsrRemoteRegistry,
+  matchRoutePath,
+} from '@mfjs/ssr';
+```
+
+### Types
+
+```ts
+type SsrRoute = {
+  path: string;
+  component: ComponentType<{ params?: Record<string, string>; path?: string }>;
+  params?: Record<string, string>;
+  title?: string;
+};
+
+type SsrRenderResult = {
+  html: string;
+  title?: string;
+  path: string;
+};
+
+type StaticExportOptions = {
+  routes: SsrRoute[];
+  outDir: string;
+  template?: string;
+  onProgress?: (page: StaticPage) => void;
+};
+
+type EdgeRequest  = { url: string; method: string; headers: Record<string, string> };
+type EdgeResponse = { status: number; headers: Record<string, string>; body: string };
+type EdgeAdapterHandler = (req: EdgeRequest) => Promise<EdgeResponse>;
+```
+
+### `renderRouteToString(route, opts?)`
+
+Synchronously renders one `SsrRoute` to an HTML string using React's `renderToStaticMarkup`.
+
+```ts
+async function renderRouteToString(
+  route: SsrRoute,
+  opts?: { template?: string }
+): Promise<SsrRenderResult>
+```
+
+### `injectIntoTemplate(html, template)`
+
+Injects an HTML fragment into a template by replacing the `<!--ssr-outlet-->` comment.
+
+```ts
+function injectIntoTemplate(html: string, template: string): string
+```
+
+### `renderRouteToStream(route, opts?)`
+
+Streaming SSR via React 18's `renderToPipeableStream`. Returns an object with a `pipe()` method and a `result` promise that resolves when streaming completes.
+
+```ts
+async function renderRouteToStream(
+  route: SsrRoute,
+  opts?: { template?: string; timeout?: number }
+): Promise<{ pipe(dest: NodeJS.WritableStream): void; result: Promise<SsrRenderResult> }>
+```
+
+### `collectStream(streamResult)`
+
+Convenience helper: pipes a stream result into a buffer and returns the complete HTML string.
+
+```ts
+async function collectStream(
+  streamResult: Awaited<ReturnType<typeof renderRouteToStream>>
+): Promise<SsrRenderResult>
+```
+
+### `staticExport(opts)`
+
+Pre-renders all routes and writes `<outDir>/<path>/index.html` files.
+
+```ts
+async function staticExport(opts: StaticExportOptions): Promise<StaticPage[]>
+```
+
+### `createEdgeAdapter(routes, opts?)`
+
+Creates a WinterCG-compatible request handler. Matches the incoming URL against `routes`, renders the matching component, and returns an `EdgeResponse`.
+
+```ts
+function createEdgeAdapter(
+  routes: SsrRoute[],
+  opts?: { template?: string; notFound?: ComponentType }
+): EdgeAdapterHandler
+```
+
+### `ssrLoadRemote(loader)`
+
+Resolves the `default` export from a Module Federation remote loader for use in SSR.
+
+```ts
+async function ssrLoadRemote(
+  loader: () => Promise<{ default: ComponentType<any> }>
+): Promise<ComponentType<any>>
+```
+
+### `ssrRenderRemote(loader, props?, opts?)`
+
+Loads a remote and renders it to HTML in one step.
+
+```ts
+async function ssrRenderRemote(
+  loader: () => Promise<{ default: ComponentType<any> }>,
+  props?: Record<string, unknown>,
+  opts?: { template?: string; path?: string }
+): Promise<SsrRenderResult>
+```
+
+### `createSsrRemoteRegistry()`
+
+Registry for multiple remotes. Useful when a host SSR handler needs to render several remotes.
+
+```ts
+function createSsrRemoteRegistry(): {
+  register(name: string, loader: () => Promise<{ default: ComponentType<any> }>): void;
+  get(name: string): (() => Promise<{ default: ComponentType<any> }>) | undefined;
+  renderAll(opts?: { template?: string }): Promise<Array<SsrRenderResult & { name: string }>>;
+}
+```
+
+### `matchRoutePath(routes, pathname)`
+
+Matches a pathname against a list of `SsrRoute`s. Returns the first match with extracted params, or `null`.
+
+```ts
+function matchRoutePath(
+  routes: SsrRoute[],
+  pathname: string
+): { route: SsrRoute; params: Record<string, string> } | null
+```
+
+---
+
+## `@mfjs/runtime` Server Router
+
+For SSR rendering, use the server-side router from `@mfjs/runtime` instead of `getRouter()` (which requires `window`).
+
+### `createServerRouter(initialPath?)`
+
+Creates an in-memory router with no browser dependencies. Safe to use in Node.js and edge runtimes.
+
+```ts
+function createServerRouter(initialPath?: string): ServerRouter
+```
+
+### `getServerRouter(initialPath?)` / `_resetServerRouter()`
+
+Singleton server router. `_resetServerRouter()` is for tests only.
+
+```ts
+function getServerRouter(initialPath?: string): ServerRouter
+function _resetServerRouter(): void
+```
+
+### `setServerPath(path)`
+
+Updates the singleton server router's current path and notifies subscribers.
+
+```ts
+function setServerPath(path: string): void
+```

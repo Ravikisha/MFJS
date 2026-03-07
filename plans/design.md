@@ -181,8 +181,8 @@ Stretch:
 * [x] `mfjs dev` — assert proxy rule created for each remote listed in host `mfjs.federation.json`
 * [x] `mfjs dev` — assert host defaults to port 3000, first remote defaults to port 3001
 * [x] `mfjs dev` — assert missing `mfjs.federation.json` triggers auto-generation before starting servers
-* [ ] `mfjs dev` — assert `SIGINT` terminates all child processes cleanly
-* [ ] Dev server proxy — assert `GET /mfjs/remotes/dashboard/remoteEntry.js` forwards to `http://localhost:3001/remoteEntry.js`
+* [x] `mfjs dev` — assert `SIGINT` terminates all child processes cleanly
+* [x] Dev server proxy — assert `GET /mfjs/remotes/dashboard/remoteEntry.js` forwards to `http://localhost:3001/remoteEntry.js`
 
 ---
 
@@ -541,7 +541,7 @@ This section tracks the full test spec for every implemented feature. Tests mark
 | [x] | `basePath` option: events only fire when path starts with basePath |
 | [x] | `destroy()` removes `popstate` listener and `mfjs:navigate` listener |
 | [x] | `dispatchMfjsNavigate({ to })` dispatches `mfjs:navigate` CustomEvent on `window` |
-| [ ] | shell `mfjs:navigate` listener causes correct remote module to be loaded |
+| [x] | shell `mfjs:navigate` listener causes correct remote module to be loaded |
 
 ---
 

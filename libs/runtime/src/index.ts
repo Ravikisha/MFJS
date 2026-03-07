@@ -5,3 +5,4 @@ export * from './route-matcher.js';
 export * from './routes.js';
 export * from './remote-pages.js';
 export * from './routing.js';
+export * from './server-router.js';

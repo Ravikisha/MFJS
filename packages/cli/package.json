@@ -18,7 +18,8 @@
     "fs-extra": "^11.2.0",
     "kleur": "^4.1.5",
     "execa": "^9.5.3",
-    "ws": "^8.18.3"
+    "ws": "^8.18.3",
+    "@mfjs/ssr": "workspace:*"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",

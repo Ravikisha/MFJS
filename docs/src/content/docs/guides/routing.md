@@ -100,12 +100,13 @@ import { NavLink } from '@mfjs/runtime';
 
 #### Test IDs
 
-`NavLink` automatically sets a `data-testid` attribute derived from the path:
+`NavLink` automatically sets a `data-testid` attribute derived from the path by replacing `/` with `-` and stripping leading/trailing dashes. The root `/` becomes `nav-home`.
 
 | Path | `data-testid` |
 |---|---|
-| `/` | `nav-/` |
-| `/dashboard/settings` | `nav-/dashboard/settings` |
+| `/` | `nav-home` |
+| `/dashboard` | `nav-dashboard` |
+| `/dashboard/settings` | `nav-dashboard-settings` |
 
 ---
 
@@ -150,7 +151,7 @@ function App() {
 interface RouteTarget {
   path: string;    // Pattern: '/dashboard/*', '/users/:id', '/'
   remote: string;  // Must match a key in the `remotes` map
-  module: string;  // Exposed module path, e.g. './App'
+  module?: string; // Exposed module path, e.g. './App' (defaults to './App' when omitted)
 }
 ```
 

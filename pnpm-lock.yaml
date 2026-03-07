@@ -163,6 +163,34 @@ importers:
         specifier: ^2.1.9
         version: 2.1.9(@types/node@22.19.13)(jsdom@28.1.0)
 
+  libs/ssr:
+    dependencies:
+      '@mfjs/runtime':
+        specifier: workspace:*
+        version: link:../runtime
+    devDependencies:
+      '@types/node':
+        specifier: ^22.13.10
+        version: 22.19.13
+      '@types/react':
+        specifier: ^18.3.12
+        version: 18.3.28
+      '@types/react-dom':
+        specifier: ^18.3.1
+        version: 18.3.7(@types/react@18.3.28)
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.9
+        version: 2.1.9(@types/node@22.19.13)(jsdom@28.1.0)
+
   libs/state:
     devDependencies:
       typescript:
@@ -183,6 +211,9 @@ importers:
 
   packages/cli:
     dependencies:
+      '@mfjs/ssr':
+        specifier: workspace:*
+        version: link:../../libs/ssr
       commander:
         specifier: ^12.1.0
         version: 12.1.0

@@ -15,6 +15,7 @@ export default defineConfig({
 						{ label: 'Getting started', slug: 'guides/getting-started' },
 						{ label: 'Routing', slug: 'guides/routing' },
 						{ label: 'EventBus & Shared State', slug: 'guides/event-bus' },
+						{ label: 'SSR & Static Export', slug: 'guides/ssr' },
 						{ label: 'CLI', slug: 'guides/cli' },
 						{ label: 'Example', slug: 'guides/example' },
 					],

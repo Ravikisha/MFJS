@@ -179,52 +179,74 @@ beforeEach(() => _resetEventBus());
 
 ### Cross-MFE example
 
-**Shell (host) — emits `shell:ready` once after mounting:**
+**Shell (host) — emits `shell:ready` once after mounting and writes a replay store:**
 
 ```tsx
 // apps/shell/src/bootstrap.tsx
 import React, { useEffect } from 'react';
 import { getEventBus } from '@mfjs/event-bus';
+import { getSimpleStore } from '@mfjs/state';
 import type { MfAppEvents } from '@mfjs/events';
 
 getRouter(); // init at module level
 
+const SHELL_READY_KEY = 'shell:ready:ts';
+
 function App() {
   useEffect(() => {
-    getEventBus<MfAppEvents>().emit('shell:ready', { timestamp: Date.now() });
+    const ts = Date.now();
+    // Write replay store FIRST so late-mounting remotes can read it synchronously.
+    getSimpleStore<number | null>(SHELL_READY_KEY, null).set(ts);
+    // Then emit the event for remotes already subscribed.
+    getEventBus<MfAppEvents>().emit('shell:ready', { timestamp: ts });
   }, []);
 
   return <RemoteOutlet routes={HOST_ROUTES} remotes={REMOTES} />;
 }
 ```
 
-**Dashboard (remote) — receives `shell:ready` and updates its UI:**
+**Dashboard (remote) — reads the replay store first, then subscribes for future emissions:**
 
 ```tsx
 // apps/dashboard/src/pages/index.tsx
 import React, { useState, useEffect } from 'react';
 import { getEventBus } from '@mfjs/event-bus';
+import { getSimpleStore } from '@mfjs/state';
 import type { MfAppEvents } from '@mfjs/events';
 
+const SHELL_READY_KEY = 'shell:ready:ts';
+
 export default function DashboardHome() {
-  const [shellReady, setShellReady] = useState(false);
+  // Initialise from the replay store — handles the race where the shell
+  // emitted shell:ready before this remote's component mounted.
+  const [shellReady, setShellReady] = useState(() =>
+    getSimpleStore<number | null>(SHELL_READY_KEY, null).get() !== null
+  );
 
   useEffect(() => {
-    const unsub = getEventBus<MfAppEvents>().on('shell:ready', () => {
+    // Synchronously re-check (in case it was set between render and effect).
+    if (getSimpleStore<number | null>(SHELL_READY_KEY, null).get() !== null) {
       setShellReady(true);
-    });
-    return unsub; // cleanup on unmount
+      return;
+    }
+    // Subscribe for future emissions (shell hot-reload, re-mounts, etc.)
+    const unsub = getEventBus<MfAppEvents>().on('shell:ready', () => setShellReady(true));
+    return unsub;
   }, []);
 
   return (
     <div>
-      {shellReady && <p>✅ Shell is ready!</p>}
+      {shellReady && <p data-testid="event-bus-received">✅ shell:ready received</p>}
     </div>
   );
 }
 ```
 
-Because both apps share the same singleton bus through Module Federation, the `shell:ready` event emitted by the host is received by the handler registered in the remote — with zero direct coupling between the two apps.
+> **Why the replay store?**
+>
+> Module Federation loads remotes lazily. By the time the remote's `useEffect` registers its `shell:ready` listener, the shell may have already emitted the event. Without the replay store the remote would never see it.
+>
+> The solution: the shell writes a `SimpleStore` singleton (shared via `@mfjs/state`) before emitting. The remote reads the store synchronously in its `useState` initialiser and in its `useEffect` before subscribing — so it always recovers the ready state regardless of mounting order.
 
 ---
 

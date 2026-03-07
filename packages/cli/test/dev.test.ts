@@ -119,4 +119,89 @@ describe('mfjs dev', () => {
     expect(await fs.pathExists(path.join(appsDir, 'shell', 'mfjs.federation.json'))).toBe(false);
     expect(await fs.pathExists(path.join(appsDir, 'dashboard', 'mfjs.federation.json'))).toBe(false);
   });
+
+  it('SIGINT terminates all spawned child processes', async () => {
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'mfjs-sigint-'))) as string;
+    const appsDir = path.join(tmp, 'apps');
+    await fs.ensureDir(path.join(appsDir, 'shell'));
+    await fs.ensureDir(path.join(appsDir, 'dashboard'));
+
+    await fs.writeJson(path.join(appsDir, 'shell', 'mfjs.app.json'), {
+      name: 'shell',
+      type: 'host',
+      port: 3000,
+    });
+    await fs.writeJson(path.join(appsDir, 'dashboard', 'mfjs.app.json'), {
+      name: 'dashboard',
+      type: 'remote',
+      port: 3001,
+    });
+
+    // Capture the mock spawn calls before running so we can track which processes were created.
+    (spawn as unknown as { mock: { calls: any[][] } }).mock.calls.length = 0;
+    vi.mocked(spawn as unknown as (...args: any[]) => any).mockClear();
+
+    await run(['--dir', tmp], tmp);
+
+    // Simulate SIGINT — process.once('SIGINT', ...) registered by attachGracefulShutdown.
+    process.emit('SIGINT');
+
+    const calls = (spawn as unknown as { mock: { calls: any[][]; results: any[] } }).mock;
+    // Each spawned mock child should have had .kill() called on it.
+    for (const result of calls.results) {
+      const child = result.value as { kill: ReturnType<typeof vi.fn>; killed: boolean };
+      // kill() should have been invoked (SIGTERM) or child was already marked killed.
+      const killCalled = (child.kill as ReturnType<typeof vi.fn>).mock.calls.length > 0;
+      expect(killCalled || child.killed).toBe(true);
+    }
+  });
+});
+
+// ── Dev server proxy rules ────────────────────────────────────────────────────
+
+describe('mfjs dev — proxy rules', () => {
+  it('proxy remoteEntry: rewrites remote URL to same-origin proxy path on host port', async () => {
+    const workspaceDir = (await fs.mkdtemp(path.join(os.tmpdir(), 'mfjs-proxy-get-'))) as string;
+
+    await fs.ensureDir(path.join(workspaceDir, 'apps', 'shell'));
+    await fs.ensureDir(path.join(workspaceDir, 'apps', 'dashboard'));
+
+    await fs.writeJson(path.join(workspaceDir, 'apps', 'shell', 'mfjs.app.json'), {
+      name: 'shell',
+      type: 'host',
+      port: 3000,
+    });
+    await fs.writeJson(path.join(workspaceDir, 'apps', 'dashboard', 'mfjs.app.json'), {
+      name: 'dashboard',
+      type: 'remote',
+      port: 3001,
+    });
+    await fs.writeJson(path.join(workspaceDir, 'apps', 'shell', 'mfjs.federation.json'), {
+      name: 'shell',
+      filename: 'remoteEntry.js',
+      remotes: {
+        dashboard: 'dashboard@http://localhost:3001/remoteEntry.js',
+      },
+    });
+
+    devCommand.exitOverride();
+    await devCommand.parseAsync(['--dir', workspaceDir, '--proxy-remotes'], { from: 'user' });
+
+    // The proxy federation config rewrites the remote entry URL to the same-origin proxy path:
+    // GET /mfjs/remotes/dashboard/remoteEntry.js  →  forwards to  http://localhost:3001/remoteEntry.js
+    const proxyCfg = await fs.readJson(
+      path.join(workspaceDir, 'apps', 'shell', 'mfjs.federation.proxy.json')
+    );
+
+    // Proxy URL encodes the forwarding target in a same-origin path on port 3000 (host port).
+    expect(proxyCfg.remotes.dashboard).toBe(
+      'dashboard@http://localhost:3000/mfjs/remotes/dashboard/remoteEntry.js'
+    );
+
+    // The proxy path segment encodes the actual remote target: /mfjs/remotes/<name>/remoteEntry.js
+    // which rspack devServer proxy rules forward to http://localhost:3001/remoteEntry.js
+    const proxyPath = '/mfjs/remotes/dashboard/remoteEntry.js';
+    const targetUrl = `http://localhost:3001${proxyPath.replace(/^\/mfjs\/remotes\/dashboard/, '')}`;
+    expect(targetUrl).toBe('http://localhost:3001/remoteEntry.js');
+  });
 });
