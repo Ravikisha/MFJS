@@ -3,6 +3,89 @@ export type FederationRemote = {
   entryUrl: string;
 };
 
+export type LoadRemoteEntryOptions = {
+  /**
+   * Max time (ms) to wait for the remote container global to appear after the
+   * remoteEntry script loads.
+   *
+   * Some dev servers can fire `script.onload` slightly before the container
+   * global is assigned.
+   */
+  containerGlobalTimeoutMs?: number;
+
+  /** How frequently (ms) to poll for the container global. */
+  containerGlobalPollMs?: number;
+
+  /**
+   * Optional cache used to record successful remoteEntry loads.
+   *
+   * Note: this cache stores **metadata** ("loaded successfully") and does not
+   * persist the actual remoteEntry JavaScript bytes. For true offline loading,
+   * use a Service Worker to cache the `remote.entryUrl` response.
+   */
+  cache?: boolean | RemoteEntryCache;
+
+  /** TTL (ms) for cache entries. Default: 24h. */
+  cacheTtlMs?: number;
+};
+
+export type RemoteEntryCacheKey = {
+  name: string;
+  entryUrl: string;
+};
+
+export type RemoteEntryCacheValue = {
+  loadedAt: number;
+};
+
+export type RemoteEntryCache = {
+  get: (key: RemoteEntryCacheKey) => RemoteEntryCacheValue | null;
+  set: (key: RemoteEntryCacheKey, value: RemoteEntryCacheValue) => void;
+};
+
+function getDefaultRemoteEntryCache(): RemoteEntryCache {
+  const storageKey = (k: RemoteEntryCacheKey) => `mfjs.remoteEntry:${k.name}:${k.entryUrl}`;
+
+  return {
+    get(key) {
+      try {
+        const raw = globalThis?.localStorage?.getItem(storageKey(key));
+        if (!raw) return null;
+        const parsed = JSON.parse(raw) as RemoteEntryCacheValue;
+        if (typeof parsed?.loadedAt !== 'number') return null;
+        return parsed;
+      } catch {
+        return null;
+      }
+    },
+    set(key, value) {
+      try {
+        globalThis?.localStorage?.setItem(storageKey(key), JSON.stringify(value));
+      } catch {
+        // Ignore - storage can be unavailable (private mode, quotas, etc.)
+      }
+    },
+  };
+}
+
+export type LoadRemoteModuleOptions = {
+  /**
+   * Max time (ms) to wait for `container.get(exposedModule)`.
+   *
+   * This protects the host from hanging indefinitely when a remote container
+   * is present but unresponsive.
+   */
+  getTimeoutMs?: number;
+
+  /**
+   * Max time (ms) to wait for the module factory to produce a module.
+   *
+   * Most MF factories are synchronous, but some runtimes/plugins can return a
+   * promise. This timeout covers either case.
+   */
+  factoryTimeoutMs?: number;
+};
+
 // Minimal webpack-style MF runtime globals (also used by Rspack MF).
 declare global {
   var __webpack_init_sharing__: undefined | ((scope: string) => Promise<void>);
@@ -32,11 +115,31 @@ function scriptId(remoteName: string) {
   return `mfjs-remote-${remoteName}`;
 }
 
-export async function loadRemoteEntry(remote: FederationRemote) {
+export async function loadRemoteEntry(remote: FederationRemote, options?: LoadRemoteEntryOptions) {
   const g = getGlobal();
   const id = scriptId(remote.name);
 
   const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+  const timeoutMs = options?.containerGlobalTimeoutMs ?? 500;
+  const pollMs = options?.containerGlobalPollMs ?? 25;
+
+  const cacheTtlMs = options?.cacheTtlMs ?? 24 * 60 * 60 * 1000;
+  const cache: RemoteEntryCache | null =
+    options?.cache === true
+      ? getDefaultRemoteEntryCache()
+      : typeof options?.cache === 'object'
+        ? options.cache
+        : null;
+
+  if (cache) {
+    const cached = cache.get({ name: remote.name, entryUrl: remote.entryUrl });
+    if (cached && Date.now() - cached.loadedAt < cacheTtlMs) {
+      // Cache is metadata only. If the container global already exists, we can
+      // short-circuit. Otherwise we still attempt injection.
+      if (g[remote.name]) return;
+    }
+  }
 
   // If container already loaded
   if (g[remote.name]) return;
@@ -65,18 +168,26 @@ export async function loadRemoteEntry(remote: FederationRemote) {
       // is actually assigned; wait a moment to avoid a false negative.
       (async () => {
         if (!g[remote.name]) {
-          for (let i = 0; i < 20 && !g[remote.name]; i++) {
-            await sleep(25);
+          const started = Date.now();
+          while (!g[remote.name] && Date.now() - started < timeoutMs) {
+            await sleep(pollMs);
           }
         }
 
         if (!g[remote.name]) {
           reject(
             new Error(
-              `Remote container "${remote.name}" not found after loading ${remote.entryUrl}`
+              `Remote container "${remote.name}" not found after loading ${remote.entryUrl} (waited ${timeoutMs}ms)`
             )
           );
           return;
+        }
+
+        if (cache) {
+          cache.set(
+            { name: remote.name, entryUrl: remote.entryUrl },
+            { loadedAt: Date.now() }
+          );
         }
 
         resolve();
@@ -133,13 +244,43 @@ export async function initRemoteContainer(remoteName: string) {
 
 export async function loadRemoteModule<TModule = any>(
   remote: FederationRemote,
-  exposedModule: string
+  exposedModule: string,
+  options?: LoadRemoteModuleOptions
 ): Promise<TModule> {
   await loadRemoteEntry(remote);
 
   const container = await initRemoteContainer(remote.name);
 
-  const factory = await container.get(exposedModule);
+  const withTimeout = async <T>(label: string, timeoutMs: number, fn: () => Promise<T>) => {
+    if (timeoutMs <= 0) return fn();
 
-  return factory() as TModule;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    try {
+      return await Promise.race([
+        fn(),
+        new Promise<T>((_, reject) => {
+          timer = setTimeout(() => {
+            reject(new Error(`${label} timed out after ${timeoutMs}ms`));
+          }, timeoutMs);
+        }),
+      ]);
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
+  };
+
+  const getTimeoutMs = options?.getTimeoutMs ?? 5000;
+  const factoryTimeoutMs = options?.factoryTimeoutMs ?? 5000;
+
+  const factory = await withTimeout(
+    `container.get("${exposedModule}") from remote "${remote.name}"`,
+    getTimeoutMs,
+    () => container.get(exposedModule)
+  );
+
+  return await withTimeout(
+    `factory() for "${remote.name}${exposedModule}"`,
+    factoryTimeoutMs,
+    async () => (await Promise.resolve(factory())) as TModule
+  );
 }

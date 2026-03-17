@@ -161,6 +161,45 @@ interface RouteTarget {
 
 Using native imports allows Rspack's `ModuleFederationPlugin` to bridge the shared dependency scope (React, ReactDOM) correctly at build time. Using `loadRemoteModule()` bypasses that bridge and causes React to load twice, triggering `Invalid hook call` errors in the remote.
 
+#### Error handling (host resilience)
+
+`RemoteOutlet` is defensive by default:
+
+- If a remote import **rejects** (network failure, remote build broken, etc.), it renders a `<pre>` with the error message.
+- If the remote component **throws during render**, `RemoteOutlet` catches it with an internal error boundary and renders `<pre data-testid="remote-render-error">…</pre>`.
+
+This makes host failures obvious during development and prevents a single broken remote from taking down the whole shell.
+
+---
+
+## Remote loading timeouts (advanced)
+
+Most apps should keep using **native federation imports** (`() => import('dashboard/App')`).
+
+Use `loadRemoteModule()` only when you truly need **runtime-dynamic remote URLs** (for example, tenant-specific CDNs, “environment switcher” UIs, or a plugin marketplace).
+
+To avoid the host hanging forever, `loadRemoteModule()` has built-in timeouts:
+
+- `getTimeoutMs` — max time to wait for `container.get(exposedModule)` (default: **5000ms**)
+- `factoryTimeoutMs` — max time to wait for the returned module factory to produce the module (default: **5000ms**)
+
+Example:
+
+```ts
+import { loadRemoteModule } from '@mfjs/runtime';
+
+const mod = await loadRemoteModule(
+  { name: 'dashboard', entryUrl: 'https://cdn.example.com/dashboard/remoteEntry.js' },
+  './App',
+  { getTimeoutMs: 2000, factoryTimeoutMs: 2000 },
+);
+```
+
+If a timeout triggers, the promise rejects with a descriptive message like:
+
+- `container.get("./App") from remote "dashboard" timed out after 2000ms`
+- `factory() for "dashboard./App" timed out after 2000ms`
+
 ---
 
 ### `RemoteApp`

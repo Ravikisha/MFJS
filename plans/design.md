@@ -256,6 +256,15 @@ Optional:
 * [ ] Gzip/Brotli support *(not configured)*
 * [x] Output `remoteEntry.js` (via `ModuleFederationPlugin.filename`)
 
+---
+
+## 7️⃣ Performance System (Week 10–11)
+
+* [x] Bundle size analyzer (`mfjs perf analyze`) that scans `dist/` output and reports file sizes
+* [x] Performance budgets (warn/error thresholds) via `--budgets <path>` with CI-friendly exit codes
+* [ ] Advanced: per-route budgets *(not implemented)*
+* [ ] Advanced: integrate with bundler stats/metafile output *(not implemented; current approach is bundler-agnostic)*
+
 ### Tests needed
 
 * [x] `mfjs build` — assert `dist/remoteEntry.js` exists in remote output
@@ -329,10 +338,10 @@ And see:
 
 ## Error Handling & Resilience (Weeks 8–9)
 
-* [ ] Remote load fallback *(partial — `loadRemoteModule` throws on failure but no UI boundary)*
-* [ ] Timeout handling *(partial — remote-loader polls 20×25ms for container global)*
-* [ ] Error boundaries auto-injection
-* [ ] Offline cache support
+* [x] Remote load fallback *(host-side UI boundary: `RemoteOutlet` wraps remotes with an error boundary and renders `data-testid="remote-render-error"` on crashes)*
+* [x] Timeout handling *(configurable: `loadRemoteEntry(..., { containerGlobalTimeoutMs, containerGlobalPollMs })` + `loadRemoteModule(..., { getTimeoutMs, factoryTimeoutMs })`)*
+* [x] Error boundaries auto-injection *(helpers: `withErrorBoundary()` / `wrapLazyWithErrorBoundary()` for wrapping arbitrary components & lazy imports)*
+* [x] Offline cache support *(metadata cache for successful remoteEntry loads via `loadRemoteEntry(..., { cache, cacheTtlMs })`; full offline bytes caching via Service Worker is recommended)*
 
 ---
 

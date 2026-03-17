@@ -1,3 +1,5 @@
+// @vitest-environment jsdom
+
 import { describe, expect, it, vi, afterEach } from 'vitest';
 import { MFJS_NAVIGATE_EVENT, createRouter, dispatchMfjsNavigate } from '../src/router.js';
 import { loadRemoteModule } from '../src/remote-loader.js';

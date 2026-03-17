@@ -167,6 +167,8 @@ const REMOTES = {
 
 If the remote import rejects, `RemoteOutlet` renders a `<pre>` with the error message in crimson.
 
+If the remote component throws during render, `RemoteOutlet` catches it via an internal error boundary and renders `<pre data-testid="remote-render-error">`.
+
 #### `RouteTarget` type
 
 ```ts
@@ -392,7 +394,36 @@ This is the async core used by `RemoteApp`. Call it directly when you need to re
 
 ## Remote loading
 
-### `loadRemoteModule(remote, exposedModule)`
+### Error boundaries (utilities)
+
+`@mfjs/runtime` includes a small `ErrorBoundary` (used internally by `RemoteOutlet`), plus helper utilities for wrapping *any* component.
+
+#### `withErrorBoundary(Component, options?)`
+
+Wraps a component with an error boundary. Useful when you render a remote component outside `RemoteOutlet`.
+
+```ts
+function withErrorBoundary<P>(
+  Component: ComponentType<P>,
+  options?: {
+    fallback?: ({ error, reset }: { error: unknown; reset: () => void }) => ReactNode;
+    testId?: string;
+  }
+): ComponentType<P>
+```
+
+#### `wrapLazyWithErrorBoundary(loader, options?)`
+
+Wraps a lazy import so render errors are caught automatically.
+
+```ts
+function wrapLazyWithErrorBoundary<P>(
+  loader: () => Promise<{ default: ComponentType<P> }>,
+  options?: { fallback?: (...) => ReactNode; testId?: string }
+): LazyExoticComponent<ComponentType<P>>
+```
+
+### `loadRemoteModule(remote, exposedModule, options?)`
 
 Dynamically injects `remoteEntry.js`, initialises the Module Federation share scope, and returns the exposed module.
 
@@ -400,10 +431,21 @@ Dynamically injects `remoteEntry.js`, initialises the Module Federation share sc
 async function loadRemoteModule<TModule = any>(
   remote: { name: string; entryUrl: string },
   exposedModule: string,
+  options?: {
+    /** Max time (ms) to wait for container.get(exposedModule). Default: 5000 */
+    getTimeoutMs?: number;
+    /** Max time (ms) to wait for the returned factory to produce a module. Default: 5000 */
+    factoryTimeoutMs?: number;
+  },
 ): Promise<TModule>
 ```
 
 > **Prefer native federation imports.** Use `() => import('dashboard/App')` (passed to `RemoteOutlet`) rather than `loadRemoteModule()` for new code. Native imports allow Rspack's `ModuleFederationPlugin` to bridge the shared React scope automatically, preventing the `Invalid hook call` error caused by loading React twice. Reserve `loadRemoteModule()` for runtime-dynamic cases where the remote URL is not known at build time.
+
+When a timeout triggers, `loadRemoteModule()` rejects with a descriptive error, for example:
+
+- `container.get("./App") from remote "dashboard" timed out after 5000ms`
+- `factory() for "dashboard./App" timed out after 5000ms`
 
 ---
 
@@ -414,6 +456,26 @@ Injects a `<script>` tag for a remote entry and waits for it to load. Deduplicat
 ```ts
 async function loadRemoteEntry(
   remote: { name: string; entryUrl: string },
+  options?: {
+    /** Max time (ms) to wait for the remote container global. Default: 500 */
+    containerGlobalTimeoutMs?: number;
+    /** Poll interval (ms) while waiting for the container global. Default: 25 */
+    containerGlobalPollMs?: number;
+
+    /**
+     * Enable a metadata cache of successful loads.
+     *
+     * Important: this does **not** store the remoteEntry JavaScript bytes.
+     * For true offline support, use a Service Worker to cache `remote.entryUrl`.
+     */
+    cache?: boolean | {
+      get(key: { name: string; entryUrl: string }): { loadedAt: number } | null;
+      set(key: { name: string; entryUrl: string }, value: { loadedAt: number }): void;
+    };
+
+    /** Cache TTL (ms). Default: 24h */
+    cacheTtlMs?: number;
+  },
 ): Promise<void>
 ```
 

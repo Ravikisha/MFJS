@@ -13,6 +13,7 @@
 import React from 'react';
 import { createRouter, dispatchMfjsNavigate, type Router, type RouterOptions } from './router.js';
 import { resolveRoute, type RouteTarget, type ResolvedRoute } from './routes.js';
+import { ErrorBoundary } from './error-boundary.js';
 
 // ── Singleton router ──────────────────────────────────────────────────────────
 
@@ -260,7 +261,20 @@ export function RemoteOutlet({
   if (error)   return <pre style={{ color: 'crimson', whiteSpace: 'pre-wrap' }}>{error}</pre>;
   if (!Remote) return <>{noMatch ?? <p style={{ color: '#888' }}>404 — No route matched.</p>}</>;
 
-  return <Remote subpath={subpath} />;
+  return (
+    <ErrorBoundary
+      fallback={({ error: boundaryError }) => (
+        <pre
+          style={{ color: 'crimson', whiteSpace: 'pre-wrap' }}
+          data-testid="remote-render-error"
+        >
+          {boundaryError instanceof Error ? boundaryError.message : String(boundaryError)}
+        </pre>
+      )}
+    >
+      <Remote subpath={subpath} />
+    </ErrorBoundary>
+  );
 }
 
 // ── RemoteApp (remote-side page router) ──────────────────────────────────────

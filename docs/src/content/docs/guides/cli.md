@@ -128,6 +128,75 @@ For Rspack, the remote entry is served at:
 
 ---
 
+### `mfjs perf analyze`
+
+Analyzes build output sizes by walking a `dist/` folder and printing a size report.
+
+This is meant to be bundler-agnostic: it doesn't need stats/metafile output. It simply reports the files your build produced.
+
+#### Usage
+
+Run from inside an app folder (or any folder that contains a `dist/` directory):
+
+```sh
+cd apps/shell
+pnpm build
+mfjs perf analyze
+```
+
+Or analyze an explicit folder:
+
+```sh
+mfjs perf analyze --dist apps/shell/dist
+```
+
+#### Output formats
+
+- `--format table` (default): human-friendly table output
+- `--format json`: machine-readable output for CI tooling
+
+```sh
+mfjs perf analyze --format json
+```
+
+#### Performance budgets
+
+You can enforce size budgets in CI using a budgets JSON file.
+
+```sh
+mfjs perf analyze --budgets ./mfjs.perf-budgets.json
+```
+
+If any rule evaluates to **error**, the command exits with code `1`.
+
+A minimal budgets file looks like:
+
+```json
+{
+  "rules": [
+    {
+      "name": "main bundle",
+      "match": "**/main*.js",
+      "warnBytes": 250000,
+      "errorBytes": 350000
+    },
+    {
+      "name": "any js chunk",
+      "match": "**/*.js",
+      "errorBytes": 500000
+    }
+  ]
+}
+```
+
+Notes:
+
+- `match` uses glob matching (same style as minimatch), relative to the analyzed `dist` directory.
+- `warnBytes` is optional. If omitted, only `errorBytes` is enforced.
+- Source map files (`*.map`) are included in the analysis by default.
+
+---
+
 ## Example workspace
 
 There is a runnable end-to-end example under:

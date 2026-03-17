@@ -10,6 +10,7 @@ import { routesCommand } from './commands/routes.js';
 import { ssrCommand } from './commands/ssr.js';
 import { typecheckCommand } from './commands/typecheck.js';
 import { ciCommand } from './commands/ci.js';
+import { perfCommand } from './commands/perf.js';
 
 const program = new Command();
 
@@ -27,6 +28,7 @@ program.addCommand(routesCommand);
 program.addCommand(ssrCommand);
 program.addCommand(typecheckCommand);
 program.addCommand(ciCommand);
+program.addCommand(perfCommand);
 
 program.showHelpAfterError();
 

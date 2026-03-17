@@ -1,3 +1,5 @@
+// @vitest-environment jsdom
+
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 import { loadRemoteEntry, initRemoteContainer, loadRemoteModule } from '../src/remote-loader.js';
 
@@ -94,8 +96,65 @@ describe('loadRemoteEntry', () => {
     const caught = p.catch(() => 'caught');
     await vi.runAllTimersAsync();
     await expect(caught).resolves.toBe('caught');
-    await expect(p).rejects.toThrow('"analytics" not found');
+    await expect(p).rejects.toThrow('waited 500ms');
     vi.useRealTimers();
+  });
+
+  it('supports a custom containerGlobalTimeoutMs (faster failure)', async () => {
+    // Script fires onload but never sets the global.
+    vi.spyOn(document.head, 'appendChild').mockImplementation((node: any) => {
+      HTMLElement.prototype.appendChild.call(document.head, node);
+      setTimeout(() => node.onload?.(), 0);
+      return node;
+    });
+
+    vi.useFakeTimers();
+    const p = loadRemoteEntry(
+      { name: 'analytics', entryUrl: 'http://localhost:3002/remoteEntry.js' },
+      { containerGlobalTimeoutMs: 50, containerGlobalPollMs: 10 }
+    );
+    const caught = p.catch(() => 'caught');
+    await vi.runAllTimersAsync();
+    await expect(caught).resolves.toBe('caught');
+    await expect(p).rejects.toThrow('waited 50ms');
+    vi.useRealTimers();
+  });
+
+  it('records a successful remoteEntry load in the cache when enabled', async () => {
+    mockScriptLoad('dashboard');
+
+    const cache = {
+      get: vi.fn(() => null),
+      set: vi.fn(),
+    };
+
+    await loadRemoteEntry(
+      { name: 'dashboard', entryUrl: 'http://localhost:3001/remoteEntry.js' },
+      { cache }
+    );
+
+    expect(cache.get).toHaveBeenCalledWith({
+      name: 'dashboard',
+      entryUrl: 'http://localhost:3001/remoteEntry.js',
+    });
+    expect(cache.set).toHaveBeenCalled();
+  });
+
+  it('does not short-circuit from cache metadata unless the container global already exists', async () => {
+    // Cache says it loaded before, but container global isn't present; we should still inject.
+    const appendSpy = mockScriptLoad('dashboard');
+
+    const cache = {
+      get: vi.fn(() => ({ loadedAt: Date.now() })),
+      set: vi.fn(),
+    };
+
+    await loadRemoteEntry(
+      { name: 'dashboard', entryUrl: 'http://localhost:3001/remoteEntry.js' },
+      { cache, cacheTtlMs: 60_000 }
+    );
+
+    expect(appendSpy).toHaveBeenCalled();
   });
 });
 
@@ -104,6 +163,10 @@ describe('loadRemoteEntry', () => {
 // ---------------------------------------------------------------------------
 
 describe('initRemoteContainer', () => {
+  beforeEach(() => {
+    delete (globalThis as any).dashboard;
+  });
+
   afterEach(() => {
     vi.restoreAllMocks();
     delete (globalThis as any).dashboard;
@@ -198,5 +261,62 @@ describe('loadRemoteModule', () => {
 
     const container = (globalThis as any).dashboard;
     expect(container.get).toHaveBeenCalledWith('./Widget');
+  });
+
+  it('times out when container.get() never resolves', async () => {
+    // Load the remoteEntry and assign a container, but with a hanging get().
+    const container = {
+      init: vi.fn(async () => {}),
+      get: vi.fn(async () => new Promise<() => unknown>(() => {})),
+    };
+
+    vi.spyOn(document.head, 'appendChild').mockImplementation((node: any) => {
+      HTMLElement.prototype.appendChild.call(document.head, node);
+      setTimeout(() => {
+        (globalThis as any).dashboard = container;
+        node.onload?.();
+      }, 0);
+      return node;
+    });
+
+    vi.useFakeTimers();
+    const p = loadRemoteModule(
+      { name: 'dashboard', entryUrl: 'http://localhost:3001/remoteEntry.js' },
+      './App',
+      { getTimeoutMs: 50 }
+    );
+    const caught = p.catch(() => 'caught');
+    await vi.runAllTimersAsync();
+    await expect(caught).resolves.toBe('caught');
+    await expect(p).rejects.toThrow('container.get("./App") from remote "dashboard" timed out after 50ms');
+    vi.useRealTimers();
+  });
+
+  it('times out when the module factory never resolves', async () => {
+    const container = {
+      init: vi.fn(async () => {}),
+      get: vi.fn(async () => () => new Promise<unknown>(() => {})),
+    };
+
+    vi.spyOn(document.head, 'appendChild').mockImplementation((node: any) => {
+      HTMLElement.prototype.appendChild.call(document.head, node);
+      setTimeout(() => {
+        (globalThis as any).dashboard = container;
+        node.onload?.();
+      }, 0);
+      return node;
+    });
+
+    vi.useFakeTimers();
+    const p = loadRemoteModule(
+      { name: 'dashboard', entryUrl: 'http://localhost:3001/remoteEntry.js' },
+      './App',
+      { factoryTimeoutMs: 60 }
+    );
+    const caught = p.catch(() => 'caught');
+    await vi.runAllTimersAsync();
+    await expect(caught).resolves.toBe('caught');
+    await expect(p).rejects.toThrow('factory() for "dashboard./App" timed out after 60ms');
+    vi.useRealTimers();
   });
 });
