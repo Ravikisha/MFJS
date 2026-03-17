@@ -16,14 +16,40 @@ Opinionated micro-frontend framework + tooling built on **Rspack Module Federati
 
 ## CLI quickstart
 
+Recommended (guided full workspace scaffold):
+
 ```sh
 mfjs init my-app
 cd my-app
 
-mfjs generate host shell
-mfjs generate remote dashboard
+mfjs scaffold app
+
+# (or, non-interactive)
+# mfjs generate host shell --port 3000
+# mfjs generate remote dashboard --port 3001
+# mfjs federation
 
 mfjs dev
+```
+
+### Tailwind (optional)
+
+You can enable Tailwind at init-time or per generated app:
+
+```sh
+mfjs init my-app --tailwind
+
+# or
+mfjs generate host shell --tailwind
+mfjs generate remote dashboard --tailwind
+```
+
+### Interactive generator
+
+If you prefer prompts without scaffolding the whole workspace:
+
+```sh
+mfjs generate wizard
 ```
 
 ---

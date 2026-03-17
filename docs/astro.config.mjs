@@ -13,6 +13,7 @@ export default defineConfig({
 					label: 'Guides',
 					items: [
 						{ label: 'Getting started', slug: 'guides/getting-started' },
+						{ label: 'Scaffold an app', slug: 'guides/scaffold-app' },
 							{ label: 'Performance', slug: 'guides/performance' },
 						{ label: 'Routing', slug: 'guides/routing' },
 						{ label: 'EventBus & Shared State', slug: 'guides/event-bus' },

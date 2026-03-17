@@ -3,6 +3,7 @@ import path from 'node:path';
 import fs from 'fs-extra';
 import kleur from 'kleur';
 import { buildCiWorkflow, buildPreviewWorkflow, buildDeployWorkflow } from './ci.js';
+import { confirm } from '@inquirer/prompts';
 
 async function writeJson(filePath: string, obj: unknown) {
   await fs.outputFile(filePath, JSON.stringify(obj, null, 2) + '\n', 'utf8');
@@ -27,13 +28,20 @@ export const initCommand = new Command('init')
   .description('Initialize a new MFJS workspace (monorepo)')
   .argument('<name>', 'Folder name for the new workspace')
   .option('-d, --dir <path>', 'Parent directory to create the workspace in', process.cwd())
-  .action(async (name: string, opts: { dir: string }) => {
+  .option('-y, --yes', 'Skip prompts and use defaults', false)
+  .option('--tailwind', 'Enable Tailwind CSS for generated apps (can also be enabled per-app in generate)', false)
+  .action(async (name: string, opts: { dir: string; yes?: boolean; tailwind?: boolean }) => {
     const workspaceDir = path.resolve(opts.dir, name);
 
     console.log(kleur.cyan(`Creating MFJS workspace in ${workspaceDir}`));
 
     await ensureEmptyDir(workspaceDir);
     await fs.ensureDir(workspaceDir);
+
+  const interactive = !opts.yes && Boolean(process.stdout.isTTY);
+    const enableTailwind = interactive
+      ? await confirm({ message: 'Enable Tailwind CSS support for generated apps?', default: Boolean((opts as any).tailwind) })
+      : Boolean((opts as any).tailwind);
 
     // root package.json
     await writeJson(path.join(workspaceDir, 'package.json'), {
@@ -66,6 +74,9 @@ export const initCommand = new Command('init')
       $schema: 'https://mfjs.dev/schemas/mfjs.config.json',
       appsDir: 'apps',
       libsDir: 'libs',
+      features: {
+        tailwind: enableTailwind,
+      },
     });
 
     // mfjs.config.ts
@@ -141,7 +152,8 @@ export const initCommand = new Command('init')
 
     console.log(kleur.green('Done.'));
     console.log(kleur.gray('Next:'));
-    console.log(kleur.gray('  mfjs generate host shell'));
-    console.log(kleur.gray('  mfjs generate remote dashboard'));
+  console.log(kleur.gray('  mfjs scaffold app  # guided full app scaffold (host + remotes)'));
+  console.log(kleur.gray('  mfjs generate host shell'));
+  console.log(kleur.gray('  mfjs generate remote dashboard'));
     console.log(kleur.gray('  mfjs dev'));
   });

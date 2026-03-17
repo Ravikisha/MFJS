@@ -2,6 +2,9 @@ import { Command } from 'commander';
 import path from 'node:path';
 import fs from 'fs-extra';
 import kleur from 'kleur';
+import { input, confirm, checkbox, number, select } from '@inquirer/prompts';
+
+type TailwindMode = 'off' | 'on';
 
 type GenerateOpts = {
   dir: string;
@@ -31,10 +34,10 @@ async function ensureDirIsCreatable(dir: string) {
 
 }
 
-async function scaffoldReactRspackApp(appDir: string, name: string, port: number) {
+async function scaffoldReactRspackApp(appDir: string, name: string, port: number, tailwind: TailwindMode) {
   await fs.ensureDir(path.join(appDir, 'src'));
 
-  await writeJson(path.join(appDir, 'package.json'), {
+  const pkg: any = {
     name: `@app/${name}`,
     private: true,
     type: 'module',
@@ -61,7 +64,18 @@ async function scaffoldReactRspackApp(appDir: string, name: string, port: number
       typescript: '^5.7.3',
       vitest: '^2.1.9'
     }
-  });
+  };
+
+  if (tailwind === 'on') {
+    pkg.devDependencies = {
+      ...pkg.devDependencies,
+      tailwindcss: '^3.4.17',
+      postcss: '^8.5.1',
+      autoprefixer: '^10.4.20',
+    };
+  }
+
+  await writeJson(path.join(appDir, 'package.json'), pkg);
 
   await writeJson(path.join(appDir, 'tsconfig.json'), {
     extends: '../../tsconfig.base.json',
@@ -91,6 +105,9 @@ import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
 
 const federationFile = process.env.MFJS_FEDERATION_FILE || 'mfjs.federation.json';
 const federationPath = path.join(process.cwd(), federationFile);
+const federation = fs.existsSync(federationPath)
+  ? JSON.parse(fs.readFileSync(federationPath, 'utf8'))
+  : null;
 // In on-demand mode (\`mfjs dev --on-demand\`), the CLI sets MFJS_ON_DEMAND_STARTER_URL.
 const onDemandStarterUrl = process.env.MFJS_ON_DEMAND_STARTER_URL || '';
 // Proxy ALL remote assets (remoteEntry + split chunks):
@@ -177,10 +194,15 @@ export default {
   },
   output: {
     uniqueName: '${name}',
-    publicPath: 'auto'
+    publicPath: 'auto',
+    filename: process.env.NODE_ENV === 'production' ? '[name].[contenthash:8].js' : '[name].js',
+    chunkFilename: process.env.NODE_ENV === 'production' ? '[id].[contenthash:8].js' : '[id].js',
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js']
+    extensions: ['.tsx', '.ts', '.js'],
+    extensionAlias: {
+      '.js': ['.tsx', '.ts', '.js'],
+    },
   },
   module: {
     rules: [
@@ -222,9 +244,44 @@ export default {
 // initialized the shared scope. Without this, shared deps (react, etc.) are
 // required synchronously before MF registers the singleton, causing
 // RUNTIME-006 (loadShareSync failure).
-import('./bootstrap');\n`,
+${tailwind === 'on' ? "import './styles.css';\n" : ''}import('./bootstrap');\n`,
     'utf8'
   );
+
+  if (tailwind === 'on') {
+    await fs.outputFile(
+      path.join(appDir, 'src/styles.css'),
+      ['@tailwind base;', '@tailwind components;', '@tailwind utilities;', ''].join('\n'),
+      'utf8'
+    );
+
+    await fs.outputFile(
+      path.join(appDir, 'tailwind.config.cjs'),
+      [
+        'module.exports = {',
+        "  content: ['./index.html', './src/**/*.{ts,tsx,js,jsx}'],",
+        '  theme: { extend: {} },',
+        '  plugins: [],',
+        '};',
+        '',
+      ].join('\n'),
+      'utf8'
+    );
+
+    await fs.outputFile(
+      path.join(appDir, 'postcss.config.cjs'),
+      [
+        'module.exports = {',
+        '  plugins: {',
+        '    tailwindcss: {},',
+        '    autoprefixer: {},',
+        '  },',
+        '};',
+        '',
+      ].join('\n'),
+      'utf8'
+    );
+  }
 
   await fs.outputFile(
     path.join(appDir, 'src/bootstrap.tsx'),
@@ -259,12 +316,14 @@ async function addHostRemoteDemo(appDir: string, remoteName: string) {
   );
 }
 
-const hostCommand = new Command('host')
+function createHostCommand() {
+  return new Command('host')
   .description('Generate a host (shell) app')
   .argument('<name>', 'Host app name (folder name under apps/)')
   .option('-d, --dir <path>', 'Workspace root directory', process.cwd())
   .option('--port <port>', 'Dev server port', '3000')
-  .action(async (name: string, opts: { dir: string; port: string }) => {
+  .option('--tailwind', 'Enable Tailwind CSS (PostCSS + tailwind.config)', false)
+  .action(async (name: string, opts: { dir: string; port: string; tailwind?: boolean }) => {
     const workspaceDir = path.resolve(opts.dir);
     const appName = toKebab(name);
     const appDir = path.join(workspaceDir, 'apps', appName);
@@ -273,7 +332,7 @@ const hostCommand = new Command('host')
     console.log(kleur.cyan(`Generating host ${appName} in ${appDir}`));
 
     await ensureDirIsCreatable(appDir);
-    await scaffoldReactRspackApp(appDir, appName, port);
+  await scaffoldReactRspackApp(appDir, appName, port, opts.tailwind ? 'on' : 'off');
 
     // Starter “proof-of-life” host UI that will work once federation runtime/config is wired.
     await addHostRemoteDemo(appDir, 'dashboard');
@@ -287,12 +346,16 @@ const hostCommand = new Command('host')
     console.log(kleur.green('Done.'));
   });
 
-const remoteCommand = new Command('remote')
+}
+
+function createRemoteCommand() {
+  return new Command('remote')
   .description('Generate a remote (micro-frontend) app')
   .argument('<name>', 'Remote app name (folder name under apps/)')
   .option('-d, --dir <path>', 'Workspace root directory', process.cwd())
   .option('--port <port>', 'Dev server port', '3001')
-  .action(async (name: string, opts: { dir: string; port: string }) => {
+  .option('--tailwind', 'Enable Tailwind CSS (PostCSS + tailwind.config)', false)
+  .action(async (name: string, opts: { dir: string; port: string; tailwind?: boolean }) => {
     const workspaceDir = path.resolve(opts.dir);
     const appName = toKebab(name);
     const appDir = path.join(workspaceDir, 'apps', appName);
@@ -301,7 +364,7 @@ const remoteCommand = new Command('remote')
     console.log(kleur.cyan(`Generating remote ${appName} in ${appDir}`));
 
     await ensureDirIsCreatable(appDir);
-    await scaffoldReactRspackApp(appDir, appName, port);
+  await scaffoldReactRspackApp(appDir, appName, port, opts.tailwind ? 'on' : 'off');
 
     // Remote entrypoint for federation config defaults.
     await addRemoteEntrypoint(appDir, appName);
@@ -318,7 +381,99 @@ const remoteCommand = new Command('remote')
     console.log(kleur.green('Done.'));
   });
 
-export const generateCommand = new Command('generate')
-  .description('Scaffold new MFJS apps')
-  .addCommand(hostCommand)
-  .addCommand(remoteCommand);
+}
+
+function createGenerateCommand() {
+  const hostCommand = createHostCommand();
+  const remoteCommand = createRemoteCommand();
+
+  const generateCommand = new Command('generate')
+    .description('Scaffold new MFJS apps')
+    .addCommand(hostCommand)
+    .addCommand(remoteCommand);
+
+  const wizardCommand = new Command('wizard')
+    .description('Interactive generator: create a host + remotes with common options')
+    .option('-d, --dir <path>', 'Workspace root directory', process.cwd())
+    .action(async (opts: { dir: string }) => {
+      const workspaceDir = path.resolve(opts.dir);
+
+      if (!process.stdout.isTTY) {
+        console.log(kleur.yellow('Wizard requires an interactive terminal. Use `mfjs generate host|remote` instead.'));
+        return;
+      }
+
+      const mode = await select({
+        message: 'What do you want to generate?',
+        choices: [
+          { name: 'Host + one remote (recommended)', value: 'pair' },
+          { name: 'Host only', value: 'host' },
+          { name: 'Remote only', value: 'remote' },
+        ],
+      });
+
+      const tailwind = await confirm({ message: 'Enable Tailwind CSS?', default: false });
+      const hostName = (mode === 'remote') ? 'shell' : await input({ message: 'Host name', default: 'shell' });
+      const hostPort = ((mode === 'remote')
+        ? 3000
+        : await number({ message: 'Host port', default: 3000, min: 1, max: 65535 })) as number;
+
+      const remoteCount = (mode === 'host'
+        ? 0
+        : mode === 'remote'
+          ? 1
+          : await number({ message: 'How many remotes?', default: 1, min: 1, max: 8 })) as number;
+
+      const remoteNames: string[] = [];
+      for (let i = 0; i < remoteCount; i++) {
+        remoteNames.push(await input({ message: `Remote #${i + 1} name`, default: i === 0 ? 'dashboard' : `remote-${i + 1}` }));
+      }
+
+      // Generate host/remotes by invoking the internal subcommands.
+      const runSub = async (cmd: Command, args: string[]) => {
+        cmd.exitOverride();
+        const prev = process.cwd();
+        process.chdir(workspaceDir);
+        try {
+          await cmd.parseAsync(args, { from: 'user' });
+        } finally {
+          process.chdir(prev);
+        }
+      };
+
+      if (mode !== 'remote') {
+        await runSub(hostCommand, [hostName, '--dir', workspaceDir, '--port', String(hostPort), ...(tailwind ? ['--tailwind'] : [])]);
+      }
+
+      const baseRemotePort = (hostPort ?? 3000) + 1;
+      for (let i = 0; i < remoteNames.length; i++) {
+        const p = baseRemotePort + i;
+        await runSub(remoteCommand, [remoteNames[i]!, '--dir', workspaceDir, '--port', String(p), ...(tailwind ? ['--tailwind'] : [])]);
+      }
+
+      const extra = await checkbox({
+        message: 'Post-generation tasks',
+        choices: [
+          { name: 'Generate federation config (mfjs federation)', value: 'federation', checked: true },
+          { name: 'Generate routes manifests (mfjs routes)', value: 'routes', checked: false },
+        ],
+      });
+
+      if (extra.includes('federation')) {
+        const { federationCommand } = await import('./federation.js');
+        await runSub(federationCommand, ['--dir', workspaceDir]);
+      }
+      if (extra.includes('routes')) {
+        const { routesCommand } = await import('./routes.js');
+        await runSub(routesCommand, ['--dir', workspaceDir]);
+      }
+
+      console.log(kleur.green('Wizard complete.'));
+    });
+
+  generateCommand.addCommand(wizardCommand);
+
+  return generateCommand;
+}
+
+export const generateCommand = createGenerateCommand();

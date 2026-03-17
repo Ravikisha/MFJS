@@ -10,8 +10,15 @@ async function run(argv: string[], cwd: string) {
   const prev = process.cwd();
   process.chdir(cwd);
   try {
-  // The Command instance here is already the 'generate' command.
-  await generateCommand.parseAsync(argv, { from: 'user' });
+  const [sub, ...rest] = argv;
+  if (!sub) throw new Error('missing subcommand');
+
+  // Execute the subcommand directly to avoid parent command parsing quirks in tests.
+  // Use a realistic argv shape so Commander treats `rest` as user args.
+  const cmd = generateCommand.commands.find((c) => c.name() === sub || c.name() === `generate:${sub}`);
+  if (!cmd) throw new Error(`unknown generate subcommand: ${sub}`);
+  cmd.exitOverride();
+  await cmd.parseAsync(rest, { from: 'user' });
   } finally {
     process.chdir(prev);
   }

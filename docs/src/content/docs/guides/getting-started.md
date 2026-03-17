@@ -20,13 +20,47 @@ pnpm install
 
 This creates a pnpm workspace with `apps/`, `packages/`, and `libs/` folders.
 
-## 2) Generate a host and a remote
+### Tailwind (optional)
+
+You can enable Tailwind defaults while initializing the workspace:
+
+```bash
+mfjs init my-mfjs-workspace --tailwind
+```
+
+This stores `features.tailwind = true` in `mfjs.config.json`, and generators can pick it up as a default.
+
+## 2) Scaffold a full app (recommended)
+
+If you want a working host + one or more remotes quickly, use the interactive scaffold:
+
+```bash
+mfjs scaffold app
+```
+
+It can optionally:
+
+- Enable Tailwind across generated apps
+- Run `mfjs federation`
+- Run `mfjs routes`
+- Add a workspace smoke test (Vitest)
+
+---
+
+## 3) Generate a host and a remote (manual / non-interactive)
 
 Generate a host (shell) and a remote (micro-frontend):
 
 ```bash
 mfjs generate host shell --port 3000
 mfjs generate remote dashboard --port 3001
+```
+
+You can enable Tailwind per-app:
+
+```bash
+mfjs generate host shell --tailwind
+mfjs generate remote dashboard --tailwind
 ```
 
 Each app gets:
@@ -39,7 +73,7 @@ Generated **hosts** include a pre-wired `bootstrap.tsx` using `NavLink`, `Remote
 
 Generated **remotes** include a `src/remote.tsx` using `RemoteApp`, plus a starter `src/pages/index.tsx` and a generated `src/mfjs.routes.ts`.
 
-## 3) Generate federation config
+## 4) Generate federation config
 
 ```bash
 mfjs federation
@@ -47,7 +81,7 @@ mfjs federation
 
 This writes `mfjs.federation.json` files for your apps under `apps/*`.
 
-## 4) Run dev servers
+## 5) Run dev servers
 
 ### Option A: normal mode
 
@@ -73,11 +107,11 @@ Remotes often produce additional split chunks at runtime. Proxying only `remoteE
 
 The generated `rspack.config.mjs` is already configured with this mapping.
 
-## 5) Open the host
+## 6) Open the host
 
 Open `http://localhost:3000`. You should see the host render the remote's home page.
 
-## 6) Generate remote page routes (optional)
+## 7) Generate remote page routes (optional)
 
 Add pages under `apps/dashboard/src/pages/`, then regenerate:
 

@@ -48,27 +48,10 @@ async function runMfjsCli(
   tmpWorkspace: string,
   cliArgs: string[]
 ): Promise<{ code: number; stdout: string; stderr: string }> {
-  const runnerPath = path.join(tmpWorkspace, 'run-mfjs-cli.mjs');
   const cliEntry = path.resolve(__dirname, '../dist/index.js');
 
-  await fs.writeFile(
-    runnerPath,
-    [
-      "import { spawn } from 'node:child_process';",
-      "import { fileURLToPath } from 'node:url';",
-      '',
-      `const cli = ${JSON.stringify(cliEntry)};`,
-      `const args = ${JSON.stringify(cliArgs)};`,
-      "const child = spawn(process.execPath, [cli, ...args], { stdio: 'inherit' });",
-      "child.on('close', (code) => process.exit(code ?? 0));",
-      "child.on('error', (err) => { console.error(err); process.exit(1); });",
-      '',
-      "void fileURLToPath;",
-    ].join('\n'),
-    'utf8'
-  );
-
-  return runNode([runnerPath], { cwd: tmpWorkspace });
+  // Run the built CLI entry directly so stdout/stderr are captured by runNode.
+  return runNode([cliEntry, ...cliArgs], { cwd: tmpWorkspace });
 }
 
 async function writeTinyWorkspace(tmp: string) {

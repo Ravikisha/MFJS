@@ -11,6 +11,36 @@ MFJS comes with a workspace-aware CLI.
 
 Creates a new MFJS workspace (pnpm workspaces) with a `mfjs.config.json` and a typed `mfjs.config.ts` stub.
 
+Useful flags:
+
+| Flag | Description |
+|---|---|
+| `--yes` | Skip prompts and use defaults |
+| `--tailwind` | Turn on Tailwind defaults for subsequent `mfjs generate`/`mfjs scaffold` |
+
+When Tailwind is enabled via `mfjs init --tailwind`, the CLI stores the default in `mfjs.config.json` so generators can pick it up automatically.
+
+---
+
+### `mfjs scaffold app`
+
+Guided “full workspace” scaffold.
+
+This is the recommended path when you want a working host + multiple remotes quickly.
+
+See the dedicated guide: [Scaffold an app](/guides/scaffold-app/).
+
+What it does:
+
+- Generates a host app and N remote apps under `apps/`
+- Optionally enables Tailwind across generated apps
+- Optionally runs `mfjs federation` and `mfjs routes` after generation
+- Adds a small workspace smoke test so CI can verify the micro-frontend wiring
+
+This command is interactive (terminal prompts). For non-interactive usage (CI), use `mfjs generate host|remote` plus `mfjs federation`.
+
+---
+
 ### `mfjs generate host <name>`
 
 Scaffolds a host app in `apps/<name>`.
@@ -21,6 +51,14 @@ Generated hosts include a pre-wired `bootstrap.tsx` that uses `@mfjs/runtime`'s 
 
 The generated `rspack.config.mjs` supports the **proxy remotes** dev workflow (see `mfjs dev --proxy-remotes` below).
 
+Useful flags:
+
+| Flag | Description |
+|---|---|
+| `-d, --dir <path>` | Workspace root directory (defaults to `process.cwd()`) |
+| `--port <port>` | Dev server port (default: `3000`) |
+| `--tailwind` | Generate Tailwind + PostCSS config and a `src/styles.css` entry |
+
 ### `mfjs generate remote <name>`
 
 Scaffolds a remote app in `apps/<name>`.
@@ -30,6 +68,35 @@ Generated remotes include:
 - `src/remote.tsx` — the default exposed module, using `RemoteApp` from `@mfjs/runtime`
 - `src/pages/index.tsx` — a starter home page
 - `src/mfjs.routes.ts` — initial generated routes file (regenerate any time with `mfjs routes`)
+
+Useful flags:
+
+| Flag | Description |
+|---|---|
+| `-d, --dir <path>` | Workspace root directory (defaults to `process.cwd()`) |
+| `--port <port>` | Dev server port (default: `3001`) |
+| `--tailwind` | Generate Tailwind + PostCSS config and a `src/styles.css` entry |
+
+When Tailwind is enabled, generated apps include:
+
+- `tailwind.config.cjs`
+- `postcss.config.cjs`
+- `src/styles.css` (`@tailwind base;`, etc.)
+- `src/main.tsx` imports `./styles.css`
+
+---
+
+### `mfjs generate wizard`
+
+Interactive generator that can create:
+
+- Host + one remote (recommended)
+- Host only
+- Remote only
+
+It also offers post-generation tasks like running `mfjs federation` or `mfjs routes`.
+
+This command requires a TTY. In CI or scripts, prefer `mfjs generate host|remote`.
 
 ### `mfjs routes`
 
