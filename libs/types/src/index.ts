@@ -37,3 +37,17 @@ export type {
   NavigateMode,
   NavigateDetail,
 } from './routing.js';
+
+export type {
+  MfjsWorkspaceConfig,
+  MfjsRemoteConfig,
+  MfjsOrchestratorConfig,
+  MfjsFederationConfig,
+  MfjsFeaturesConfig,
+} from './mfjs-config.js';
+
+export type { MfjsPlugin, MfjsDevPlan, MfjsAppMeta } from './plugins.js';
+
+export type { MfjsPageRoute, MfjsRoutesManifest, MfjsHostRoutesManifest, MfjsRoutingCompiler } from './routing-compiler.js';
+export { defaultRoutingCompiler } from './routing-compiler.js';
+

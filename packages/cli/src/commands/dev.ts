@@ -7,6 +7,7 @@ import http from 'node:http';
 import { WebSocketServer } from 'ws';
 import { federationCommand } from './federation.js';
 import { routesCommand } from './routes.js';
+import { loadWorkspaceConfig } from '../config.js';
 
 type DevOpts = {
   dir: string;
@@ -14,6 +15,7 @@ type DevOpts = {
   proxyRemotes?: boolean;
   hmrRemotes?: boolean;
   onDemand?: boolean;
+  watch?: boolean;
 };
 
 type AppMeta = {
@@ -114,6 +116,23 @@ function run(cmd: string, args: string[], cwd: string, env?: NodeJS.ProcessEnv) 
   });
 
   return child;
+}
+
+export function _devEnvForApp(args: {
+  appType: 'host' | 'remote';
+  proxyRemotes: boolean;
+  hostFederationFile?: string;
+  reloadUrl?: string;
+  starterUrl?: string;
+}): NodeJS.ProcessEnv {
+  const { appType, proxyRemotes, hostFederationFile, reloadUrl, starterUrl } = args;
+  const isHost = appType === 'host';
+  return {
+    ...(proxyRemotes && isHost && hostFederationFile ? { MFJS_FEDERATION_FILE: hostFederationFile } : {}),
+    ...(reloadUrl ? { MFJS_DEV_RELOAD_URL: reloadUrl } : {}),
+    ...(starterUrl ? { MFJS_ON_DEMAND_STARTER_URL: starterUrl } : {}),
+    ...(starterUrl && isHost ? { MFJS_ON_DEMAND_MIDDLEWARE: '1' } : {}),
+  };
 }
 
 function attachGracefulShutdown(children: Array<ReturnType<typeof spawn>>) {
@@ -254,8 +273,22 @@ export const devCommand = new Command('dev')
     'Start only the host initially; start remote dev servers automatically on first request (best-effort, requires proxy remotes mode)',
     false
   )
+  .option(
+    '--watch',
+    'Watch workspace config/federation/routes files and restart the affected dev server(s) (best-effort)',
+    false
+  )
   .action(async (opts: DevOpts) => {
     const workspaceDir = path.resolve(opts.dir);
+
+  const { cfg: workspaceCfg } = await loadWorkspaceConfig(workspaceDir);
+
+  // Allow workspace config to provide defaults (CLI flags still win).
+  const cfgOrch = workspaceCfg.orchestrator ?? {};
+  const proxyRemotes = opts.proxyRemotes ?? Boolean(cfgOrch.proxyRemotes);
+  const hmrRemotes = opts.hmrRemotes ?? Boolean(cfgOrch.hmrRemotes);
+  const onDemand = opts.onDemand ?? (cfgOrch.mode === 'on-demand');
+  const watch = Boolean(opts.watch);
     const appsDir = path.join(workspaceDir, 'apps');
 
     if (!(await fs.pathExists(appsDir))) {
@@ -288,22 +321,22 @@ export const devCommand = new Command('dev')
     const host = appMetas.find((a) => a.meta.type === 'host');
     const remotes = appMetas.filter((a) => a.meta.type === 'remote');
 
-    if (opts.onDemand && !opts.proxyRemotes) {
+  if (onDemand && !proxyRemotes) {
       console.log(kleur.yellow('Warning: --on-demand works best with --proxy-remotes. Continuing anyway.'));
     }
 
     // Start order:
     // - default: remotes first then host
     // - on-demand: host first, remotes are started lazily
-    const sorted = opts.onDemand
+  const sorted = onDemand
       ? (host ? [host] : [])
       : [...appMetas].sort((a, b) => (a.meta.type === 'remote' ? -1 : 1) - (b.meta.type === 'remote' ? -1 : 1));
 
-    if (opts.proxyRemotes && host) {
+  if (proxyRemotes && host) {
       await writeHostProxyFederation(host.dir, host.meta, remotes);
     }
 
-    const reloadServer = opts.hmrRemotes ? createDevReloadServer() : null;
+  const reloadServer = hmrRemotes ? createDevReloadServer() : null;
     const reload = reloadServer ? await reloadServer.listen() : null;
 
     console.log(kleur.cyan(`Starting ${sorted.length} dev server(s)...`));
@@ -314,7 +347,7 @@ export const devCommand = new Command('dev')
     const startedRemotes = new Set<string>();
     const remoteByName = new Map(remotes.map((r) => [r.meta.name, r] as const));
 
-    const remoteStarter = opts.onDemand
+  const remoteStarter = onDemand
       ? (() => {
           const server = http.createServer(async (req, res) => {
             try {
@@ -388,7 +421,7 @@ export const devCommand = new Command('dev')
     for (const app of sorted) {
       console.log(kleur.gray(`- ${app.meta.type} ${app.meta.name} (port ${app.meta.port})`));
       const args = ['dev'];
-      if (opts.proxyRemotes && app.meta.type === 'host') {
+  if (proxyRemotes && app.meta.type === 'host') {
         children.push({
           child: run('pnpm', args, app.dir, {
             MFJS_FEDERATION_FILE: 'mfjs.federation.proxy.json',
@@ -420,6 +453,76 @@ export const devCommand = new Command('dev')
       process.once('exit', () => remoteStarter.close());
     }
 
+    const restartable = new Map<string, { meta: AppMeta; dir: string; env?: NodeJS.ProcessEnv; child: ReturnType<typeof spawn> }>();
+
+    for (const c of children) {
+      const app = appMetas.find((a) => a.meta.name === c.appName);
+      if (!app) continue;
+      // env is embedded in spawn call below; track only for restarts.
+      restartable.set(c.appName, { meta: app.meta, dir: app.dir, child: c.child });
+    }
+
+    const restartApp = (name: string) => {
+      const entry = restartable.get(name);
+      if (!entry) return;
+      try {
+        entry.child.kill('SIGTERM');
+      } catch {
+        // ignore
+      }
+      const args = ['dev'];
+      const env = _devEnvForApp({
+        appType: entry.meta.type,
+        proxyRemotes,
+        hostFederationFile: 'mfjs.federation.proxy.json',
+        ...(reload?.url ? { reloadUrl: reload.url } : {}),
+        ...(starterInfo?.url ? { starterUrl: starterInfo.url } : {}),
+      });
+      const child = run('pnpm', args, entry.dir, env);
+      entry.child = child;
+    };
+
+    if (watch) {
+      // Best-effort restart triggers. Avoid optional deps by using fs.watch.
+      const watchPaths = [
+        path.join(workspaceDir, 'mfjs.config.json'),
+        path.join(workspaceDir, 'mfjs.config.ts'),
+      ];
+      for (const app of appMetas) {
+        watchPaths.push(path.join(app.dir, 'mfjs.app.json'));
+        watchPaths.push(path.join(app.dir, 'mfjs.federation.json'));
+        watchPaths.push(path.join(app.dir, 'mfjs.federation.proxy.json'));
+        watchPaths.push(path.join(app.dir, 'mfjs.routes.json'));
+        watchPaths.push(path.join(app.dir, 'mfjs.routes.host.json'));
+        watchPaths.push(path.join(app.dir, 'rspack.config.mjs'));
+      }
+
+      const lastByPath = new Map<string, number>();
+      const debounceMs = 300;
+      const restartAll = () => {
+        for (const a of appMetas) restartApp(a.meta.name);
+      };
+
+      for (const p of watchPaths) {
+        try {
+          if (!fs.existsSync(p)) continue;
+          fs.watch(p, { persistent: true }, () => {
+            const now = Date.now();
+            const prev = lastByPath.get(p) || 0;
+            if (now - prev < debounceMs) return;
+            lastByPath.set(p, now);
+
+            restartAll();
+          });
+        } catch {
+          // ignore
+        }
+      }
+
+      console.log(kleur.cyan('\nWatch mode:'));
+      console.log(kleur.gray('- watching mfjs.config.*, mfjs.*.json, rspack.config.mjs')); 
+      console.log(kleur.gray('- on change: restarting dev servers (best-effort)'));
+  }
     // Friendly summary.
     if (host) {
       console.log(kleur.green(`Host:   http://localhost:${host.meta.port}`));
@@ -428,13 +531,13 @@ export const devCommand = new Command('dev')
       console.log(kleur.green(`Remote: http://localhost:${r.meta.port} (remoteEntry: http://localhost:${r.meta.port}/remoteEntry.js)`));
     }
 
-    if (opts.proxyRemotes && host) {
+  if (proxyRemotes && host) {
       console.log(kleur.cyan('\nProxy mode:'));
       console.log(kleur.gray(`- wrote ${path.relative(workspaceDir, path.join(host.dir, 'mfjs.federation.proxy.json'))}`));
       console.log(kleur.gray('- ensure your host rspack devServer is configured to proxy /mfjs/remotes/<name>/remoteEntry.js to each remote')); 
     }
 
-    if (starterInfo && host) {
+  if (starterInfo && host) {
       console.log(kleur.cyan('\nOn-demand remotes:'));
       console.log(kleur.gray(`- remote starter endpoint: ${starterInfo.url}/__mfjs/start-remote?name=<remoteName>`));
   console.log(kleur.gray('- host proxy can call this endpoint before proxying remoteEntry/chunks (supported by the default generated templates)'));

@@ -33,11 +33,28 @@ describe('mfjs generate', () => {
     const entryFile = path.join(tmp, 'apps', 'dashboard', 'src', 'remote.tsx');
     expect(await fs.pathExists(entryFile)).toBe(true);
 
+  expect(await fs.pathExists(path.join(tmp, 'apps', 'dashboard', 'src', 'pages', 'index.tsx'))).toBe(true);
+  expect(await fs.pathExists(path.join(tmp, 'apps', 'dashboard', 'src', 'mfjs.routes.ts'))).toBe(true);
+
     const meta = await fs.readJson(path.join(tmp, 'apps', 'dashboard', 'mfjs.app.json'));
     expect(meta.exposes).toEqual({ './App': './src/remote.tsx' });
   });
 
-  it('host bootstrap.tsx uses loadRemoteModule to load the remote (proof-of-life)', async () => {
+  it('remote template uses getFederatedRouter() so it can consume the host router when shared via federation', async () => {
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'mfjs-cli-'))) as string;
+
+    await run(['remote', 'dashboard', '--dir', tmp, '--port', '3001'], tmp);
+
+    const remote = await fs.readFile(path.join(tmp, 'apps', 'dashboard', 'src', 'remote.tsx'), 'utf8');
+    expect(remote).toContain("from '@mfjs/runtime'");
+    expect(remote).toContain('getFederatedRouter');
+    expect(remote).toContain('getFederatedRouter()');
+  expect(remote).toContain('RemoteApp');
+  expect(remote).toContain("from './mfjs.routes.js'");
+    expect(remote).toContain('router.navigate');
+  });
+
+  it('host bootstrap.tsx uses RemoteOutlet + NavLink + usePathname (routing proof-of-life)', async () => {
     const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'mfjs-cli-'))) as string;
 
   await run(['host', 'shell', '--dir', tmp, '--port', '3000'], tmp);
@@ -45,9 +62,17 @@ describe('mfjs generate', () => {
     // After introducing the async boundary, app code lives in bootstrap.tsx
     const bootstrap = await fs.readFile(path.join(tmp, 'apps', 'shell', 'src', 'bootstrap.tsx'), 'utf8');
     expect(bootstrap).toContain("from '@mfjs/runtime'");
-    expect(bootstrap).toContain('loadRemoteModule');
+  expect(bootstrap).toContain('RemoteOutlet');
+  expect(bootstrap).toContain('NavLink');
+  expect(bootstrap).toContain('usePathname');
+  expect(bootstrap).toContain('mfjs.routes.host.json');
     expect(bootstrap).toContain('connectMfjsDevReload');
     expect(bootstrap).toContain('MFJS_DEV_RELOAD_URL');
+    expect(bootstrap).toContain('provideHostRouter');
+    expect(bootstrap).toContain('getRouter');
+    expect(bootstrap).toContain('provideHostRouter(getRouter())');
+
+  expect(await fs.pathExists(path.join(tmp, 'apps', 'shell', 'mfjs.routes.host.json'))).toBe(true);
   });
 
   test('host exposes MFJS_DEV_RELOAD_URL to client and connects reload client when present', async () => {

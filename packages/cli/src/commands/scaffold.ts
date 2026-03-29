@@ -4,6 +4,8 @@ import fs from 'fs-extra';
 import kleur from 'kleur';
 import { input, confirm, number, checkbox } from '@inquirer/prompts';
 
+import { getTailwindDefault, loadWorkspaceConfig } from '../config.js';
+
 import { generateCommand } from './generate.js';
 import { federationCommand } from './federation.js';
 
@@ -14,10 +16,8 @@ type ScaffoldOpts = {
 
 async function readWorkspaceTailwindDefault(workspaceDir: string): Promise<boolean> {
   try {
-    const cfgPath = path.join(workspaceDir, 'mfjs.config.json');
-    if (!(await fs.pathExists(cfgPath))) return false;
-    const cfg = (await fs.readJson(cfgPath)) as any;
-    return Boolean(cfg?.features?.tailwind);
+    const { cfg } = await loadWorkspaceConfig(workspaceDir);
+    return getTailwindDefault(cfg);
   } catch {
     return false;
   }

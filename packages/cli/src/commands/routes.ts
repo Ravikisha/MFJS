@@ -2,6 +2,57 @@ import { Command } from 'commander';
 import path from 'node:path';
 import fs from 'fs-extra';
 import kleur from 'kleur';
+// NOTE: we keep the implementation local to @mfjs/cli to avoid TS rootDir
+// cross-package source imports during compilation.
+// The *contract* lives in @mfjs/types (libs/types/src/routing-compiler.ts).
+type MfjsPageRoute = { path: string; file: string };
+
+const defaultRoutingCompiler = {
+  routeFromPageFile(relFromPages: string) {
+    let withoutExt = relFromPages.replace(/\.(tsx|ts|jsx|js)$/, '');
+    withoutExt = withoutExt.replace(/\\/g, '/');
+
+    const segs = withoutExt.split('/').filter(Boolean);
+    const out: string[] = [];
+
+    for (let i = 0; i < segs.length; i++) {
+      const s = segs[i];
+      if (!s) continue;
+      if (s === 'index' && i === segs.length - 1) continue;
+
+      const mCatchAll = s.match(/^\[\.\.\.(.+)\]$/);
+      if (mCatchAll) {
+        out.push('*');
+        continue;
+      }
+
+      const mParam = s.match(/^\[(.+)\]$/);
+      if (mParam) {
+        out.push(':' + mParam[1]);
+        continue;
+      }
+
+      out.push(s);
+    }
+
+    return '/' + out.join('/');
+  },
+
+  sortRoutesForMatching(routes: MfjsPageRoute[]) {
+    const score = (p: string) => {
+      const segs = p.split('/').filter(Boolean);
+      let s = 0;
+      for (const seg of segs) {
+        if (seg === '*') s += 0;
+        else if (seg.startsWith(':')) s += 1;
+        else s += 2;
+      }
+      return s * 100 + segs.length;
+    };
+
+    return [...routes].sort((a, b) => score(b.path) - score(a.path));
+  },
+};
 
 type AppMeta = {
   name: string;
@@ -50,39 +101,7 @@ async function findApps(workspaceDir: string) {
 }
 
 function routeFromPageFile(relFromPages: string) {
-  // pages/index.tsx -> /
-  // pages/about.tsx -> /about
-  // pages/reports/[id].tsx -> /reports/:id
-  // pages/docs/[...slug].tsx -> /docs/*
-  // pages/settings/index.tsx -> /settings
-
-  let withoutExt = relFromPages.replace(/\.(tsx|ts|jsx|js)$/, '');
-  withoutExt = withoutExt.replace(/\\/g, '/');
-
-  const segs = withoutExt.split('/').filter(Boolean);
-
-  const out: string[] = [];
-  for (let i = 0; i < segs.length; i++) {
-    const s = segs[i];
-    if (s === undefined) continue;
-    if (s === 'index' && i === segs.length - 1) continue;
-
-    const mCatchAll = s.match(/^\[\.\.\.(.+)\]$/);
-    if (mCatchAll) {
-      out.push('*');
-      continue;
-    }
-
-    const mParam = s.match(/^\[(.+)\]$/);
-    if (mParam) {
-      out.push(':' + mParam[1]);
-      continue;
-    }
-
-    out.push(s);
-  }
-
-  return '/' + out.join('/');
+  return defaultRoutingCompiler.routeFromPageFile(relFromPages);
 }
 
 async function scanPages(appDir: string) {
@@ -112,20 +131,7 @@ async function scanPages(appDir: string) {
 }
 
 function sortRoutesForMatching(routes: PageRoute[]) {
-  // Heuristic: more specific routes first.
-  // Static > params > splat, and longer paths first.
-  const score = (p: string) => {
-    const segs = p.split('/').filter(Boolean);
-    let s = 0;
-    for (const seg of segs) {
-      if (seg === '*') s += 0;
-      else if (seg.startsWith(':')) s += 1;
-      else s += 2;
-    }
-    return s * 100 + segs.length;
-  };
-
-  return [...routes].sort((a, b) => score(b.path) - score(a.path));
+  return defaultRoutingCompiler.sortRoutesForMatching(routes as MfjsPageRoute[]) as PageRoute[];
 }
 
 async function writeRemoteRoutesModule(appDir: string, routes: PageRoute[]) {

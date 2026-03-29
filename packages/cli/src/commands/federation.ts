@@ -2,6 +2,7 @@ import { Command } from 'commander';
 import path from 'node:path';
 import fs from 'fs-extra';
 import kleur from 'kleur';
+import { loadWorkspaceConfig } from '../config.js';
 
 type AppMeta = {
   name: string;
@@ -105,7 +106,7 @@ async function detectSharedFromSource(appDir: string) {
   const files = entries.filter((f) => f.endsWith('.ts') || f.endsWith('.tsx') || f.endsWith('.js') || f.endsWith('.jsx'));
 
   const shared: FederationConfig['shared'] = {};
-  const lookFor = ['react', 'react-dom', 'react-router-dom', '@mfjs/event-bus', '@mfjs/state', '@mfjs/ui'];
+  const lookFor = ['react', 'react-dom', 'react-router-dom', '@mfjs/event-bus', '@mfjs/state', '@mfjs/ui', '@mfjs/runtime'];
 
   for (const file of files) {
     const content = await fs.readFile(path.join(srcDir, file), 'utf8');
@@ -147,6 +148,8 @@ export const federationCommand = new Command('federation')
   .option('-d, --dir <path>', 'Workspace root directory', process.cwd())
   .action(async (opts: { dir: string }) => {
     const workspaceDir = path.resolve(opts.dir);
+
+  const { cfg: workspaceCfg, plugins } = await loadWorkspaceConfig(workspaceDir);
     const apps = await findApps(workspaceDir);
 
     if (apps.length === 0) {
@@ -163,14 +166,32 @@ export const federationCommand = new Command('federation')
       const exposes = await detectExposes(remote.dir, remote.meta);
       const shared = mergeShared(defaultShared(), await detectSharedFromPackageJson(remote.dir), await detectSharedFromSource(remote.dir));
 
+      // Allow workspace config to add extra shared singleton deps.
+      const extraShared = (workspaceCfg.federation?.shared ?? []).reduce((acc, name) => {
+        acc[name] = { singleton: true, requiredVersion: false };
+        return acc;
+      }, {} as FederationConfig['shared']);
+
       const cfg: FederationConfig = {
         name: toFederationName(detectedName),
         filename: 'remoteEntry.js',
         ...(exposes !== undefined ? { exposes } : {}),
-        shared
+        shared: mergeShared(shared, extraShared)
       };
 
-      await writeFederationConfig(remote.dir, cfg);
+      // Plugin hook: federationConfig
+      let finalCfg: FederationConfig = cfg;
+      for (const p of plugins) {
+        if (!p.federationConfig) continue;
+        const next = await p.federationConfig({
+          workspaceDir,
+          app: { ...remote.meta, dir: remote.dir },
+          config: finalCfg,
+        });
+        if (next) finalCfg = next as FederationConfig;
+      }
+
+      await writeFederationConfig(remote.dir, finalCfg);
       console.log(kleur.green(`wrote ${path.relative(workspaceDir, path.join(remote.dir, 'mfjs.federation.json'))}`));
     }
 
@@ -178,16 +199,32 @@ export const federationCommand = new Command('federation')
       const detectedName = await detectAppName(host.dir, host.meta);
       const shared = mergeShared(defaultShared(), await detectSharedFromPackageJson(host.dir), await detectSharedFromSource(host.dir));
 
+      const extraShared = (workspaceCfg.federation?.shared ?? []).reduce((acc, name) => {
+        acc[name] = { singleton: true, requiredVersion: false };
+        return acc;
+      }, {} as FederationConfig['shared']);
+
       const cfg: FederationConfig = {
         name: toFederationName(detectedName),
         filename: 'remoteEntry.js',
   // Rspack dev-server serves remoteEntry at the root by default.
   // (Vite-style /assets/remoteEntry.js doesn't apply here.)
   remotes: Object.fromEntries(remotes.map((r) => [r.meta.name, `${r.meta.name}@http://localhost:${r.meta.port}/remoteEntry.js`])),
-        shared
+        shared: mergeShared(shared, extraShared)
       };
 
-      await writeFederationConfig(host.dir, cfg);
+      let finalCfg: FederationConfig = cfg;
+      for (const p of plugins) {
+        if (!p.federationConfig) continue;
+        const next = await p.federationConfig({
+          workspaceDir,
+          app: { ...host.meta, dir: host.dir },
+          config: finalCfg,
+        });
+        if (next) finalCfg = next as FederationConfig;
+      }
+
+      await writeFederationConfig(host.dir, finalCfg);
       console.log(kleur.green(`wrote ${path.relative(workspaceDir, path.join(host.dir, 'mfjs.federation.json'))}`));
     }
 

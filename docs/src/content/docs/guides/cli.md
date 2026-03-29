@@ -50,6 +50,8 @@ Generated apps currently use **Rspack** (`rspack.config.mjs`).
 
 Generated hosts include a pre-wired `bootstrap.tsx` that uses `@mfjs/runtime`'s `NavLink`, `RemoteOutlet`, `usePathname`, and `getRouter` to load and display remote apps.
 
+Generated hosts also include a starter `mfjs.routes.host.json` manifest (regenerate with `mfjs routes`).
+
 The generated `rspack.config.mjs` supports the **proxy remotes** dev workflow (see `mfjs dev --proxy-remotes` below).
 
 Useful flags:
@@ -66,7 +68,7 @@ Scaffolds a remote app in `apps/<name>`.
 
 Generated remotes include:
 
-- `src/remote.tsx` — the default exposed module, using `RemoteApp` from `@mfjs/runtime`
+- `src/remote.tsx` — the default exposed module, using `RemoteApp` + `pages` from `@mfjs/runtime`
 - `src/pages/index.tsx` — a starter home page
 - `src/mfjs.routes.ts` — initial generated routes file (regenerate any time with `mfjs routes`)
 
@@ -202,6 +204,31 @@ Auto-detection behavior:
 The default remote expose is `./App -> ./src/remote.tsx`.
 
 Generated apps already include a `rspack.config.mjs` that will load `mfjs.federation.json` (if present) and enable `ModuleFederationPlugin` automatically.
+
+---
+
+## Router sharing (host → remote)
+
+If your host and remotes import routing utilities from `@mfjs/runtime`, you should ensure the runtime is shared as a singleton in Module Federation (the default output of `mfjs federation` already does this).
+
+To share the **same router instance** across host + remotes, MFJS provides a shared module entry:
+
+- `provideHostRouter()` — called by the host once
+- `getFederatedRouter()` — called by remotes to access the host router when available
+
+Host example:
+
+```ts
+import { getRouter, provideHostRouter } from '@mfjs/runtime';
+provideHostRouter(getRouter());
+```
+
+Remote example:
+
+```ts
+import { getFederatedRouter } from '@mfjs/runtime';
+const router = getFederatedRouter();
+```
 
 For Rspack, the remote entry is served at:
 
