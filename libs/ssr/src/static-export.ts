@@ -21,7 +21,8 @@
  */
 
 import { writeFile, mkdir } from 'node:fs/promises';
-import { join, dirname, resolve, sep } from 'node:path';
+import { dirname, resolve, sep } from 'node:path';
+import { createHash } from 'node:crypto';
 import { isSafePathname } from '@mfjs/security';
 import { renderRouteToString, injectIntoTemplate } from './render-to-string.js';
 import type { StaticExportOptions, StaticPage } from './types.js';
@@ -34,7 +35,6 @@ import type { StaticExportOptions, StaticPage } from './types.js';
  * - `/dashboard/users/42`     → `dashboard/users/42/index.html`
  */
 function pathToFile(urlPath: string): string {
-  // Strip query/hash if present.
   const q = urlPath.indexOf('?');
   const h = urlPath.indexOf('#');
   const cut = q === -1 ? h : h === -1 ? q : Math.min(q, h);
@@ -49,9 +49,28 @@ export interface StaticExportFailure {
   error: Error;
 }
 
+export interface StaticExportManifestEntry {
+  file: string;
+  /** Content SHA-256, hex-encoded (16-char prefix). */
+  hash: string;
+  bytes: number;
+}
+
 export interface StaticExportResult {
   pages: StaticPage[];
   failures: StaticExportFailure[];
+  manifest: Record<string, StaticExportManifestEntry>;
+}
+
+export interface StaticExportExtraOptions {
+  /** Maximum concurrent route renders. Default 8. Set to 1 for sequential. */
+  concurrency?: number;
+  /**
+   * When set, write a JSON manifest mapping route path → output file + content
+   * hash + byte length. Use it for ETag/CDN purge keys. Path is relative to
+   * `outDir` (or absolute).
+   */
+  manifestFile?: string;
 }
 
 /**
@@ -61,74 +80,162 @@ export interface StaticExportResult {
  * can fail their own build deterministically. The caller decides whether to
  * throw on `failures.length > 0`.
  */
-export async function staticExport(options: StaticExportOptions): Promise<StaticPage[]>;
 export async function staticExport(
-  options: StaticExportOptions & { detailed: true },
+  options: StaticExportOptions & StaticExportExtraOptions,
+): Promise<StaticPage[]>;
+export async function staticExport(
+  options: StaticExportOptions & StaticExportExtraOptions & { detailed: true },
 ): Promise<StaticExportResult>;
 export async function staticExport(
-  options: StaticExportOptions & { detailed?: boolean },
+  options: StaticExportOptions & StaticExportExtraOptions & { detailed?: boolean },
 ): Promise<StaticPage[] | StaticExportResult> {
-  const { routes, App, template, outDir, detailed } = options;
-
-  const pages: StaticPage[] = [];
-  const failures: StaticExportFailure[] = [];
-  const seenFiles = new Set<string>();
+  const { routes, App, template, outDir, detailed, concurrency, manifestFile } = options;
 
   const resolvedOutDir = outDir ? resolve(outDir) + sep : null;
+  const limit = Math.max(1, concurrency ?? 8);
 
-  for (const route of routes) {
+  type Slot = {
+    page?: StaticPage;
+    failure?: StaticExportFailure;
+    manifestEntry?: StaticExportManifestEntry;
+    routePath: string;
+  };
+  const slots: Slot[] = new Array(routes.length);
+
+  // Pre-pass: reserve file paths sequentially so duplicates are deterministic
+  // regardless of completion order.
+  const seenFiles = new Map<string, number>();
+  const reservedFile = new Array<string | null>(routes.length);
+
+  for (let i = 0; i < routes.length; i++) {
+    const route = routes[i]!;
+    slots[i] = { routePath: route.path };
     if (!isSafePathname(route.path)) {
-      failures.push({ path: route.path, error: new Error(`Unsafe route path rejected: ${route.path}`) });
+      slots[i] = {
+        routePath: route.path,
+        failure: { path: route.path, error: new Error(`Unsafe route path rejected: ${route.path}`) },
+      };
+      reservedFile[i] = null;
       continue;
     }
-    // Pattern routes (`:id`, `*`) cannot be exported as static files — they
-    // need concrete params. Skip them silently rather than producing files
-    // with `:` in the name (illegal on Windows / S3).
     if (/[:*]/.test(route.path)) {
+      reservedFile[i] = null;
       continue;
     }
+    const file = pathToFile(route.path);
+    const seen = seenFiles.get(file);
+    if (seen !== undefined) {
+      slots[i] = {
+        routePath: route.path,
+        failure: { path: route.path, error: new Error(`Duplicate output path: ${file}`) },
+      };
+      reservedFile[i] = null;
+      continue;
+    }
+    seenFiles.set(file, i);
+    reservedFile[i] = file;
+  }
+
+  async function renderOne(i: number): Promise<void> {
+    if (slots[i]?.failure) return;
+    const file = reservedFile[i];
+    if (file == null) return;
+    const route = routes[i]!;
     let result;
     try {
       result = await renderRouteToString(App, route);
     } catch (err) {
-      failures.push({ path: route.path, error: err instanceof Error ? err : new Error(String(err)) });
-      continue;
+      slots[i] = {
+        routePath: route.path,
+        failure: { path: route.path, error: err instanceof Error ? err : new Error(String(err)) },
+      };
+      return;
     }
     if (result.statusCode >= 500) {
-      failures.push({
-        path: route.path,
-        error: result.error ?? new Error(`Render failed with status ${result.statusCode}`),
-      });
-      continue;
+      slots[i] = {
+        routePath: route.path,
+        failure: {
+          path: route.path,
+          error: result.error ?? new Error(`Render failed with status ${result.statusCode}`),
+        },
+      };
+      return;
     }
     const content = injectIntoTemplate(template, result.html);
-    const file = pathToFile(route.path);
-    if (seenFiles.has(file)) {
-      failures.push({ path: route.path, error: new Error(`Duplicate output path: ${file}`) });
-      continue;
-    }
-    seenFiles.add(file);
-    pages.push({ file, content });
 
     if (outDir && resolvedOutDir) {
       const outPath = resolve(outDir, file);
       if (!outPath.startsWith(resolvedOutDir)) {
-        failures.push({
-          path: route.path,
-          error: new Error(`Path traversal blocked: ${route.path}`),
-        });
-        continue;
+        slots[i] = {
+          routePath: route.path,
+          failure: { path: route.path, error: new Error(`Path traversal blocked: ${route.path}`) },
+        };
+        return;
       }
       try {
         await mkdir(dirname(outPath), { recursive: true });
         await writeFile(outPath, content, 'utf8');
       } catch (err) {
-        failures.push({ path: route.path, error: err instanceof Error ? err : new Error(String(err)) });
+        slots[i] = {
+          routePath: route.path,
+          failure: { path: route.path, error: err instanceof Error ? err : new Error(String(err)) },
+        };
+        return;
+      }
+    }
+
+    const hash = createHash('sha256').update(content).digest('hex').slice(0, 16);
+    const bytes = Buffer.byteLength(content, 'utf8');
+    slots[i] = {
+      routePath: route.path,
+      page: { file, content },
+      manifestEntry: { file, hash, bytes },
+    };
+  }
+
+  // Bounded-parallel worker pool. `next` is a shared cursor.
+  let next = 0;
+  const workers = new Array<Promise<void>>(Math.min(limit, routes.length));
+  for (let w = 0; w < workers.length; w++) {
+    workers[w] = (async () => {
+      while (true) {
+        const i = next++;
+        if (i >= routes.length) return;
+        await renderOne(i);
+      }
+    })();
+  }
+  await Promise.all(workers);
+
+  const pages: StaticPage[] = [];
+  const failures: StaticExportFailure[] = [];
+  const manifest: Record<string, StaticExportManifestEntry> = {};
+
+  for (const slot of slots) {
+    if (slot.failure) failures.push(slot.failure);
+    if (slot.page) pages.push(slot.page);
+    if (slot.manifestEntry) manifest[slot.routePath] = slot.manifestEntry;
+  }
+
+  if (manifestFile && outDir && resolvedOutDir) {
+    const manifestPath = resolve(outDir, manifestFile);
+    if (manifestPath.startsWith(resolvedOutDir)) {
+      try {
+        await mkdir(dirname(manifestPath), { recursive: true });
+        const sortedKeys = Object.keys(manifest).sort();
+        const sorted: Record<string, StaticExportManifestEntry> = {};
+        for (const k of sortedKeys) sorted[k] = manifest[k]!;
+        await writeFile(manifestPath, JSON.stringify(sorted, null, 2) + '\n', 'utf8');
+      } catch (err) {
+        failures.push({
+          path: manifestFile,
+          error: err instanceof Error ? err : new Error(String(err)),
+        });
       }
     }
   }
 
-  if (detailed) return { pages, failures };
+  if (detailed) return { pages, failures, manifest };
   if (failures.length > 0) {
     throw new Error(
       `staticExport: ${failures.length} route(s) failed:\n` +

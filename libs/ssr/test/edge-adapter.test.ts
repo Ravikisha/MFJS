@@ -5,6 +5,7 @@
 import { describe, it, expect } from 'vitest';
 import React from 'react';
 import { createEdgeAdapter } from '../src/edge-adapter.js';
+import { LruHtmlCache } from '../src/html-cache.js';
 import type { SsrRoute, EdgeRequest } from '../src/types.js';
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
@@ -113,5 +114,110 @@ describe('createEdgeAdapter', () => {
 
     expect(res.body).toContain('<!doctype html>');
     expect(res.body).toContain('404');
+  });
+});
+
+describe('createEdgeAdapter — htmlCache (ETag before render)', () => {
+  it('serves cached HTML on repeat hits without re-rendering', async () => {
+    const htmlCache = new LruHtmlCache({ max: 8 });
+    let renderCount = 0;
+    function CountingApp() {
+      renderCount++;
+      return React.createElement('div', { id: 'counted' });
+    }
+
+    const handler = createEdgeAdapter({
+      App: CountingApp,
+      template: TEMPLATE,
+      routes: [{ path: '/' }],
+      etag: true,
+      htmlCache,
+    });
+
+    const first = await handler(makeRequest('https://example.com/'));
+    expect(first.status).toBe(200);
+    expect(first.headers['x-mfjs-ssr-cache']).toBe('miss');
+    expect(first.headers['etag']).toMatch(/^W\/"/);
+    expect(renderCount).toBe(1);
+
+    const second = await handler(makeRequest('https://example.com/'));
+    expect(second.status).toBe(200);
+    expect(second.headers['x-mfjs-ssr-cache']).toBe('hit');
+    expect(second.headers['etag']).toBe(first.headers['etag']);
+    expect(renderCount).toBe(1);
+  });
+
+  it('returns 304 from cache when If-None-Match matches', async () => {
+    const htmlCache = new LruHtmlCache();
+    let renderCount = 0;
+    function CountingApp() {
+      renderCount++;
+      return React.createElement('div', null, 'hi');
+    }
+
+    const handler = createEdgeAdapter({
+      App: CountingApp,
+      template: TEMPLATE,
+      routes: [{ path: '/' }],
+      etag: true,
+      htmlCache,
+    });
+
+    const first = await handler(makeRequest('https://example.com/'));
+    const tag = first.headers['etag']!;
+
+    const cached: EdgeRequest = {
+      url: 'https://example.com/',
+      method: 'GET',
+      headers: { 'if-none-match': tag },
+    };
+    const conditional = await handler(cached);
+    expect(conditional.status).toBe(304);
+    expect(conditional.body).toBe('');
+    expect(renderCount).toBe(1);
+  });
+
+  it('skips caching when cacheKey returns null', async () => {
+    const htmlCache = new LruHtmlCache();
+    let renderCount = 0;
+    function CountingApp() {
+      renderCount++;
+      return React.createElement('div', null, 'x');
+    }
+
+    const handler = createEdgeAdapter({
+      App: CountingApp,
+      template: TEMPLATE,
+      routes: [{ path: '/' }],
+      etag: true,
+      htmlCache,
+      cacheKey: () => null,
+    });
+
+    await handler(makeRequest('https://example.com/'));
+    await handler(makeRequest('https://example.com/'));
+    expect(renderCount).toBe(2);
+  });
+
+  it('cache disabled when enrichHead is set (per-request HTML)', async () => {
+    const htmlCache = new LruHtmlCache();
+    let renderCount = 0;
+    function CountingApp() {
+      renderCount++;
+      return React.createElement('div', null, 'x');
+    }
+
+    const handler = createEdgeAdapter({
+      App: CountingApp,
+      template: TEMPLATE,
+      routes: [{ path: '/' }],
+      etag: true,
+      htmlCache,
+      enrichHead: () => '<meta name="nonce" content="abc">',
+    });
+
+    await handler(makeRequest('https://example.com/'));
+    await handler(makeRequest('https://example.com/'));
+    expect(renderCount).toBe(2);
   });
 });

@@ -27,4 +27,10 @@ export {
 } from './state-hydration.js';
 export { buildPreloadTags, remoteEntryPreloads, type PreloadLink } from './preload.js';
 export { cacheControl, buildWeakEtag, ifNoneMatchHit, type CacheControlOptions } from './cache-headers.js';
+export {
+  LruHtmlCache,
+  type HtmlCache,
+  type HtmlCacheEntry,
+  type LruHtmlCacheOptions,
+} from './html-cache.js';
 export { ssrLoadRemoteEdge, type SsrEdgeRemoteMap } from './remote-ssr.js';

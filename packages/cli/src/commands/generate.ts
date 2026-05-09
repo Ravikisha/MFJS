@@ -430,7 +430,12 @@ function createHostCommand() {
       );
     },
     async alsoWrite(appDir, name, port) {
-      await writeJson(path.join(appDir, 'mfjs.app.json'), { name, type: 'host', port });
+      await writeJson(path.join(appDir, 'mfjs.app.json'), {
+        $schema: '../../node_modules/@mfjs/types/schemas/mfjs.app.json',
+        name,
+        type: 'host',
+        port,
+      });
     },
   });
 }
@@ -444,6 +449,7 @@ function createRemoteCommand() {
     },
     async alsoWrite(appDir, name, port) {
       await writeJson(path.join(appDir, 'mfjs.app.json'), {
+        $schema: '../../node_modules/@mfjs/types/schemas/mfjs.app.json',
         name,
         type: 'remote',
         port,

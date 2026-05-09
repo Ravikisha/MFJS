@@ -140,7 +140,11 @@ async function findApps(workspaceDir: string) {
 
 async function writeFederationConfig(appDir: string, cfg: FederationConfig) {
   const outPath = path.join(appDir, 'mfjs.federation.json');
-  await fs.outputFile(outPath, JSON.stringify(cfg, null, 2) + '\n', 'utf8');
+  const withSchema = {
+    $schema: '../../node_modules/@mfjs/types/schemas/mfjs.federation.json',
+    ...cfg,
+  };
+  await fs.outputFile(outPath, JSON.stringify(withSchema, null, 2) + '\n', 'utf8');
 }
 
 export const federationCommand = new Command('federation')

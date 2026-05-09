@@ -1,6 +1,8 @@
 import http from 'node:http';
 import fs from 'node:fs';
+import fsp from 'node:fs/promises';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { createEdgeAdapter } from '@mfjs/ssr';
 import type { EdgeAdapterOptions, EdgeAdapterExtraOptions } from '@mfjs/ssr';
 
@@ -210,6 +212,51 @@ function readBody(
       reject(err);
     });
   });
+}
+
+// ── Deploy scaffold (used by `mfjs deploy --target node|docker`) ─────────────
+
+export interface ScaffoldDeployOptions {
+  cwd: string;
+  dryRun?: boolean;
+  log?: (msg: string) => void;
+}
+
+export interface ScaffoldDeployResult {
+  files: { dest: string; written: boolean }[];
+  nextHint: string;
+}
+
+export const deployTarget = 'node';
+
+export async function scaffoldDeploy(opts: ScaffoldDeployOptions): Promise<ScaffoldDeployResult> {
+  const here = path.dirname(fileURLToPath(import.meta.url));
+  const templatesDir = path.resolve(here, '..', 'templates');
+  const log = opts.log ?? (() => {});
+  const result: ScaffoldDeployResult = {
+    files: [],
+    nextHint: '`docker build -t shell . && docker run -p 3000:3000 shell`',
+  };
+  const entries = ['Dockerfile'];
+  for (const name of entries) {
+    const src = path.join(templatesDir, name);
+    const dest = path.join(opts.cwd, name);
+    let written = false;
+    try {
+      await fsp.access(dest);
+      log(`  skip  ${name} (exists)`);
+    } catch {
+      log(`  write ${name}`);
+      if (!opts.dryRun) {
+        const content = await fsp.readFile(src, 'utf8');
+        await fsp.mkdir(path.dirname(dest), { recursive: true });
+        await fsp.writeFile(dest, content, 'utf8');
+      }
+      written = true;
+    }
+    result.files.push({ dest, written });
+  }
+  return result;
 }
 
 const MIME: Record<string, string> = {

@@ -55,6 +55,9 @@ export const initCommand = new Command('init')
         typecheck: 'mfjs typecheck',
         'ci:affected': 'mfjs ci affected',
       },
+      devDependencies: {
+        '@mfjs/types': '^0.1.0',
+      },
     });
 
     // pnpm workspace
@@ -71,7 +74,7 @@ export const initCommand = new Command('init')
 
     // mfjs.config.json
     await writeJson(path.join(workspaceDir, 'mfjs.config.json'), {
-      $schema: 'https://mfjs.dev/schemas/mfjs.config.json',
+      $schema: './node_modules/@mfjs/types/schemas/mfjs.config.json',
       appsDir: 'apps',
       libsDir: 'libs',
       features: {

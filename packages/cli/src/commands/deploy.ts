@@ -2,13 +2,36 @@ import { Command } from 'commander';
 import path from 'node:path';
 import fs from 'fs-extra';
 import kleur from 'kleur';
-import { execa } from 'execa';
 import { loadWorkspaceConfig } from '../config.js';
 
 type Target = 'vercel' | 'cloudflare' | 'netlify' | 'node' | 'docker';
 
+interface ScaffoldDeployOptions {
+  cwd: string;
+  dryRun?: boolean;
+  log?: (msg: string) => void;
+}
+
+interface ScaffoldDeployResult {
+  files: { dest: string; written: boolean }[];
+  nextHint: string;
+}
+
+interface DeployAdapterModule {
+  scaffoldDeploy: (opts: ScaffoldDeployOptions) => Promise<ScaffoldDeployResult>;
+  deployTarget?: string;
+}
+
+const ADAPTER_PACKAGES: Record<Target, string | null> = {
+  vercel: '@mfjs/adapter-vercel',
+  cloudflare: '@mfjs/adapter-cloudflare',
+  node: '@mfjs/adapter-node',
+  docker: '@mfjs/adapter-node',
+  netlify: null, // No adapter-netlify yet — use inline scaffold.
+};
+
 export const deployCommand = new Command('deploy')
-  .description('Package the workspace for a deploy target (scaffolds adapter files).')
+  .description('Package the workspace for a deploy target (delegates to @mfjs/adapter-* packages).')
   .option('--target <target>', 'vercel | cloudflare | netlify | node | docker')
   .option('--cwd <dir>', 'Workspace root', process.cwd())
   .option('--dry-run', 'Print actions but do not write files')
@@ -24,6 +47,29 @@ export const deployCommand = new Command('deploy')
 
     console.log(kleur.bold(`mfjs deploy -> ${target}`));
 
+    const log = (msg: string) => console.log(kleur.green(msg));
+    const adapterPkg = ADAPTER_PACKAGES[target];
+
+    if (adapterPkg) {
+      const mod = await tryLoadAdapter(adapterPkg);
+      if (mod) {
+        const scaffoldOpts: ScaffoldDeployOptions = { cwd, log };
+        if (opts.dryRun !== undefined) scaffoldOpts.dryRun = opts.dryRun;
+        const result = await mod.scaffoldDeploy(scaffoldOpts);
+        if (result.files.every((f) => !f.written)) {
+          console.log(kleur.dim('  (no files written; all targets exist)'));
+        }
+        console.log(kleur.dim(`  next: ${result.nextHint}`));
+        return;
+      }
+      console.log(
+        kleur.yellow(
+          `  ${adapterPkg} not installed; using built-in scaffold. Install ${adapterPkg} to customize the deploy.`,
+        ),
+      );
+    }
+
+    // Fallback: built-in inline scaffolds.
     switch (target) {
       case 'vercel':
         return scaffoldVercel(cwd, opts.dryRun);
@@ -36,6 +82,18 @@ export const deployCommand = new Command('deploy')
         return scaffoldNode(cwd, opts.dryRun);
     }
   });
+
+async function tryLoadAdapter(pkg: string): Promise<DeployAdapterModule | null> {
+  try {
+    const mod = (await import(pkg)) as Partial<DeployAdapterModule>;
+    if (typeof mod.scaffoldDeploy === 'function') {
+      return mod as DeployAdapterModule;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
 
 async function writeIfMissing(file: string, content: string, dryRun?: boolean): Promise<void> {
   if (await fs.pathExists(file)) {

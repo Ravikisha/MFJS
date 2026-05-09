@@ -11,7 +11,13 @@ export {
   type RenderRouteToStreamOptions,
 } from './render-to-stream.js';
 
-export { staticExport, type StaticExportFailure, type StaticExportResult } from './static-export.js';
+export {
+  staticExport,
+  type StaticExportFailure,
+  type StaticExportResult,
+  type StaticExportExtraOptions,
+  type StaticExportManifestEntry,
+} from './static-export.js';
 
 export {
   ssrLoadRemote,

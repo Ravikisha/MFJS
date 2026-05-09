@@ -57,6 +57,12 @@ export interface Store<S, A> {
   dispatch(action: A): void;
   subscribe(listener: StoreListener<S>): Unsubscribe;
   replaceReducer(nextReducer: Reducer<S, A>): void;
+  /**
+   * Hydrate the store with an externally-supplied state (e.g. from a persistence
+   * layer or SSR transfer). Notifies listeners. Throws if called inside a
+   * reducer.
+   */
+  replaceState(next: S): void;
   readonly listenerCount: number;
 }
 
@@ -99,11 +105,21 @@ export function createStore<S, A>(initialState: S, reducer: Reducer<S, A>): Stor
     currentReducer = nextReducer;
   }
 
+  function replaceState(next: S): void {
+    if (isDispatching) {
+      throw new Error('[mfjs/state] replaceState() may not be called inside a reducer.');
+    }
+    if (next === state) return;
+    state = next;
+    for (const l of [...listeners]) l(state);
+  }
+
   return {
     getState,
     dispatch,
     subscribe,
     replaceReducer,
+    replaceState,
     get listenerCount() {
       return listeners.size;
     },

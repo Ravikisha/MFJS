@@ -66,7 +66,12 @@ async function killChild(child) {
 }
 
 if (process.env.MFJS_E2E !== '1') {
-  console.log('MFJS e2e is opt-in. Set MFJS_E2E=1 to run.');
+  // Opt-in by design: prevents accidental long-running e2e during fast dev test loops.
+  // CI invokes Playwright via `playwright.config.ts:webServer.env` which always sets
+  // MFJS_E2E=1, so a missing flag in CI means misconfiguration, not silent skip.
+  console.warn(
+    '[mfjs/e2e] skipped: MFJS_E2E env var not set to "1". Run with MFJS_E2E=1 (Playwright already sets this automatically).',
+  );
   process.exit(0);
 }
 

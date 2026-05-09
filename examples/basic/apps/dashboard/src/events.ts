@@ -1,9 +1,6 @@
 /**
- * Shared event contract — mirrors shell/src/events.ts.
- * In production, extract this to a shared `@app/events` package.
+ * Re-export of the shared event contract from `@mfjs/events`.
+ * Kept here for backward-compat with imports written against the local path.
+ * New code should import directly from `@mfjs/events`.
  */
-export type MfAppEvents = {
-  'shell:ready': { timestamp: number };
-  'mfe:navigate': { to: string; from: string };
-  'dashboard:action': { action: string; payload?: unknown };
-};
+export type { MfAppEvents } from '@mfjs/events';

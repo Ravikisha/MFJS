@@ -3,9 +3,13 @@
   "changelog": "@changesets/cli/changelog",
   "commit": false,
   "fixed": [],
-  "linked": [["@mfjs/cli", "@mfjs/runtime", "@mfjs/ssr", "@mfjs/event-bus", "@mfjs/state", "@mfjs/types", "@mfjs/ui", "@mfjs/events", "@mfjs/rspack-route-assets", "@mfjs/security", "@mfjs/observability"]],
+  "linked": [
+    ["@mfjs/runtime", "@mfjs/ssr", "@mfjs/security"],
+    ["@mfjs/state", "@mfjs/event-bus", "@mfjs/events"],
+    ["@mfjs/adapter-node", "@mfjs/adapter-vercel", "@mfjs/adapter-cloudflare"]
+  ],
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["docs"]
+  "ignore": ["docs", "@app/*", "mfjs-example-*"]
 }

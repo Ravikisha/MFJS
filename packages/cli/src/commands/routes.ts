@@ -149,13 +149,16 @@ async function writeRemoteRoutesModule(appDir: string, routes: PageRoute[]) {
     // Keep the import target relative to this file (src/mfjs.routes.ts).
     // Page files live under src/pages/** so we should import from './pages/**'.
     const rel = toPosixPath(r.file).replace(/^\.\//, '');
-    const importTarget = rel.startsWith('src/pages/')
+    const withPrefix = rel.startsWith('src/pages/')
       ? './' + rel.slice('src/'.length)
       : rel.startsWith('pages/')
         ? './' + rel
         : rel.startsWith('src/')
           ? './' + rel.slice('src/'.length)
           : './' + rel;
+    // Strip the source extension — TS resolves `.tsx`/`.ts` from the bare specifier
+    // and bundlers (rspack/vite) reject explicit `.tsx` in dynamic imports.
+    const importTarget = withPrefix.replace(/\.(tsx|ts|jsx|js|mjs|cjs)$/i, '');
     lines.push(
       `  { path: ${JSON.stringify(r.path)}, load: () => import(${JSON.stringify(importTarget)}) },`
     );

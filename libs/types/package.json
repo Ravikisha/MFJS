@@ -17,9 +17,12 @@
   "types": "dist/index.d.ts",
   "exports": {
     ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
+    "./schemas/mfjs.config.json": "./schemas/mfjs.config.json",
+    "./schemas/mfjs.app.json": "./schemas/mfjs.app.json",
+    "./schemas/mfjs.federation.json": "./schemas/mfjs.federation.json",
     "./package.json": "./package.json"
   },
-  "files": ["dist", "README.md", "LICENSE"],
+  "files": ["dist", "schemas", "README.md", "LICENSE"],
   "sideEffects": false,
   "scripts": {
     "build": "tsc -p tsconfig.json",

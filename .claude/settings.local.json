@@ -4,7 +4,10 @@
       "Bash(pnpm install *)",
       "Bash(pnpm build *)",
       "Bash(pnpm test *)",
-      "Bash(pnpm -r --if-present --filter '!docs' --filter '!@app/*' --filter '!mfjs-example-*' test)"
+      "Bash(pnpm -r --if-present --filter '!docs' --filter '!@app/*' --filter '!mfjs-example-*' test)",
+      "Bash(pnpm -r build)",
+      "Bash(pnpm -r --filter '@app/*' build)",
+      "Bash(pnpm add *)"
     ]
   }
 }

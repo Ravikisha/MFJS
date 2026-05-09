@@ -12,6 +12,7 @@ import { matchRoutePath } from './route-utils.js';
 import { cacheControl, buildWeakEtag, ifNoneMatchHit, type CacheControlOptions } from './cache-headers.js';
 import { isRedirect } from './redirect.js';
 import { escapeHtml } from '@mfjs/security';
+import type { HtmlCache } from './html-cache.js';
 import type { EdgeAdapterHandler, EdgeAdapterOptions, EdgeRequest, EdgeResponse } from './types.js';
 
 export interface EdgeAdapterExtraOptions {
@@ -37,6 +38,19 @@ export interface EdgeAdapterExtraOptions {
    * template must contain `<!--ssr-head-->` to receive the result.
    */
   enrichHead?: (ctx: { request: EdgeRequest; pathname: string }) => string | Promise<string>;
+  /**
+   * Optional rendered-HTML cache. When set, the adapter does an ETag-only
+   * round-trip for cache hits — `If-None-Match` is checked before any render.
+   * Provide a per-request stable `cacheKey` if route output varies on cookies,
+   * locale, etc. Caching is automatically skipped when `enrichHead` is set
+   * (per-request HTML).
+   */
+  htmlCache?: HtmlCache;
+  /**
+   * Build a cache key from the request. Default: `pathname`. Return `null` to
+   * skip caching for this request (e.g. authenticated routes).
+   */
+  cacheKey?: (ctx: { request: EdgeRequest; pathname: string }) => string | null;
 }
 
 function lowerKeys(headers?: Record<string, string>): Record<string, string> {
@@ -89,9 +103,12 @@ export function createEdgeAdapter(
     headers: extraHeaders,
     csp,
     enrichHead,
+    htmlCache,
+    cacheKey,
   } = options;
 
   const baseExtra = lowerKeys(extraHeaders);
+  const cacheEnabled = Boolean(htmlCache && etag && !enrichHead);
 
   return async function handleEdgeRequest(request: EdgeRequest): Promise<EdgeResponse> {
     const url = new URL(request.url);
@@ -110,6 +127,38 @@ export function createEdgeAdapter(
     if (!match) {
       if (onNotFound) return onNotFound(request);
       return defaultNotFound(pathname, template, baseExtra, notFoundCache);
+    }
+
+    // ── ETag-before-render fast path ────────────────────────────────────────
+    let entryKey: string | null = null;
+    if (cacheEnabled && htmlCache) {
+      entryKey = cacheKey ? cacheKey({ request, pathname }) : pathname;
+      if (entryKey !== null) {
+        const cached = await htmlCache.get(entryKey);
+        if (cached) {
+          const responseHeaders: Record<string, string> = {
+            ...baseExtra,
+            'content-type': 'text/html; charset=utf-8',
+            'x-mfjs-ssr': '1',
+            'x-mfjs-ssr-cache': 'hit',
+            etag: cached.etag,
+          };
+          const cspValue = typeof csp === 'function' ? csp(request) : csp;
+          if (cspValue) responseHeaders['content-security-policy'] = cspValue;
+          appendVary(responseHeaders, 'Accept-Encoding');
+          const cacheOpts = cacheOverrides?.[match.path] ?? cache;
+          if (cacheOpts && cached.status < 400) {
+            responseHeaders['cache-control'] = cacheControl(cacheOpts);
+          }
+          if (ifNoneMatchHit(cached.etag, getHeader(request, 'if-none-match'))) {
+            return { status: 304, headers: responseHeaders, body: '' };
+          }
+          if (method === 'HEAD') {
+            return { status: cached.status, headers: responseHeaders, body: '' };
+          }
+          return { status: cached.status, headers: responseHeaders, body: cached.html };
+        }
+      }
     }
 
     let result;
@@ -145,16 +194,28 @@ export function createEdgeAdapter(
       responseHeaders['cache-control'] = cacheControl(cacheOpts);
     }
 
+    let etagValue: string | undefined;
+    if (etag && result.statusCode < 400) {
+      etagValue = buildWeakEtag(html);
+      responseHeaders['etag'] = etagValue;
+    }
+
+    if (cacheEnabled && htmlCache && entryKey !== null && etagValue && result.statusCode < 400) {
+      responseHeaders['x-mfjs-ssr-cache'] = 'miss';
+      await htmlCache.set(entryKey, {
+        html,
+        etag: etagValue,
+        status: result.statusCode,
+        storedAt: Date.now(),
+      });
+    }
+
     if (method === 'HEAD') {
       return { status: result.statusCode, headers: responseHeaders, body: '' };
     }
 
-    if (etag && result.statusCode < 400) {
-      const tag = buildWeakEtag(html);
-      responseHeaders['etag'] = tag;
-      if (ifNoneMatchHit(tag, getHeader(request, 'if-none-match'))) {
-        return { status: 304, headers: responseHeaders, body: '' };
-      }
+    if (etagValue && ifNoneMatchHit(etagValue, getHeader(request, 'if-none-match'))) {
+      return { status: 304, headers: responseHeaders, body: '' };
     }
 
     return {

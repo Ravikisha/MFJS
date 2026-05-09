@@ -1,75 +1,195 @@
-export const metadata = { title: 'Deployment' };
+import { Badge } from '@/components/ui/badge';
+import { CodeBlock } from '@/components/site/code-block';
+import { Callout } from '@/components/docs/callout';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/docs/tabs';
+import { RocketIcon } from '@/components/icons';
 
-export default function Deployment() {
+export const metadata = {
+  title: 'Deployment',
+  description:
+    'Deploy MFJS to Vercel Edge, Cloudflare Workers/Pages, Node.js, or Docker. mfjs deploy resolves the right adapter package automatically.',
+};
+
+export default function DeploymentPage() {
   return (
     <>
+      <Badge variant="accent" className="mb-4">
+        <RocketIcon className="h-3 w-3" /> Deploy
+      </Badge>
       <h1>Deployment</h1>
       <p>
-        MFJS ships adapters for Vercel, Cloudflare, Node, and Docker. Pick the target, run the scaffold, ship.
+        <code>mfjs deploy</code> dynamically loads the right adapter package — Vercel Edge,
+        Cloudflare, or Node — and scaffolds a working platform config. Adapters are loose deps;
+        install only what you actually ship.
       </p>
 
-      <h2>Vercel</h2>
-      <pre><code>{`mfjs deploy --target vercel
-vercel deploy`}</code></pre>
+      <Tabs defaultValue="vercel">
+        <TabsList>
+          <TabsTrigger value="vercel">Vercel</TabsTrigger>
+          <TabsTrigger value="cloudflare">Cloudflare</TabsTrigger>
+          <TabsTrigger value="node">Node</TabsTrigger>
+          <TabsTrigger value="docker">Docker</TabsTrigger>
+        </TabsList>
 
-      <pre><code>{`// api/ssr.ts
-import { createVercelHandler } from '@mfjs/adapter-vercel';
-import App from '../src/App.js';
-import { routes } from '../src/routes.js';
-import template from '../public/index.html?raw';
+        <TabsContent value="vercel">
+          <h2 id="vercel">Vercel Edge</h2>
+          <CodeBlock
+            language="bash"
+            code={`pnpm add -D @mfjs/adapter-vercel
+mfjs deploy --target vercel
+vercel deploy`}
+          />
+          <p>
+            The adapter forwards <code>request.body</code> and <code>signal</code>, lowercases
+            headers, and returns a <code>ReadableStream</code> for streaming SSR. Static assets are
+            served with <code>Cache-Control: public, max-age=31536000, immutable</code>.
+          </p>
+          <CodeBlock
+            language="ts"
+            filename="api/[[...slug]].ts"
+            code={`import { createVercelHandler } from '@mfjs/adapter-vercel';
+import { App } from '../src/App';
+import template from '../src/template.html?raw';
+import routes from '../src/mfjs.routes';
 
-const handler = createVercelHandler({ App, routes, template });
-export default handler;
-export const config = { runtime: 'edge' };`}</code></pre>
+export const config = { runtime: 'edge' };
 
-      <h2>Cloudflare Workers / Pages</h2>
-      <pre><code>{`mfjs deploy --target cloudflare
+export default createVercelHandler({ App, template, routes, etag: true });`}
+          />
+        </TabsContent>
+
+        <TabsContent value="cloudflare">
+          <h2 id="cloudflare">Cloudflare Workers / Pages</h2>
+          <CodeBlock
+            language="bash"
+            code={`pnpm add -D @mfjs/adapter-cloudflare
+mfjs deploy --target cloudflare
 wrangler deploy
-# or for Pages
-wrangler pages deploy apps/shell/dist`}</code></pre>
+# or, for Cloudflare Pages
+wrangler pages deploy apps/shell/dist`}
+          />
+          <CodeBlock
+            language="ts"
+            filename="src/worker.ts"
+            code={`import { createCloudflareWorker } from '@mfjs/adapter-cloudflare';
 
-      <pre><code>{`// Worker
-import { createCloudflareWorker } from '@mfjs/adapter-cloudflare';
-export default createCloudflareWorker({ App, routes, template });`}</code></pre>
+const worker = createCloudflareWorker({
+  App,
+  template,
+  routes,
+  etag: true,
+  csp: () => buildCsp({ nonce: cryptoRandomNonce() }),
+});
 
-      <h2>Node.js</h2>
-      <pre><code>{`// apps/shell/server.ts
-import { startNodeServer } from '@mfjs/adapter-node';
-import App from './src/App.js';
-import { routes } from './src/routes.js';
-import fs from 'node:fs';
+export default worker;`}
+          />
+        </TabsContent>
+
+        <TabsContent value="node">
+          <h2 id="node">Node.js</h2>
+          <CodeBlock
+            language="bash"
+            code={`pnpm add -D @mfjs/adapter-node
+mfjs deploy --target node`}
+          />
+          <CodeBlock
+            language="ts"
+            filename="server.ts"
+            code={`import { startNodeServer } from '@mfjs/adapter-node';
 
 startNodeServer({
-  App, routes,
-  template: fs.readFileSync('./public/index.html', 'utf8'),
-  staticDir: 'dist',
-  port: Number(process.env.PORT ?? 3000),
-});`}</code></pre>
+  App,
+  template,
+  routes,
+  port: Number(process.env.PORT) || 3000,
+  staticDir: 'apps/shell/dist',
+  maxBodyBytes: 1024 * 1024,
+  bodyTimeoutMs: 30_000,
+  logger: { info: console.log, error: console.error },
+});`}
+          />
+          <Callout variant="info" title="Slowloris hardening">
+            The Node adapter sets <code>keepAliveTimeout</code>, <code>headersTimeout</code>, and{' '}
+            <code>requestTimeout</code> to safe defaults; binary uploads get a size cap and a read
+            deadline.
+          </Callout>
+        </TabsContent>
 
-      <h2>Docker</h2>
-      <pre><code>{`mfjs deploy --target docker
+        <TabsContent value="docker">
+          <h2 id="docker">Docker</h2>
+          <CodeBlock
+            language="bash"
+            code={`mfjs deploy --target docker
 docker build -t shell .
-docker run -p 3000:3000 shell`}</code></pre>
+docker run -p 3000:3000 shell`}
+          />
+          <p>The generated Dockerfile is multi-stage:</p>
+          <CodeBlock
+            language="text"
+            filename="Dockerfile"
+            code={`FROM node:22-alpine AS builder
+WORKDIR /app
+RUN corepack enable && corepack prepare pnpm@9.15.5 --activate
+COPY pnpm-lock.yaml package.json pnpm-workspace.yaml ./
+COPY . .
+RUN pnpm install --frozen-lockfile
+RUN pnpm -r build
 
-      <h2>Netlify</h2>
-      <pre><code>{`mfjs deploy --target netlify
-netlify deploy --prod`}</code></pre>
+FROM node:22-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=builder /app ./
+EXPOSE 3000
+CMD ["node", "apps/shell/dist/server.js"]`}
+          />
+        </TabsContent>
+      </Tabs>
 
-      <h2>CDN publicPath</h2>
+      <h2 id="cdn">Putting remotes on a CDN</h2>
       <p>
-        For static-only deploys behind a CDN, set <code>federation.publicPath</code> in{' '}
-        <code>mfjs.config.ts</code> so every generated asset references the correct origin.
+        Each remote app is a self-contained bundle under <code>apps/&lt;name&gt;/dist/</code>. Upload
+        that directory to a CDN and point <code>federation.publicPath</code> at it before building.
       </p>
 
-      <pre><code>{`export default {
-  federation: { publicPath: 'https://cdn.mycorp.com/mfe/' },
-};`}</code></pre>
+      <CodeBlock
+        language="ts"
+        filename="mfjs.config.ts"
+        code={`{
+  federation: {
+    publicPath: 'https://cdn.acme.com/dashboard/',
+    sri: { algo: 'sha384' },
+    allowlist: ['https://cdn.acme.com'],
+  },
+}`}
+      />
 
-      <h2>CI preview apps</h2>
+      <h2 id="custom-adapter">Writing your own adapter</h2>
       <p>
-        <code>mfjs init</code> scaffolds <code>.github/workflows/pr-preview.yml</code> and{' '}
-        <code>deploy.yml</code>. Tweak the target platform to match your host.
+        Each adapter is just a thin bridge that turns the platform&apos;s native request type into{' '}
+        <code>EdgeRequest</code>. Implement <code>scaffoldDeploy()</code> + a handler factory and{' '}
+        <code>mfjs deploy --target your-adapter</code> will pick it up.
       </p>
+
+      <CodeBlock
+        language="ts"
+        filename="@your-co/mfjs-adapter-foo/src/index.ts"
+        code={`import { createEdgeAdapter } from '@mfjs/ssr';
+
+export const deployTarget = 'foo';
+
+export async function scaffoldDeploy(opts: { cwd: string; dryRun?: boolean }) {
+  // Write your platform config here.
+  return { files: [], nextHint: 'foo deploy' };
+}
+
+export function createFooHandler(options) {
+  const handler = createEdgeAdapter(options);
+  return async (request) => {
+    const res = await handler(toEdgeRequest(request));
+    return toFooResponse(res);
+  };
+}`}
+      />
     </>
   );
 }

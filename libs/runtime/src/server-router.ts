@@ -48,18 +48,29 @@ let alsLoadAttempted = false;
 async function loadAls(): Promise<RouterStorage | null> {
   if (alsLoadAttempted) return als;
   alsLoadAttempted = true;
+  // Guard for non-Node runtimes (browser, edge) so bundlers can DCE this branch
+  // when `process` is statically replaced (rspack DefinePlugin, vite define).
+  const proc = (globalThis as { process?: { versions?: { node?: string } } }).process;
+  if (!proc?.versions?.node) {
+    als = null;
+    return als;
+  }
   try {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const { AsyncLocalStorage } = await import(
-      // Using a string literal would have rspack/edge bundlers pull `node:async_hooks`
-      // into edge bundles. The dynamic specifier keeps the import lazy.
-      /* @vite-ignore */ 'node:async_hooks' as string
-    );
+    // Indirect import: `new Function('s', 'return import(s)')` hides the
+    // `'node:async_hooks'` specifier from rspack/webpack/vite static analyzers
+    // so it is never traced into browser bundles. The function is created
+    // once per call site; cost is negligible.
+    // eslint-disable-next-line @typescript-eslint/no-implied-eval, no-new-func
+    const dynamicImport = new Function('s', 'return import(s);') as (
+      s: string,
+    ) => Promise<{ AsyncLocalStorage: unknown }>;
+    const spec = ['node', 'async_hooks'].join(':');
+    const mod = await dynamicImport(spec);
     type AlsCtor = new () => {
       getStore(): Router | undefined;
       run<T>(router: Router, fn: () => T): T;
     };
-    const Ctor = AsyncLocalStorage as AlsCtor;
+    const Ctor = mod.AsyncLocalStorage as AlsCtor;
     const store = new Ctor();
     als = {
       getStore: () => store.getStore(),

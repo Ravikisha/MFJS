@@ -147,4 +147,44 @@ describe('staticExport', () => {
       })
     ).rejects.toThrow(/ssr-outlet/);
   });
+
+  it('renders concurrently and preserves original route order', async () => {
+    const order: string[] = [];
+    function SlowApp({ path: p }: { path: string }) {
+      order.push(p);
+      return React.createElement('div', { 'data-path': p });
+    }
+    const routes = Array.from({ length: 12 }, (_v, i) => ({ path: `/p${i}` }));
+    const pages = await staticExport({
+      routes,
+      App: SlowApp,
+      template: TEMPLATE,
+      concurrency: 4,
+    });
+    expect(pages).toHaveLength(12);
+    for (let i = 0; i < routes.length; i++) {
+      expect(pages[i].file).toBe(`p${i}/index.html`);
+    }
+  });
+
+  it('writes a manifest with hash + bytes when manifestFile is set', async () => {
+    const outDir = await makeTmp();
+    const result = await staticExport({
+      routes: [{ path: '/' }, { path: '/about' }],
+      App: StaticApp,
+      template: TEMPLATE,
+      outDir,
+      manifestFile: 'manifest.json',
+      detailed: true,
+    });
+
+    expect(Object.keys(result.manifest)).toEqual(expect.arrayContaining(['/', '/about']));
+    for (const entry of Object.values(result.manifest)) {
+      expect(entry.hash).toMatch(/^[0-9a-f]{16}$/);
+      expect(entry.bytes).toBeGreaterThan(0);
+    }
+    const written = JSON.parse(await fs.readFile(path.join(outDir, 'manifest.json'), 'utf8'));
+    expect(written['/']).toBeDefined();
+    expect(written['/about']).toBeDefined();
+  });
 });

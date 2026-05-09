@@ -1,90 +1,223 @@
-export const metadata = { title: 'Getting started' };
+import Link from 'next/link';
+import { CodeBlock } from '@/components/site/code-block';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Callout } from '@/components/docs/callout';
+import { Steps, Step } from '@/components/docs/steps';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/docs/tabs';
+import { ArrowRight, CheckIcon, RocketIcon, ShieldIcon, NetworkIcon } from '@/components/icons';
+
+export const metadata = {
+  title: 'Getting started',
+  description:
+    'Scaffold a production-ready MFJS workspace in five commands. Host + remote, file-based routing, federation, dev server with HMR.',
+};
 
 export default function GettingStarted() {
   return (
     <>
+      <Badge variant="accent" className="mb-4">
+        <RocketIcon className="h-3 w-3" /> Quickstart
+      </Badge>
       <h1>Getting started</h1>
       <p>
-        MFJS scaffolds a complete micro-frontend workspace in a single command. This page walks you from a
-        blank directory to a running host + remote with HMR.
+        MFJS scaffolds a complete micro-frontend workspace in five commands. By the end of this
+        guide you&apos;ll have a host, a remote, file-based routing, and a dev server with HMR
+        running on the same origin.
       </p>
 
-      <h2>Prerequisites</h2>
+      <Callout variant="info" title="Who is this for?">
+        Built for product teams that ship more than one frontend codebase and want a typed, opinionated
+        runtime under their Module Federation. Comfortable defaults; nothing you can&apos;t override.
+      </Callout>
+
+      <h2 id="prerequisites">Prerequisites</h2>
       <ul>
-        <li>Node.js 20 or higher</li>
-        <li>pnpm 9.15+ (<code>corepack enable &amp;&amp; corepack prepare pnpm@9.15.5 --activate</code>)</li>
+        <li>
+          <strong>Node.js 20+</strong> on Linux, macOS, or Windows.
+        </li>
+        <li>
+          <strong>pnpm 9.15+</strong> (npm and yarn also work — see{' '}
+          <Link href="/docs/troubleshooting">Troubleshooting</Link>).
+        </li>
+        <li>
+          A terminal that can run <code>npx</code> / <code>pnpm dlx</code>.
+        </li>
       </ul>
 
-      <h2>Install the CLI</h2>
-      <pre><code>{`pnpm dlx @mfjs/cli@latest init my-app
-# or globally
-pnpm add -g @mfjs/cli`}</code></pre>
+      <Tabs defaultValue="pnpm">
+        <TabsList>
+          <TabsTrigger value="pnpm">pnpm (recommended)</TabsTrigger>
+          <TabsTrigger value="npm">npm</TabsTrigger>
+          <TabsTrigger value="yarn">yarn</TabsTrigger>
+        </TabsList>
+        <TabsContent value="pnpm">
+          <CodeBlock
+            language="bash"
+            code={`corepack enable\ncorepack prepare pnpm@9.15.5 --activate\npnpm dlx @mfjs/cli@latest init my-app`}
+          />
+        </TabsContent>
+        <TabsContent value="npm">
+          <CodeBlock language="bash" code={`npx @mfjs/cli@latest init my-app`} />
+        </TabsContent>
+        <TabsContent value="yarn">
+          <CodeBlock language="bash" code={`yarn dlx @mfjs/cli@latest init my-app`} />
+        </TabsContent>
+      </Tabs>
 
-      <h2>Scaffold a workspace</h2>
-      <pre><code>{`mfjs init my-app --tailwind
-cd my-app
+      <h2 id="walkthrough">Walkthrough</h2>
 
-mfjs scaffold app
-# or non-interactive:
-mfjs generate host shell --port 3000
-mfjs generate remote dashboard --port 3001
-mfjs federation`}</code></pre>
+      <Steps>
+        <Step title="Initialize a workspace" active>
+          <p className="mt-2">
+            <code>mfjs init</code> writes <code>mfjs.config.json</code>, a TS config, a workspace
+            <code> tsconfig.base.json</code>, GitHub Actions for CI, and a deploy workflow.
+          </p>
+          <CodeBlock
+            language="bash"
+            code={`pnpm dlx @mfjs/cli@latest init my-app\ncd my-app`}
+          />
+        </Step>
+        <Step title="Generate a host and a remote">
+          <p className="mt-2">
+            Use the wizard for guided scaffolding, or pass flags directly. App names must match{' '}
+            <code>/^[a-z][a-z0-9-]*$/</code>; ports must fit 1–65535.
+          </p>
+          <CodeBlock
+            language="bash"
+            code={`# Wizard (recommended on first run)\nmfjs scaffold app\n\n# Non-interactive\nmfjs generate host shell --port 3000\nmfjs generate remote dashboard --port 3001\nmfjs federation`}
+          />
+        </Step>
+        <Step title="Run the dev server">
+          <CodeBlock
+            language="bash"
+            code={`mfjs dev --proxy-remotes --hmr-remotes`}
+          />
+          <p className="mt-2">
+            <code>--proxy-remotes</code> serves every remote on the host&apos;s origin so CSP, cookies,
+            and SRI behave like production. <code>--hmr-remotes</code> reloads the host when a remote
+            recompiles.
+          </p>
+        </Step>
+        <Step title="Add a route">
+          <p className="mt-2">
+            Drop a file in <code>apps/dashboard/src/pages/</code>. MFJS uses Next.js-style file
+            conventions: <code>index.tsx</code>, <code>[id].tsx</code>, <code>(group)/</code>.
+          </p>
+          <CodeBlock
+            language="tsx"
+            filename="apps/dashboard/src/pages/settings.tsx"
+            code={`export default function Settings() {\n  return (\n    <main>\n      <h2>Settings</h2>\n      <p>Configure your account.</p>\n    </main>\n  );\n}`}
+          />
+          <p>
+            Re-scan with <code>mfjs routes --watch</code>. The host now matches{' '}
+            <code>/dashboard/settings</code>.
+          </p>
+        </Step>
+        <Step title="Build for production">
+          <CodeBlock
+            language="bash"
+            code={`mfjs build              # all apps\nmfjs build --app shell  # one app`}
+          />
+          <p className="mt-2">
+            Output lands under <code>apps/&lt;name&gt;/dist/</code>. Asset filenames carry content
+            hashes; <code>remoteEntry.js</code> embeds SRI when{' '}
+            <code>federation.sri</code> is on.
+          </p>
+        </Step>
+        <Step title="Deploy">
+          <Tabs defaultValue="vercel">
+            <TabsList>
+              <TabsTrigger value="vercel">Vercel</TabsTrigger>
+              <TabsTrigger value="cloudflare">Cloudflare</TabsTrigger>
+              <TabsTrigger value="node">Node / Docker</TabsTrigger>
+            </TabsList>
+            <TabsContent value="vercel">
+              <CodeBlock language="bash" code={`mfjs deploy --target vercel\nvercel deploy`} />
+            </TabsContent>
+            <TabsContent value="cloudflare">
+              <CodeBlock
+                language="bash"
+                code={`mfjs deploy --target cloudflare\nwrangler pages deploy apps/shell/dist`}
+              />
+            </TabsContent>
+            <TabsContent value="node">
+              <CodeBlock
+                language="bash"
+                code={`mfjs deploy --target node\ndocker build -t shell .\ndocker run -p 3000:3000 shell`}
+              />
+            </TabsContent>
+          </Tabs>
+        </Step>
+      </Steps>
 
-      <p>
-        The generated workspace uses pnpm workspaces, Rspack 1.x for bundling, and TypeScript 5 everywhere.
-        Default layout:
+      <Callout variant="success" title="That's the whole flow.">
+        Most teams need nothing else for their first deployment. The pages below cover advanced
+        topics: typed routes, security headers, observability, and adapter customization.
+      </Callout>
+
+      <h2 id="next">What&apos;s next?</h2>
+
+      <div className="not-prose grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <NextCard
+          icon={<NetworkIcon />}
+          href="/docs/federation"
+          title="Module Federation"
+          body="Shared deps, allowlists, SRI, CDN public-path."
+        />
+        <NextCard
+          icon={<ShieldIcon />}
+          href="/docs/security"
+          title="Security"
+          body="Strict-dynamic CSP, SRI, base64url nonces."
+        />
+        <NextCard
+          icon={<RocketIcon />}
+          href="/docs/production-checklist"
+          title="Production checklist"
+          body="Caching, observability, version checks."
+        />
+      </div>
+
+      <hr />
+
+      <p className="text-sm text-muted-foreground">
+        <CheckIcon className="mr-1 inline h-4 w-4 text-emerald-500" /> Made it through the
+        quickstart? Star the repo on{' '}
+        <a href="https://github.com/mfjs/mfjs" target="_blank" rel="noopener noreferrer">
+          GitHub
+        </a>
+        .
       </p>
-
-      <pre><code>{`my-app/
-├── apps/
-│   ├── shell/              # host (port 3000)
-│   └── dashboard/          # remote (port 3001)
-├── libs/                   # shared libs (created on demand)
-├── mfjs.config.ts
-├── package.json
-└── pnpm-workspace.yaml`}</code></pre>
-
-      <h2>Run the dev server</h2>
-      <pre><code>{`mfjs dev
-# with proxy-remotes (same-origin) and HMR reload:
-mfjs dev --proxy-remotes --hmr-remotes`}</code></pre>
-
-      <p>
-        Open <code>http://localhost:3000</code>. The host mounts the dashboard remote under{' '}
-        <code>/dashboard/*</code> and the index route.
-      </p>
-
-      <h2>Add a page</h2>
-      <p>
-        Drop a file in <code>apps/dashboard/src/pages/</code>. Regenerate routes:
-      </p>
-
-      <pre><code>{`# apps/dashboard/src/pages/settings.tsx
-export default function Settings() {
-  return <h2>Settings page</h2>;
+    </>
+  );
 }
 
-# in the app folder:
-mfjs routes --watch`}</code></pre>
-
-      <p>
-        Now <code>/dashboard/settings</code> renders the new page. The host's <code>RemoteOutlet</code>{' '}
-        resolves the URL, the dashboard remote lazy-loads the matching page module, and React Fast Refresh
-        keeps the state between edits.
-      </p>
-
-      <h2>Next steps</h2>
-      <ul>
-        <li>
-          Read <a href="/docs/routing">Routing</a> to learn about guards, params, and navigation events.
-        </li>
-        <li>
-          Read <a href="/docs/federation">Module Federation</a> for shared-dep strategy and CDN deploy.
-        </li>
-        <li>
-          Read <a href="/docs/production-checklist">Production checklist</a> before shipping.
-        </li>
-      </ul>
-    </>
+function NextCard({
+  icon,
+  href,
+  title,
+  body,
+}: {
+  icon: React.ReactNode;
+  href: string;
+  title: string;
+  body: string;
+}) {
+  return (
+    <Link href={href} className="group block focus:outline-none">
+      <Card interactive className="h-full">
+        <CardHeader>
+          <span className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-secondary text-accent">
+            {icon}
+          </span>
+          <CardTitle className="mt-3 flex items-center justify-between text-sm">
+            {title}
+            <ArrowRight className="h-4 w-4 opacity-0 transition-opacity group-hover:opacity-100" />
+          </CardTitle>
+          <CardDescription>{body}</CardDescription>
+        </CardHeader>
+      </Card>
+    </Link>
   );
 }

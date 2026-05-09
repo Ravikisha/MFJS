@@ -2,7 +2,38 @@ import { loadRemoteEntry, type FederationRemote } from './remote-loader.js';
 import { resolveRoute, type RouteTarget } from './routes.js';
 import { emitRemoteLoad } from './telemetry.js';
 
-const prefetched = new Set<string>();
+const PREFETCH_CACHE_MAX = 256;
+
+class BoundedKeySet {
+  private readonly map = new Map<string, true>();
+  constructor(private readonly max: number) {}
+  has(key: string): boolean {
+    if (!this.map.has(key)) return false;
+    this.map.delete(key);
+    this.map.set(key, true);
+    return true;
+  }
+  add(key: string): void {
+    if (this.map.has(key)) {
+      this.map.delete(key);
+    } else if (this.map.size >= this.max) {
+      const oldest = this.map.keys().next().value;
+      if (oldest !== undefined) this.map.delete(oldest);
+    }
+    this.map.set(key, true);
+  }
+  delete(key: string): void {
+    this.map.delete(key);
+  }
+  clear(): void {
+    this.map.clear();
+  }
+  get size(): number {
+    return this.map.size;
+  }
+}
+
+const prefetched = new BoundedKeySet(PREFETCH_CACHE_MAX);
 
 export interface PrefetchOptions {
   /** Route table used to resolve the target URL into a remote name. */
