@@ -315,7 +315,7 @@ moxjs deploy --target vercel                      # writes vercel.json`}
       <p className="text-sm text-muted-foreground">
         <CheckIcon className="mr-1 inline h-4 w-4 text-emerald-500" /> Made it through the
         quickstart? Star the repo on{' '}
-        <a href="https://github.com/moxjs/moxjs" target="_blank" rel="noopener noreferrer">
+        <a href="https://github.com/Ravikisha/MFJS" target="_blank" rel="noopener noreferrer">
           GitHub
         </a>
         .

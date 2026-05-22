@@ -133,7 +133,7 @@ describe('validateAgainst', () => {
 
   it('allows $schema even with additionalProperties=false', () => {
     const r = validateAgainst(cat['moxjs.app']!, {
-      $schema: 'https://moxjs.dev/schemas/moxjs.app.json',
+      $schema: 'https://moxjs.vercel.app/schemas/moxjs.app.json',
       name: 'shop',
       kind: 'host',
     });

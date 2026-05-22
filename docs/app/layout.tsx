@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   },
   description:
     'Opinionated, zero-config micro-frontend framework built on Rspack Module Federation. Typed contracts, file-based routing, SSR, edge adapters, observability, and a CLI that just works.',
-  metadataBase: new URL('https://moxjs.dev'),
+  metadataBase: new URL('https://moxjs.vercel.app'),
   openGraph: {
     title: 'MOXJS — Production-grade micro-frontends',
     description:

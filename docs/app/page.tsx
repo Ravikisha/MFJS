@@ -81,7 +81,7 @@ export default function App() {
               <ButtonLink href="/docs/concepts" variant="outline" size="lg">
                 Read the concepts
               </ButtonLink>
-              <ButtonLink href="https://github.com/moxjs/moxjs" external variant="ghost" size="lg">
+              <ButtonLink href="https://github.com/Ravikisha/MFJS" external variant="ghost" size="lg">
                 <GitHubIcon /> Star on GitHub
               </ButtonLink>
             </div>

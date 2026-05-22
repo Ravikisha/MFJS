@@ -101,7 +101,7 @@ export function Welcome({ defaultProjectName = 'my-mox-app' }: WelcomeProps) {
         </a>
         <a
           className="mw-doc"
-          href="https://moxjs.dev/docs"
+          href="https://moxjs.vercel.app/docs"
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -256,7 +256,7 @@ export function Welcome({ defaultProjectName = 'my-mox-app' }: WelcomeProps) {
               type="button"
               className="mw-cta"
               onClick={() => {
-                window.open('https://moxjs.dev/docs/getting-started', '_blank', 'noopener');
+                window.open('https://moxjs.vercel.app/docs/getting-started', '_blank', 'noopener');
               }}
             >
               Let&apos;s build! <span aria-hidden>🚀</span>
@@ -267,17 +267,20 @@ export function Welcome({ defaultProjectName = 'my-mox-app' }: WelcomeProps) {
 
       <footer className="mw-footer">
         <span className="mw-foot-left">
-          Made with <span className="mw-heart" aria-hidden>♥</span> by the moxjs team
+          Made with <span className="mw-heart" aria-hidden>♥</span> by{' '}
+          <a href="https://github.com/ravikisha" target="_blank" rel="noopener noreferrer">
+            Ravi Kishan
+          </a>
         </span>
         <div className="mw-foot-links">
-          <a href="https://github.com/moxjs/moxjs" target="_blank" rel="noopener noreferrer">
+          <a href="https://github.com/Ravikisha/MFJS" target="_blank" rel="noopener noreferrer">
             <GitHubIcon /> GitHub
           </a>
-          <a href="https://moxjs.dev/docs" target="_blank" rel="noopener noreferrer">
+          <a href="https://moxjs.vercel.app/docs" target="_blank" rel="noopener noreferrer">
             <BookIcon /> Docs
           </a>
-          <a href="https://discord.gg/moxjs" target="_blank" rel="noopener noreferrer">
-            <DiscordIcon /> Discord
+          <a href="https://moxjs.vercel.app/" target="_blank" rel="noopener noreferrer">
+            <DiscordIcon /> Live site
           </a>
         </div>
       </footer>

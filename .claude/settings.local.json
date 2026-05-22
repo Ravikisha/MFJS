@@ -17,7 +17,8 @@
       "Bash(pnpm --filter @moxjs/runtime --filter @moxjs/security --filter @moxjs/observability --filter @moxjs/ssr test)",
       "Bash(pnpm -r --filter \"./libs/*\" --filter \"./packages/*\" build)",
       "Bash(npm run *)",
-      "Bash(pnpm --filter @moxjs/runtime --filter @moxjs/security --filter @moxjs/cli test)"
+      "Bash(pnpm --filter @moxjs/runtime --filter @moxjs/security --filter @moxjs/cli test)",
+      "PowerShell(pnpm exec *)"
     ]
   }
 }

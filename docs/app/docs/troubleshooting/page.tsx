@@ -215,7 +215,7 @@ lsof -ti:3000 | xargs kill -9`}
       <Callout variant="info" title="Still stuck?">
         Run <code>moxjs diagnose</code> for a full environment report, and set{' '}
         <code>MOXJS_DEBUG=1</code> to surface stack traces. Open an issue at{' '}
-        <a href="https://github.com/moxjs/moxjs/issues">github.com/moxjs/moxjs/issues</a> with the{' '}
+        <a href="https://github.com/Ravikisha/MFJS/issues">github.com/Ravikisha/MFJS/issues</a> with the{' '}
         <code>diagnose</code> output attached.
       </Callout>
     </>

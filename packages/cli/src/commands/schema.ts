@@ -34,7 +34,7 @@ export interface SchemaCatalog {
 
 const DRAFT = 'https://json-schema.org/draft/2020-12/schema';
 
-export function buildSchemas(baseUrl = 'https://moxjs.dev/schemas'): SchemaCatalog {
+export function buildSchemas(baseUrl = 'https://moxjs.vercel.app/schemas'): SchemaCatalog {
   return {
     'moxjs.config': configSchema(baseUrl),
     'moxjs.app': appSchema(baseUrl),
@@ -249,7 +249,7 @@ function matchesType(value: unknown, type: string): boolean {
 export const schemaCommand = new Command('schema')
   .description('Emit JSON Schemas for moxjs config files (config / app / federation / ssr).')
   .option('--out <dir>', 'output directory', './schemas')
-  .option('--base-url <url>', 'base URL embedded into $id fields', 'https://moxjs.dev/schemas')
+  .option('--base-url <url>', 'base URL embedded into $id fields', 'https://moxjs.vercel.app/schemas')
   .option('--minify', 'emit compact JSON (no indent)')
   .action((opts: { out: string; baseUrl: string; minify?: boolean }) => {
     const writeOpts: WriteSchemasOptions = {

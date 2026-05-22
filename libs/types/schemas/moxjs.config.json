@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://moxjs.dev/schemas/moxjs.config.json",
+  "$id": "https://moxjs.vercel.app/schemas/moxjs.config.json",
   "title": "MOXJS Workspace Config",
   "description": "Schema for moxjs.config.json — workspace-level configuration consumed by @moxjs/cli.",
   "type": "object",

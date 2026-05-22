@@ -52,7 +52,7 @@ export function SiteHeader() {
         <div className="ml-auto flex flex-1 items-center justify-end gap-2 lg:flex-initial">
           <SearchTrigger className="hidden md:inline-flex" />
           <ButtonLink
-            href="https://github.com/moxjs/moxjs"
+            href="https://github.com/Ravikisha/MFJS"
             external
             variant="ghost"
             size="icon"
