@@ -5,6 +5,7 @@ import kleur from 'kleur';
 import { execa } from 'execa';
 import { compressDist } from './compress.js';
 import { loadWorkspaceConfig } from '../config.js';
+import { writeBuildStats } from './build-stats.js';
 
 type AppMeta = {
   name: string;
@@ -23,7 +24,7 @@ async function runBuild(cwd: string, signal: AbortSignal): Promise<void> {
 }
 
 export const buildCommand = new Command('build')
-  .description('Build all apps under apps/* (those that have mfjs.app.json)')
+  .description('Build all apps under apps/* (those that have moxjs.app.json)')
   .option('-d, --dir <path>', 'Workspace root directory', process.cwd())
   .option(
     '--compress',
@@ -45,6 +46,10 @@ export const buildCommand = new Command('build')
     false,
   )
   .option('--allow-empty', 'Exit 0 even when no apps are present.', false)
+  .option(
+    '--stats [path]',
+    'Write a JSON build-stats summary (default path: moxjs-build-stats.json under the workspace root).',
+  )
   .action(
     async (opts: {
       dir: string;
@@ -52,6 +57,7 @@ export const buildCommand = new Command('build')
       compressInclude: string;
       compressDeleteOriginal: boolean;
       allowEmpty: boolean;
+      stats?: boolean | string;
     }) => {
       const workspaceDir = path.resolve(opts.dir);
       const appsDir = path.join(workspaceDir, 'apps');
@@ -68,7 +74,7 @@ export const buildCommand = new Command('build')
       const appMetas: Array<{ dir: string; meta: AppMeta }> = [];
 
       for (const folder of appFolders) {
-        const metaPath = path.join(appsDir, folder, 'mfjs.app.json');
+        const metaPath = path.join(appsDir, folder, 'moxjs.app.json');
         if (!(await fs.pathExists(metaPath))) continue;
         const meta = (await fs.readJson(metaPath)) as AppMeta;
         appMetas.push({ dir: path.join(appsDir, folder), meta });
@@ -79,7 +85,7 @@ export const buildCommand = new Command('build')
           console.log(kleur.yellow('No apps found — exiting cleanly (--allow-empty).'));
           return;
         }
-        console.error(kleur.yellow('No apps found (missing mfjs.app.json).'));
+        console.error(kleur.yellow('No apps found (missing moxjs.app.json).'));
         process.exitCode = 2;
         return;
       }
@@ -129,6 +135,25 @@ export const buildCommand = new Command('build')
                 `  compress: wrote ${result.written} file(s) (${result.gzWritten} gz, ${result.brWritten} br), skipped ${result.skipped}`,
               ),
             );
+          }
+        }
+      }
+
+      if (opts.stats) {
+        const outPath = path.resolve(
+          workspaceDir,
+          typeof opts.stats === 'string' ? opts.stats : 'moxjs-build-stats.json',
+        );
+        const stats = await writeBuildStats(workspaceDir, outPath);
+        console.log(
+          kleur.gray(
+            `  stats: wrote ${path.relative(workspaceDir, outPath)} (${stats.apps.length} app(s), ${stats.conflicts.length} conflict(s))`,
+          ),
+        );
+        if (stats.conflicts.length > 0) {
+          for (const c of stats.conflicts) {
+            const detail = c.versions.map((v) => `${v.app}@${v.version}`).join(', ');
+            console.log(kleur.yellow(`  conflict: ${c.dep} → ${detail}`));
           }
         }
       }

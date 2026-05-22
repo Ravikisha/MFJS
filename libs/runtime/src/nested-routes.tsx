@@ -107,12 +107,14 @@ function walk(routes: NestedRoute[], remaining: string, out: MatchedRoute[]): bo
       continue;
     }
 
-    const patternForMatch = route.children?.length ? appendWildcard(routePath) : routePath;
+    const hasChildren = !!route.children?.length;
+    const patternForMatch = hasChildren ? appendWildcard(routePath) : routePath;
     const m = matchPath(patternForMatch, remaining);
     if (!m) continue;
 
     const consumed = computeConsumed(routePath, m.params);
-    out.push({ route, params: m.params, consumed });
+    const segmentParams = hasChildren ? stripWildcardParam(m.params) : m.params;
+    out.push({ route, params: segmentParams, consumed });
 
     if (route.children?.length) {
       const nextRemaining = stripPrefix(remaining, consumed) || '/';
@@ -124,6 +126,12 @@ function walk(routes: NestedRoute[], remaining: string, out: MatchedRoute[]): bo
     return true;
   }
   return false;
+}
+
+function stripWildcardParam(params: Record<string, string>): Record<string, string> {
+  if (!('*' in params)) return params;
+  const { ['*']: _wild, ...rest } = params;
+  return rest;
 }
 
 function appendWildcard(p: string): string {

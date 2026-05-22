@@ -1,5 +1,5 @@
-export const MFJS_REMOTE_LOAD_EVENT = 'mfjs:remote-load';
-export const MFJS_ERROR_EVENT = 'mfjs:error';
+export const MOXJS_REMOTE_LOAD_EVENT = 'moxjs:remote-load';
+export const MOXJS_ERROR_EVENT = 'moxjs:error';
 
 export interface RemoteLoadTelemetryDetail {
   remote: string;
@@ -17,24 +17,24 @@ export interface ErrorTelemetryDetail {
 
 export function emitRemoteLoad(detail: RemoteLoadTelemetryDetail): void {
   if (typeof window === 'undefined') return;
-  window.dispatchEvent(new CustomEvent(MFJS_REMOTE_LOAD_EVENT, { detail }));
+  window.dispatchEvent(new CustomEvent(MOXJS_REMOTE_LOAD_EVENT, { detail }));
 }
 
 export function emitError(detail: ErrorTelemetryDetail): void {
   if (typeof window === 'undefined') return;
-  window.dispatchEvent(new CustomEvent(MFJS_ERROR_EVENT, { detail }));
+  window.dispatchEvent(new CustomEvent(MOXJS_ERROR_EVENT, { detail }));
 }
 
 export function onRemoteLoad(cb: (d: RemoteLoadTelemetryDetail) => void): () => void {
   if (typeof window === 'undefined') return () => {};
   const handler = (e: Event) => cb((e as CustomEvent<RemoteLoadTelemetryDetail>).detail);
-  window.addEventListener(MFJS_REMOTE_LOAD_EVENT, handler);
-  return () => window.removeEventListener(MFJS_REMOTE_LOAD_EVENT, handler);
+  window.addEventListener(MOXJS_REMOTE_LOAD_EVENT, handler);
+  return () => window.removeEventListener(MOXJS_REMOTE_LOAD_EVENT, handler);
 }
 
 export function onRuntimeError(cb: (d: ErrorTelemetryDetail) => void): () => void {
   if (typeof window === 'undefined') return () => {};
   const handler = (e: Event) => cb((e as CustomEvent<ErrorTelemetryDetail>).detail);
-  window.addEventListener(MFJS_ERROR_EVENT, handler);
-  return () => window.removeEventListener(MFJS_ERROR_EVENT, handler);
+  window.addEventListener(MOXJS_ERROR_EVENT, handler);
+  return () => window.removeEventListener(MOXJS_ERROR_EVENT, handler);
 }

@@ -2,7 +2,7 @@ import path from 'node:path';
 import fs from 'fs-extra';
 import { pathToFileURL } from 'node:url';
 import kleur from 'kleur';
-import { MfjsCliError } from './errors.js';
+import { MoxjsCliError } from './errors.js';
 
 export type CliWorkspaceConfig = {
   name?: string;
@@ -99,9 +99,9 @@ async function applyHook<T>(value: T, plugins: CliPlugin[], hook: keyof CliPlugi
 }
 
 function debugWarn(msg: string): void {
-  if (process.env['MFJS_DEBUG'] === '1' || process.env['MFJS_DEBUG'] === 'true') {
+  if (process.env['MOXJS_DEBUG'] === '1' || process.env['MOXJS_DEBUG'] === 'true') {
     // eslint-disable-next-line no-console
-    console.warn(kleur.yellow(`[mfjs] ${msg}`));
+    console.warn(kleur.yellow(`[moxjs] ${msg}`));
   }
 }
 
@@ -109,7 +109,7 @@ async function loadJsonConfig(jsonPath: string): Promise<CliWorkspaceConfig | nu
   try {
     return (await fs.readJson(jsonPath)) as CliWorkspaceConfig;
   } catch (err) {
-    throw new MfjsCliError(
+    throw new MoxjsCliError(
       `Failed to parse ${path.basename(jsonPath)}: ${(err as Error).message}`,
       {
         code: 'CONFIG-001',
@@ -124,17 +124,17 @@ async function loadJsonConfig(jsonPath: string): Promise<CliWorkspaceConfig | nu
 
 async function loadTsConfig(tsPath: string): Promise<CliWorkspaceConfig | null> {
   // We refuse to import `.ts` directly: at runtime the CLI ships as compiled
-  // JS, so `await import('mfjs.config.ts')` either silently no-ops or runs
-  // user code unchecked. We require a pre-transpiled `mfjs.config.js` (or .mjs)
+  // JS, so `await import('moxjs.config.ts')` either silently no-ops or runs
+  // user code unchecked. We require a pre-transpiled `moxjs.config.js` (or .mjs)
   // sibling. Users who like TS should compile through tsx/jiti themselves.
   const candidate = tsPath.replace(/\.ts$/, '.js');
   if (!(await fs.pathExists(candidate))) {
-    throw new MfjsCliError(
+    throw new MoxjsCliError(
       `Found ${path.basename(tsPath)} but no compiled ${path.basename(candidate)}.`,
       {
         code: 'CONFIG-002',
         hint: [
-          'Compile your TS config first (e.g. `tsc mfjs.config.ts`) or rename to .js / .mjs.',
+          'Compile your TS config first (e.g. `tsc moxjs.config.ts`) or rename to .js / .mjs.',
           'The CLI no longer imports raw .ts to avoid arbitrary-code-execution surprises.',
         ],
       },
@@ -146,7 +146,7 @@ async function loadTsConfig(tsPath: string): Promise<CliWorkspaceConfig | null> 
     if (cfg && typeof cfg === 'object') return cfg;
     return null;
   } catch (err) {
-    throw new MfjsCliError(
+    throw new MoxjsCliError(
       `Failed to load ${path.basename(candidate)}: ${(err as Error).message}`,
       { code: 'CONFIG-003', hint: `File: ${candidate}` },
     );
@@ -156,15 +156,15 @@ async function loadTsConfig(tsPath: string): Promise<CliWorkspaceConfig | null> 
 export interface LoadConfigResult {
   cfg: CliWorkspaceConfig;
   plugins: CliPlugin[];
-  /** True if no `mfjs.config.{json,ts,js}` was found. */
+  /** True if no `moxjs.config.{json,ts,js}` was found. */
   missing: boolean;
 }
 
 export async function loadWorkspaceConfig(workspaceDir: string): Promise<LoadConfigResult> {
-  const jsonPath = path.join(workspaceDir, 'mfjs.config.json');
-  const tsPath = path.join(workspaceDir, 'mfjs.config.ts');
-  const jsPath = path.join(workspaceDir, 'mfjs.config.js');
-  const mjsPath = path.join(workspaceDir, 'mfjs.config.mjs');
+  const jsonPath = path.join(workspaceDir, 'moxjs.config.json');
+  const tsPath = path.join(workspaceDir, 'moxjs.config.ts');
+  const jsPath = path.join(workspaceDir, 'moxjs.config.js');
+  const mjsPath = path.join(workspaceDir, 'moxjs.config.mjs');
 
   let cfg: CliWorkspaceConfig = {};
   let foundAny = false;
@@ -186,7 +186,7 @@ export async function loadWorkspaceConfig(workspaceDir: string): Promise<LoadCon
         }
         break;
       } catch (err) {
-        throw new MfjsCliError(
+        throw new MoxjsCliError(
           `Failed to load ${path.basename(p)}: ${(err as Error).message}`,
           { code: 'CONFIG-003', hint: `File: ${p}` },
         );
@@ -201,7 +201,7 @@ export async function loadWorkspaceConfig(workspaceDir: string): Promise<LoadCon
   }
 
   if (!foundAny) {
-    debugWarn(`No mfjs.config.{json,js,mjs,ts} found in ${workspaceDir}.`);
+    debugWarn(`No moxjs.config.{json,js,mjs,ts} found in ${workspaceDir}.`);
   }
 
   const plugins: CliPlugin[] = Array.isArray(cfg.plugins) ? Object.freeze([...cfg.plugins]) as CliPlugin[] : [];

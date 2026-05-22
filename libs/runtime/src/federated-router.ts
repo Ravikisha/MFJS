@@ -1,5 +1,5 @@
 /**
- * @mfjs/runtime — Federated Router (Phase-0/1 bridge)
+ * @moxjs/runtime — Federated Router (Phase-0/1 bridge)
  *
  * Goal: allow the host (shell) to provide the *router singleton instance* to
  * remotes via Module Federation shared modules.

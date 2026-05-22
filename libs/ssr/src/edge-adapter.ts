@@ -1,5 +1,5 @@
 /**
- * @mfjs/ssr — edge adapter
+ * @moxjs/ssr — edge adapter
  *
  * Framework-agnostic request/response bridge for edge runtimes (Cloudflare
  * Workers, Vercel Edge, Deno Deploy, AWS Lambda@Edge). Feeds an `EdgeRequest`
@@ -11,7 +11,9 @@ import { renderRouteToString, injectIntoTemplate } from './render-to-string.js';
 import { matchRoutePath } from './route-utils.js';
 import { cacheControl, buildWeakEtag, ifNoneMatchHit, type CacheControlOptions } from './cache-headers.js';
 import { isRedirect } from './redirect.js';
-import { escapeHtml } from '@mfjs/security';
+import { isJsonResponse, isNotFound } from './response.js';
+import { buildRequestContext, runWithRequestContext } from './request-context.js';
+import { escapeHtml } from '@moxjs/security';
 import type { HtmlCache } from './html-cache.js';
 import type { EdgeAdapterHandler, EdgeAdapterOptions, EdgeRequest, EdgeResponse } from './types.js';
 
@@ -139,8 +141,8 @@ export function createEdgeAdapter(
           const responseHeaders: Record<string, string> = {
             ...baseExtra,
             'content-type': 'text/html; charset=utf-8',
-            'x-mfjs-ssr': '1',
-            'x-mfjs-ssr-cache': 'hit',
+            'x-moxjs-ssr': '1',
+            'x-moxjs-ssr-cache': 'hit',
             etag: cached.etag,
           };
           const cspValue = typeof csp === 'function' ? csp(request) : csp;
@@ -162,8 +164,11 @@ export function createEdgeAdapter(
     }
 
     let result;
+    const ctx = buildRequestContext(request);
     try {
-      result = await renderRouteToString(App, { path: match.path, params: match.params });
+      result = await runWithRequestContext(ctx, () =>
+        renderRouteToString(App, { path: match.path, params: match.params }),
+      );
     } catch (err) {
       if (isRedirect(err)) {
         return {
@@ -171,6 +176,21 @@ export function createEdgeAdapter(
           headers: { ...baseExtra, location: err.location },
           body: '',
         };
+      }
+      if (isJsonResponse(err)) {
+        return {
+          status: err.status,
+          headers: {
+            ...baseExtra,
+            ...err.headers,
+            'content-type': err.headers['content-type'] ?? 'application/json; charset=utf-8',
+          },
+          body: JSON.stringify(err.body),
+        };
+      }
+      if (isNotFound(err)) {
+        if (onNotFound) return onNotFound(request);
+        return defaultNotFound(pathname, template, baseExtra, notFoundCache);
       }
       throw err;
     }
@@ -181,7 +201,7 @@ export function createEdgeAdapter(
     const responseHeaders: Record<string, string> = {
       ...baseExtra,
       'content-type': 'text/html; charset=utf-8',
-      'x-mfjs-ssr': '1',
+      'x-moxjs-ssr': '1',
     };
 
     const cspValue = typeof csp === 'function' ? csp(request) : csp;
@@ -201,7 +221,7 @@ export function createEdgeAdapter(
     }
 
     if (cacheEnabled && htmlCache && entryKey !== null && etagValue && result.statusCode < 400) {
-      responseHeaders['x-mfjs-ssr-cache'] = 'miss';
+      responseHeaders['x-moxjs-ssr-cache'] = 'miss';
       await htmlCache.set(entryKey, {
         html,
         etag: etagValue,

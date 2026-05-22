@@ -33,12 +33,12 @@ export interface ThemeProviderProps {
 export function ThemeProvider({ theme, children }: ThemeProviderProps) {
   const merged = useMemo<Theme>(() => ({ ...defaultTheme, ...theme }), [theme]);
   const cssVars: CSSProperties & Record<string, string> = {
-    '--mfjs-color-primary': merged.colorPrimary,
-    '--mfjs-color-on-primary': merged.colorOnPrimary,
-    '--mfjs-color-surface': merged.colorSurface,
-    '--mfjs-color-on-surface': merged.colorOnSurface,
-    '--mfjs-color-border': merged.colorBorder,
-    '--mfjs-radius-md': merged.radiusMd,
+    '--moxjs-color-primary': merged.colorPrimary,
+    '--moxjs-color-on-primary': merged.colorOnPrimary,
+    '--moxjs-color-surface': merged.colorSurface,
+    '--moxjs-color-on-surface': merged.colorOnSurface,
+    '--moxjs-color-border': merged.colorBorder,
+    '--moxjs-radius-md': merged.radiusMd,
   };
   return (
     <ThemeCtx.Provider value={merged}>

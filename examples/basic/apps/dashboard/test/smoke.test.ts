@@ -3,7 +3,7 @@ import {
   loadRemoteModule,
   resolveRemotePage,
   type RemotePageRoute,
-} from '@mfjs/runtime';
+} from '@moxjs/runtime';
 
 const mockPages: RemotePageRoute[] = [
   { path: '/users/:id', load: async () => ({ default: () => null }) },
@@ -12,11 +12,11 @@ const mockPages: RemotePageRoute[] = [
 ];
 
 describe('dashboard example app — routing', () => {
-  it('loadRemoteModule is exported from @mfjs/runtime', () => {
+  it('loadRemoteModule is exported from @moxjs/runtime', () => {
     expect(typeof loadRemoteModule).toBe('function');
   });
 
-  it('resolveRemotePage is exported from @mfjs/runtime', () => {
+  it('resolveRemotePage is exported from @moxjs/runtime', () => {
     expect(typeof resolveRemotePage).toBe('function');
   });
 

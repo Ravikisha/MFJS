@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://moxjs.dev/schemas/moxjs.federation.json",
+  "title": "MOXJS Federation Config",
+  "description": "Schema for moxjs.federation.json — written by `moxjs federation`, consumed by Rspack ModuleFederationPlugin.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "filename", "shared"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "name": {
+      "type": "string",
+      "pattern": "^[A-Za-z_$][A-Za-z0-9_$]*$",
+      "description": "Module Federation container name (must be a valid JS identifier)."
+    },
+    "filename": { "type": "string", "default": "remoteEntry.js" },
+    "exposes": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "remotes": {
+      "type": "object",
+      "additionalProperties": { "type": "string" },
+      "description": "Map of remote name to '<name>@<entryUrl>'."
+    },
+    "shared": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["singleton"],
+        "properties": {
+          "singleton": { "type": "boolean" },
+          "eager": { "type": "boolean" },
+          "requiredVersion": {
+            "oneOf": [
+              { "type": "string" },
+              { "type": "boolean", "enum": [false] }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

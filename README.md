@@ -1,14 +1,22 @@
-# MFJS
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="logo/09-orchestrator-node.svg">
+    <source media="(prefers-color-scheme: light)" srcset="logo/09-orchestrator-node-light.svg">
+    <img src="logo/09-orchestrator-node.svg" alt="MOXJS" width="200" height="200">
+  </picture>
+</p>
 
-Opinionated micro-frontend framework + tooling built on **Rspack Module Federation**.
+<h1 align="center">MOXJS</h1>
+
+<p align="center">Opinionated micro-frontend framework + tooling built on <strong>Rspack Module Federation</strong>.</p>
 
 ## Monorepo layout
 
 | Path | Purpose |
 |---|---|
-| `packages/cli` | `mfjs` CLI (init / generate / dev / build / federation / routes) |
-| `libs/runtime` | `@mfjs/runtime` — router, routing components, hooks, remote loader |
-| `libs/ssr` | `@mfjs/ssr` — server rendering, streaming SSR, static export, edge adapter |
+| `packages/cli` | `moxjs` CLI (init / generate / dev / build / federation / routes) |
+| `libs/runtime` | `@moxjs/runtime` — router, routing components, hooks, remote loader |
+| `libs/ssr` | `@moxjs/ssr` — server rendering, streaming SSR, static export, edge adapter |
 | `docs/` | Documentation website (Astro Starlight) |
 | `examples/basic` | Runnable host + remote example |
 
@@ -19,17 +27,17 @@ Opinionated micro-frontend framework + tooling built on **Rspack Module Federati
 Recommended (guided full workspace scaffold):
 
 ```sh
-mfjs init my-app
+moxjs init my-app
 cd my-app
 
-mfjs scaffold app
+moxjs scaffold app
 
 # (or, non-interactive)
-# mfjs generate host shell --port 3000
-# mfjs generate remote dashboard --port 3001
-# mfjs federation
+# moxjs generate host shell --port 3000
+# moxjs generate remote dashboard --port 3001
+# moxjs federation
 
-mfjs dev
+moxjs dev
 ```
 
 ### Tailwind (optional)
@@ -37,11 +45,11 @@ mfjs dev
 You can enable Tailwind at init-time or per generated app:
 
 ```sh
-mfjs init my-app --tailwind
+moxjs init my-app --tailwind
 
 # or
-mfjs generate host shell --tailwind
-mfjs generate remote dashboard --tailwind
+moxjs generate host shell --tailwind
+moxjs generate remote dashboard --tailwind
 ```
 
 ### Interactive generator
@@ -49,14 +57,14 @@ mfjs generate remote dashboard --tailwind
 If you prefer prompts without scaffolding the whole workspace:
 
 ```sh
-mfjs generate wizard
+moxjs generate wizard
 ```
 
 ---
 
 ## Routing
 
-`@mfjs/runtime` ships a complete, React-ready routing layer built on the browser History API. It uses a **two-tier model**:
+`@moxjs/runtime` ships a complete, React-ready routing layer built on the browser History API. It uses a **two-tier model**:
 
 1. **Host routes** — the shell app declares which remote handles which URL prefix.
 2. **Remote pages** — each remote app exposes a set of page components for sub-paths.
@@ -68,10 +76,10 @@ mfjs generate wizard
 | `getRouter(opts?)` | Returns (or lazily creates) the singleton router. Call at **module level** in your host `bootstrap.tsx` to survive React StrictMode's double-invocation. |
 | `useRouter()` | Hook — returns the singleton `Router` instance. |
 | `usePathname()` | Hook — returns the current pathname string; re-renders on every navigation. |
-| `NavLink` | `<NavLink to="/path" label="…" />` — renders an `<a>` that dispatches `mfjs:navigate` instead of doing a full-page reload. Receives `activeStyle` / `className` for active-link styling. |
+| `NavLink` | `<NavLink to="/path" label="…" />` — renders an `<a>` that dispatches `moxjs:navigate` instead of doing a full-page reload. Receives `activeStyle` / `className` for active-link styling. |
 | `RemoteOutlet` | Host-side component. Matches the current path against a `routes` table and lazily renders the matching remote component. |
-| `RemoteApp` | Remote-side component. Matches `subpath` against a `pages` array (usually from the auto-generated `mfjs.routes.ts`) and renders the matching page. |
-| `dispatchMfjsNavigate({ to })` | Imperative cross-app navigation via the `mfjs:navigate` DOM event. |
+| `RemoteApp` | Remote-side component. Matches `subpath` against a `pages` array (usually from the auto-generated `moxjs.routes.ts`) and renders the matching page. |
+| `dispatchMoxjsNavigate({ to })` | Imperative cross-app navigation via the `moxjs:navigate` DOM event. |
 | `resolveRoute(routes, pathname)` | Low-level route resolver (supports `:params` and `*` splat). |
 
 ### Host bootstrap pattern
@@ -80,8 +88,8 @@ mfjs generate wizard
 // shell/src/bootstrap.tsx
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { NavLink, RemoteOutlet, usePathname, getRouter } from '@mfjs/runtime';
-import type { RouteTarget } from '@mfjs/runtime';
+import { NavLink, RemoteOutlet, usePathname, getRouter } from '@moxjs/runtime';
+import type { RouteTarget } from '@moxjs/runtime';
 
 // Declare which remote handles each URL prefix
 const HOST_ROUTES: RouteTarget[] = [
@@ -125,8 +133,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 
 ```tsx
 // dashboard/src/remote.tsx
-import { RemoteApp } from '@mfjs/runtime';
-import { pages } from './mfjs.routes.js';   // auto-generated by `mfjs routes`
+import { RemoteApp } from '@moxjs/runtime';
+import { pages } from './moxjs.routes.js';   // auto-generated by `moxjs routes`
 
 export default function RemoteRoot({ subpath = '/' }: { subpath?: string }) {
   return <RemoteApp subpath={subpath} pages={pages} />;
@@ -135,11 +143,11 @@ export default function RemoteRoot({ subpath = '/' }: { subpath?: string }) {
 
 ### File-based routing in remotes
 
-Run `mfjs routes` inside a remote app to scan `src/pages/` and generate `src/mfjs.routes.ts`:
+Run `moxjs routes` inside a remote app to scan `src/pages/` and generate `src/moxjs.routes.ts`:
 
 ```sh
 cd apps/dashboard
-mfjs routes
+moxjs routes
 ```
 
 File → route mapping:
@@ -153,8 +161,8 @@ File → route mapping:
 Generated output:
 
 ```ts
-// src/mfjs.routes.ts  (auto-generated — do not edit)
-import type { RemotePageRoute } from '@mfjs/runtime';
+// src/moxjs.routes.ts  (auto-generated — do not edit)
+import type { RemotePageRoute } from '@moxjs/runtime';
 export const pages: RemotePageRoute[] = [
   { path: '/users/:id', load: () => import('./pages/users/[id].tsx') },
   { path: '/settings',  load: () => import('./pages/settings.tsx') },
@@ -167,9 +175,9 @@ export const pages: RemotePageRoute[] = [
 Pages can navigate without importing the router directly:
 
 ```tsx
-import { dispatchMfjsNavigate } from '@mfjs/runtime';
+import { dispatchMoxjsNavigate } from '@moxjs/runtime';
 
-<button onClick={() => dispatchMfjsNavigate({ to: '/dashboard/settings' })}>
+<button onClick={() => dispatchMoxjsNavigate({ to: '/dashboard/settings' })}>
   Go to settings
 </button>
 ```
@@ -180,40 +188,40 @@ import { dispatchMfjsNavigate } from '@mfjs/runtime';
 
 ### Proxy remotes (recommended)
 
-`mfjs dev --proxy-remotes` rewrites the host remotes list to **same-origin** URLs:
+`moxjs dev --proxy-remotes` rewrites the host remotes list to **same-origin** URLs:
 
-- `dashboard@http://localhost:3000/mfjs/remotes/dashboard/remoteEntry.js`
+- `dashboard@http://localhost:3000/moxjs/remotes/dashboard/remoteEntry.js`
 
 The generated host `rspack.config.mjs` proxies all remote assets through the host dev-server:
 
-- `/mfjs/remotes/<remoteName>/*  →  http://localhost:<remotePort>/*`
+- `/moxjs/remotes/<remoteName>/*  →  http://localhost:<remotePort>/*`
 
 This avoids dev-time 404s for remote split chunks.
 
 ### Remote rebuild → host reload (HMR)
 
-`mfjs dev --hmr-remotes` starts a small reload server and injects `MFJS_DEV_RELOAD_URL` into each app. Generated hosts call `connectMfjsDevReload()` (from `@mfjs/runtime`) when that env var is present, so the host auto-refreshes whenever a remote recompiles.
+`moxjs dev --hmr-remotes` starts a small reload server and injects `MOXJS_DEV_RELOAD_URL` into each app. Generated hosts call `connectMoxjsDevReload()` (from `@moxjs/runtime`) when that env var is present, so the host auto-refreshes whenever a remote recompiles.
 
 ---
 
 ## SSR / SSG
 
-MFJS ships an SSR/SSG toolkit in `@mfjs/ssr` plus a CLI wrapper (`mfjs ssr`) for static export and a reference Node SSR server.
+MOXJS ships an SSR/SSG toolkit in `@moxjs/ssr` plus a CLI wrapper (`moxjs ssr`) for static export and a reference Node SSR server.
 
 Features:
 
 - Server rendering to string: `renderRouteToString()` + `injectIntoTemplate()`
 - Streaming SSR (React 18): `renderRouteToStream()`
-- Static export: `staticExport()` or `mfjs ssr export`
+- Static export: `staticExport()` or `moxjs ssr export`
 - Edge adapter: `createEdgeAdapter()`
 - Remote SSR helpers: `ssrRenderRemote()` + `createSsrRemoteOutlet()`
 
 CLI:
 
 ```sh
-mfjs ssr export
-mfjs ssr serve --port 3000        # streaming by default
-mfjs ssr serve --port 3000 --no-stream
+moxjs ssr export
+moxjs ssr serve --port 3000        # streaming by default
+moxjs ssr serve --port 3000 --no-stream
 ```
 
 ---
@@ -222,10 +230,10 @@ mfjs ssr serve --port 3000 --no-stream
 
 ### Auto-detection
 
-`mfjs federation` reads `mfjs.app.json` and infers:
+`moxjs federation` reads `moxjs.app.json` and infers:
 
-- **App name** — `mfjs.app.json.name` → `package.json` name → folder name
-- **Exposes** — `mfjs.app.json.exposes` → `src/remote.tsx` → `src/App.tsx`
+- **App name** — `moxjs.app.json.name` → `package.json` name → folder name
+- **Exposes** — `moxjs.app.json.exposes` → `src/remote.tsx` → `src/App.tsx`
 - **Shared deps** — small allowlist inferred from `package.json` deps
 
 ### RemoteEntry URL (Rspack)
@@ -290,7 +298,7 @@ pnpm -r build    # build all packages
 The opt-in e2e suite starts `examples/basic` (host + remote) and exercises routing, navigation, and remote page rendering.
 
 ```sh
-MFJS_E2E=1 pnpm e2e   # opt-in (local)
+MOXJS_E2E=1 pnpm e2e   # opt-in (local)
 pnpm e2e:ci            # always-on (CI)
 ```
 

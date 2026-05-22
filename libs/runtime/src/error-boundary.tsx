@@ -23,8 +23,8 @@ export type ErrorBoundaryProps = {
 type ErrorBoundaryState = { error: unknown | null };
 
 /**
- * Error Boundary that emits `MFJS_ERROR_EVENT` so observability adapters
- * (`@mfjs/observability`) can capture render-time crashes.
+ * Error Boundary that emits `MOXJS_ERROR_EVENT` so observability adapters
+ * (`@moxjs/observability`) can capture render-time crashes.
  */
 export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
   override state: ErrorBoundaryState = { error: null };

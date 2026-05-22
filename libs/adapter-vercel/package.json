@@ -1,15 +1,15 @@
 {
-  "name": "@mfjs/adapter-vercel",
+  "name": "@moxjs/adapter-vercel",
   "version": "0.1.0",
-  "description": "Vercel deployment adapter for MFJS (Edge Functions + static assets).",
+  "description": "Vercel deployment adapter for MOXJS (Edge Functions + static assets).",
   "license": "MIT",
-  "homepage": "https://github.com/anthropics/MFJS#readme",
+  "homepage": "https://github.com/anthropics/MOXJS#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/anthropics/MFJS.git",
+    "url": "https://github.com/anthropics/MOXJS.git",
     "directory": "libs/adapter-vercel"
   },
-  "keywords": ["mfjs", "vercel", "edge", "ssr", "module-federation"],
+  "keywords": ["moxjs", "vercel", "edge", "ssr", "module-federation"],
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -24,7 +24,7 @@
     "build": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@mfjs/ssr": "workspace:*"
+    "@moxjs/ssr": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.13.10",

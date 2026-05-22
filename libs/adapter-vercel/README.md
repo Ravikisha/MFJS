@@ -1,18 +1,18 @@
-# @mfjs/adapter-vercel
+# @moxjs/adapter-vercel
 
-Vercel deployment adapter for MFJS.
+Vercel deployment adapter for MOXJS.
 
 ## Install
 
 ```sh
-pnpm add @mfjs/adapter-vercel
+pnpm add @moxjs/adapter-vercel
 ```
 
 ## Use
 
 ```ts
 // api/ssr.ts
-import { createVercelHandler } from '@mfjs/adapter-vercel';
+import { createVercelHandler } from '@moxjs/adapter-vercel';
 import App from '../src/App.js';
 import { routes } from '../src/routes.js';
 import template from '../public/index.html?raw';

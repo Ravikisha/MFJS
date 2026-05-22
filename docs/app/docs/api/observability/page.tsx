@@ -1,34 +1,118 @@
-export const metadata = { title: '@mfjs/observability API' };
+import { CodeBlock } from '@/components/site/code-block';
+
+export const metadata = {
+  title: '@moxjs/observability API',
+  description:
+    'Hook registry for error/metric/remote-load events, structured logger, Web Vitals collection, console + Sentry adapters, fingerprint helper.',
+};
 
 export default function ObsApi() {
   return (
     <>
-      <h1>@mfjs/observability</h1>
+      <h1>@moxjs/observability</h1>
+      <p>
+        Three hooks bridge runtime telemetry to your collector of choice. Adapters wire the hooks
+        to a specific backend; the library never sends anything by itself.
+      </p>
 
-      <h2>Hooks</h2>
-      <ul>
-        <li><code>onError(handler)</code> / <code>reportError(event)</code></li>
-        <li><code>onMetric(handler)</code> / <code>reportMetric(metric)</code></li>
-        <li><code>onRemoteLoad(handler)</code> / <code>reportRemoteLoad(event)</code></li>
-        <li><code>clearHandlers()</code></li>
-      </ul>
+      <h2 id="hooks">Hooks</h2>
+      <CodeBlock
+        language="ts"
+        code={`type Source = 'host' | 'remote' | 'ssr' | 'sw';
 
-      <h2>Logger</h2>
-      <ul>
-        <li><code>createLogger(&#123; name?, level?, bindings?, sink? &#125;)</code></li>
-        <li>Returns <code>Logger</code>: <code>debug / info / warn / error / child</code></li>
-      </ul>
+interface ErrorEvent {
+  error: unknown;
+  source: Source;
+  context?: Record<string, unknown>;
+}
+interface MetricEvent {
+  name: string;
+  value: number;
+  tags?: Record<string, string>;
+  ts?: number;
+}
+interface RemoteLoadEvent {
+  remote: string;
+  phase: 'start' | 'success' | 'error';
+  durationMs: number;
+  cached?: boolean;
+  error?: unknown;
+}
 
-      <h2>Web Vitals</h2>
-      <ul>
-        <li><code>collectWebVitals(opts?)</code> → returns disposer</li>
-      </ul>
+onError(handler: (e: ErrorEvent) => void): () => void;
+onMetric(handler: (m: MetricEvent) => void): () => void;
+onRemoteLoad(handler: (e: RemoteLoadEvent) => void): () => void;
 
-      <h2>Adapters</h2>
-      <ul>
-        <li><code>useConsoleAdapter(opts?)</code></li>
-        <li><code>useSentryAdapter(Sentry, opts?)</code></li>
-      </ul>
+reportError(e: ErrorEvent): void;
+reportMetric(m: MetricEvent): void;
+reportRemoteLoad(e: RemoteLoadEvent): void;
+
+clearHandlers(): void;            // tests`}
+      />
+
+      <h2 id="logger">Structured logger</h2>
+      <CodeBlock
+        language="ts"
+        code={`createLogger(opts?: {
+  name?: string;
+  level?: 'debug' | 'info' | 'warn' | 'error';
+  bindings?: Record<string, unknown>;  // included on every record
+  sink?: (record: LogRecord) => void;  // default: console + JSON line
+}): Logger;
+
+interface Logger {
+  debug(msg: string, ctx?: object): void;
+  info(msg: string, ctx?: object): void;
+  warn(msg: string, ctx?: object): void;
+  error(msg: string, ctx?: object): void;
+  child(bindings: Record<string, unknown>): Logger;
+}
+
+interface LogRecord {
+  time: string;
+  level: 'debug' | 'info' | 'warn' | 'error';
+  name?: string;
+  msg: string;
+  ctx?: Record<string, unknown>;
+}`}
+      />
+
+      <h2 id="web-vitals">Web Vitals</h2>
+      <CodeBlock
+        language="ts"
+        code={`collectWebVitals(opts?: {
+  metrics?: Array<'LCP' | 'CLS' | 'FID' | 'INP' | 'TTFB' | 'FCP'>;
+  reportAllChanges?: boolean;
+}): () => void;                  // returns disposer`}
+      />
+
+      <h2 id="adapters">Adapters</h2>
+      <CodeBlock
+        language="ts"
+        code={`useConsoleAdapter(opts?: {
+  level?: 'debug' | 'info' | 'warn' | 'error';
+  metrics?: boolean;             // default true — emit metrics as console.debug
+}): () => void;
+
+useSentryAdapter(Sentry: typeof import('@sentry/browser'), opts?: {
+  tags?: Record<string, string>;
+  beforeReport?: (e: ErrorEvent) => boolean;  // false → drop
+}): () => void;`}
+      />
+
+      <h2 id="fingerprint">Fingerprint</h2>
+      <CodeBlock
+        language="ts"
+        code={`computeFingerprint(opts: {
+  error: unknown;
+  remote?: string;
+  source?: Source;
+  stripPrefixes?: string[];
+}): string[];                     // ready to pass as Sentry's fingerprint
+
+// Shorthand
+groupBy(opts: Parameters<typeof computeFingerprint>[0]): string[];`}
+      />
     </>
   );
 }

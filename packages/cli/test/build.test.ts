@@ -1,5 +1,5 @@
 /**
- * Tests for `mfjs build` command logic and build output artifacts.
+ * Tests for `moxjs build` command logic and build output artifacts.
  *
  * Unit tests verify app-discovery and ordering logic without running Rspack.
  * Output tests assert the shape of the dist/ artifacts that Rspack produces
@@ -14,7 +14,7 @@ import fs from 'fs-extra';
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 async function makeTmp(): Promise<string> {
-  return fs.mkdtemp(path.join(os.tmpdir(), 'mfjs-build-')) as Promise<string>;
+  return fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-build-')) as Promise<string>;
 }
 
 async function scaffoldWorkspace(
@@ -25,7 +25,7 @@ async function scaffoldWorkspace(
   for (const app of apps) {
     const dir = path.join(appsDir, app.name);
     await fs.ensureDir(dir);
-    await fs.writeJson(path.join(dir, 'mfjs.app.json'), {
+    await fs.writeJson(path.join(dir, 'moxjs.app.json'), {
       name: app.name,
       type: app.type,
       port: app.port,
@@ -43,32 +43,32 @@ function sortAppsForBuild<T extends { meta: { type: 'host' | 'remote' } }>(apps:
 
 // ── Unit tests — app discovery & sorting ─────────────────────────────────────
 
-describe('mfjs build — app discovery', () => {
-  it('discovers all apps that have mfjs.app.json', async () => {
+describe('moxjs build — app discovery', () => {
+  it('discovers all apps that have moxjs.app.json', async () => {
     const tmp = await makeTmp();
     const appsDir = await scaffoldWorkspace(tmp, [
       { name: 'shell', type: 'host', port: 3000 },
       { name: 'dashboard', type: 'remote', port: 3001 },
     ]);
 
-    expect(await fs.pathExists(path.join(appsDir, 'shell', 'mfjs.app.json'))).toBe(true);
-    expect(await fs.pathExists(path.join(appsDir, 'dashboard', 'mfjs.app.json'))).toBe(true);
+    expect(await fs.pathExists(path.join(appsDir, 'shell', 'moxjs.app.json'))).toBe(true);
+    expect(await fs.pathExists(path.join(appsDir, 'dashboard', 'moxjs.app.json'))).toBe(true);
   });
 
-  it('ignores app folders that lack mfjs.app.json', async () => {
+  it('ignores app folders that lack moxjs.app.json', async () => {
     const tmp = await makeTmp();
     const appsDir = path.join(tmp, 'apps');
 
     await fs.ensureDir(path.join(appsDir, 'shell'));
-    await fs.writeJson(path.join(appsDir, 'shell', 'mfjs.app.json'), {
+    await fs.writeJson(path.join(appsDir, 'shell', 'moxjs.app.json'), {
       name: 'shell', type: 'host', port: 3000,
     });
-    await fs.ensureDir(path.join(appsDir, 'storybook')); // no mfjs.app.json
+    await fs.ensureDir(path.join(appsDir, 'storybook')); // no moxjs.app.json
 
     const folders = (await fs.readdir(appsDir)) as string[];
     const withMeta: string[] = [];
     for (const f of folders) {
-      if (await fs.pathExists(path.join(appsDir, f, 'mfjs.app.json'))) {
+      if (await fs.pathExists(path.join(appsDir, f, 'moxjs.app.json'))) {
         withMeta.push(f);
       }
     }
@@ -83,21 +83,21 @@ describe('mfjs build — app discovery', () => {
     const folders = (await fs.readdir(appsDir)) as string[];
     const withMeta: string[] = [];
     for (const f of folders) {
-      if (await fs.pathExists(path.join(appsDir, f, 'mfjs.app.json'))) {
+      if (await fs.pathExists(path.join(appsDir, f, 'moxjs.app.json'))) {
         withMeta.push(f);
       }
     }
     expect(withMeta).toHaveLength(0);
   });
 
-  it('correctly reads host and remote types from mfjs.app.json', async () => {
+  it('correctly reads host and remote types from moxjs.app.json', async () => {
     const tmp = await makeTmp();
     const appsDir = await scaffoldWorkspace(tmp, [
       { name: 'shell', type: 'host', port: 3000 },
       { name: 'dashboard', type: 'remote', port: 3001 },
     ]);
-    const shell = await fs.readJson(path.join(appsDir, 'shell', 'mfjs.app.json'));
-    const dash  = await fs.readJson(path.join(appsDir, 'dashboard', 'mfjs.app.json'));
+    const shell = await fs.readJson(path.join(appsDir, 'shell', 'moxjs.app.json'));
+    const dash  = await fs.readJson(path.join(appsDir, 'dashboard', 'moxjs.app.json'));
     expect(shell.type).toBe('host');
     expect(dash.type).toBe('remote');
   });
@@ -105,7 +105,7 @@ describe('mfjs build — app discovery', () => {
 
 // ── Unit tests — build order ──────────────────────────────────────────────────
 
-describe('mfjs build — build order', () => {
+describe('moxjs build — build order', () => {
   it('remotes are sorted before hosts', () => {
     const apps = [
       { dir: '/apps/shell',     meta: { name: 'shell',     type: 'host' as const,   port: 3000 } },
@@ -192,20 +192,20 @@ describe('build output — remote (dashboard) dist/', () => {
   );
 
   it.skipIf(!distReady)(
-    'mfjs.federation.json declares filename: remoteEntry.js',
+    'moxjs.federation.json declares filename: remoteEntry.js',
     async () => {
       const cfg = await fs.readJson(
-        path.join(exampleRoot, 'apps', 'dashboard', 'mfjs.federation.json')
+        path.join(exampleRoot, 'apps', 'dashboard', 'moxjs.federation.json')
       );
       expect(cfg.filename).toBe('remoteEntry.js');
     }
   );
 
   it.skipIf(!distReady)(
-    'mfjs.federation.json exposes "./App"',
+    'moxjs.federation.json exposes "./App"',
     async () => {
       const cfg = await fs.readJson(
-        path.join(exampleRoot, 'apps', 'dashboard', 'mfjs.federation.json')
+        path.join(exampleRoot, 'apps', 'dashboard', 'moxjs.federation.json')
       );
       expect(cfg.exposes).toHaveProperty('./App');
     }
@@ -240,10 +240,10 @@ describe('build output — shell (host) dist/', () => {
   );
 
   it.skipIf(!distReady)(
-    'shell mfjs.federation.json references dashboard remoteEntry.js',
+    'shell moxjs.federation.json references dashboard remoteEntry.js',
     async () => {
       const cfg = await fs.readJson(
-        path.join(exampleRoot, 'apps', 'shell', 'mfjs.federation.json')
+        path.join(exampleRoot, 'apps', 'shell', 'moxjs.federation.json')
       );
       expect(cfg.remotes?.dashboard).toContain('remoteEntry.js');
     }

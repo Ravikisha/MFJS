@@ -1,22 +1,22 @@
 {
-  "name": "@mfjs/cli",
+  "name": "@moxjs/cli",
   "version": "0.1.0",
-  "description": "MFJS command-line tool: scaffold, dev, build, federation, SSR, deploy, and diagnostics for module federation workspaces.",
+  "description": "MOXJS command-line tool: scaffold, dev, build, federation, SSR, deploy, and diagnostics for module federation workspaces.",
   "license": "MIT",
-  "homepage": "https://github.com/anthropics/MFJS#readme",
+  "homepage": "https://github.com/anthropics/MOXJS#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/anthropics/MFJS.git",
+    "url": "https://github.com/anthropics/MOXJS.git",
     "directory": "packages/cli"
   },
-  "keywords": ["mfjs", "module-federation", "cli", "rspack", "scaffold"],
+  "keywords": ["moxjs", "module-federation", "cli", "rspack", "scaffold"],
   "private": false,
   "publishConfig": {
     "access": "public"
   },
   "type": "module",
   "bin": {
-    "mfjs": "./dist/index.js"
+    "moxjs": "./dist/index.js"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -39,8 +39,8 @@
     "kleur": "^4.1.5",
     "execa": "^9.5.3",
     "ws": "^8.18.3",
-    "@mfjs/ssr": "workspace:*",
-    "@mfjs/types": "workspace:*",
+    "@moxjs/ssr": "workspace:*",
+    "@moxjs/types": "workspace:*",
     "tree-kill": "^1.2.2",
     "chokidar": "^4.0.3"
   },

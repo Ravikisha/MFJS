@@ -1,7 +1,7 @@
 {
-  "name": "@mfjs/prettier-config",
+  "name": "@moxjs/prettier-config",
   "version": "0.1.0",
-  "description": "Shared Prettier config for MFJS projects.",
+  "description": "Shared Prettier config for MOXJS projects.",
   "main": "index.json",
   "publishConfig": { "access": "public" },
   "files": ["index.json", "README.md"]

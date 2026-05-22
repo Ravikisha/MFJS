@@ -1,5 +1,5 @@
 /**
- * @mfjs/runtime — server-side router utilities
+ * @moxjs/runtime — server-side router utilities
  *
  * The browser router (`router.ts`) uses `window` / `history`. This module
  * provides a minimal request-scoped router safe for SSR. **Do not** rely on a

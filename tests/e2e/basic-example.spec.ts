@@ -55,7 +55,7 @@ test('@direct navigating to /dashboard/settings shows settings page', async ({ p
   await page.goto('http://localhost:3000/', { waitUntil: 'domcontentloaded' });
   await expect(page.getByTestId('remote-loaded')).toBeVisible({ timeout: 10_000 });
 
-  // Click the Settings nav link (dispatches mfjs:navigate to /dashboard/settings)
+  // Click the Settings nav link (dispatches moxjs:navigate to /dashboard/settings)
   await page.getByTestId('nav-dashboard-settings').click();
 
   await expect(page.getByTestId('page-settings')).toBeVisible({ timeout: 10_000 });

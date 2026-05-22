@@ -17,7 +17,7 @@ export default function SecurityPage() {
       </Badge>
       <h1>Security</h1>
       <p>
-        <code>@mfjs/security</code> packages the primitives federated apps actually need: a CSP
+        <code>@moxjs/security</code> packages the primitives federated apps actually need: a CSP
         builder with <code>strict-dynamic</code>, SRI hashing for <code>remoteEntry.js</code>, an
         origin allowlist with wildcard support, base64url-validated nonces, and helpers for safe
         hydration. Every primitive is edge-runtime safe (Web Crypto, no <code>Buffer</code>, no{' '}
@@ -32,7 +32,7 @@ export default function SecurityPage() {
 
       <CodeBlock
         language="ts"
-        code={`import { buildCsp } from '@mfjs/security';
+        code={`import { buildCsp } from '@moxjs/security';
 
 const policy = buildCsp({
   nonce: cryptoRandomNonce(),       // base64url
@@ -51,6 +51,93 @@ const policy = buildCsp({
         whenever a nonce is set.
       </Callout>
 
+      <h2 id="csp-middleware">CSP middleware</h2>
+      <p>
+        Drop a per-request nonce into your Express/Connect/Fastify server with{' '}
+        <code>cspMiddleware</code>. The middleware sets the header and exposes{' '}
+        <code>res.locals.cspNonce</code> for downstream renderers.
+      </p>
+      <CodeBlock
+        language="ts"
+        code={`import { cspMiddleware } from '@moxjs/security';
+
+app.use(cspMiddleware({
+  remotes: ['https://cdn.example.com'],
+  reportOnly: false,
+}));
+
+app.get('/', (_req, res) => {
+  res.send(\`<script nonce="\${res.locals!.cspNonce}">…</script>\`);
+});`}
+      />
+      <p>
+        Use <code>cspFastifyHook</code> as a Fastify <code>preHandler</code> hook, or{' '}
+        <code>cspHeaderFactory</code> for framework-neutral header computation.
+      </p>
+
+      <h2 id="rate-limit">Rate limiting</h2>
+      <p>
+        <code>RateLimiter</code> implements a token-bucket per key.{' '}
+        <code>createRateLimitGuard</code> returns a request guard that emits{' '}
+        <code>X-RateLimit-*</code> headers on success and a 429 with <code>Retry-After</code> when
+        the bucket is empty.
+      </p>
+      <CodeBlock
+        language="ts"
+        code={`import { createRateLimitGuard } from '@moxjs/security';
+
+const guard = createRateLimitGuard({
+  capacity: 60,             // burst
+  refillPerSec: 30,         // sustained
+  keyFor: (req) =>
+    req.headers?.['x-api-key'] ?? req.headers?.['x-forwarded-for'] ?? 'anon',
+});
+
+export default async function fetch(req) {
+  const r = guard({ url: req.url, headers: Object.fromEntries(req.headers) });
+  if (!r.allowed) {
+    return new Response(r.response!.body, {
+      status: r.response!.status,
+      headers: r.response!.headers,
+    });
+  }
+  // …route the request, attaching r.headers to the final response.
+}`}
+      />
+      <Callout variant="info" title="In-memory only by default">
+        The default store evicts least-recently-used keys above <code>maxKeys</code>. Pass a custom{' '}
+        <code>store</code> (Redis, KV) for multi-instance deployments.
+      </Callout>
+
+      <h2 id="audit-log">Audit log</h2>
+      <p>
+        Track auth/admin actions with <code>AuditLogger</code>. Sensitive fields in{' '}
+        <code>metadata</code> (passwords, tokens, cookies) are scrubbed before sinks see them.
+      </p>
+      <CodeBlock
+        language="ts"
+        code={`import { AuditLogger, bufferSink } from '@moxjs/security';
+
+const buf = bufferSink();
+const audit = new AuditLogger({ sinks: [buf.sink], redactKeys: ['ssn'] });
+
+await audit.success({
+  actor: user.id,
+  action: 'user.login',
+  resource: { type: 'user', id: user.id },
+  ip: req.headers['x-forwarded-for'],
+  requestId: req.id,
+  metadata: { token: 'tk-…', ssn: '…' },   // both replaced with '[REDACTED]'
+});
+
+await audit.denied({
+  actor: user.id,
+  action: 'org.delete',
+  resource: { type: 'org', id: org.id },
+  reason: 'insufficient role',
+});`}
+      />
+
       <h2 id="sri">Subresource Integrity</h2>
       <p>
         <code>sriHashFromUrl</code> fetches a URL and returns a SHA-256/384/512 integrity attribute.
@@ -59,7 +146,7 @@ const policy = buildCsp({
 
       <CodeBlock
         language="ts"
-        code={`import { sriHashFromUrl } from '@mfjs/security';
+        code={`import { sriHashFromUrl } from '@moxjs/security';
 
 const integrity = await sriHashFromUrl(
   'https://cdn.acme.com/dashboard/remoteEntry.js',
@@ -69,10 +156,114 @@ const integrity = await sriHashFromUrl(
 // "sha384-AbCdEf..."`}
       />
 
+      <h3 id="sri-manifest">SRI for a federation manifest</h3>
+      <p>
+        Use <code>computeSriForManifest</code> at build time to bulk-hash every
+        <code> remoteEntry.js</code> in your manifest, then <code>injectSriIntoHtml</code> to
+        patch the shell HTML with the matching <code>integrity</code> + <code>crossorigin</code>{' '}
+        attributes. Both helpers run under Web Crypto so they work in Workers, Vercel Edge, and
+        Node 19+ without <code>node:crypto</code>.
+      </p>
+
+      <CodeBlock
+        language="ts"
+        code={`import { computeSriForManifest, injectSriIntoHtml } from '@moxjs/security';
+
+const { entries, failures } = await computeSriForManifest(
+  manifest.map((m) => ({ name: m.name, entryUrl: m.entryUrl })),
+  { algo: 'sha384', concurrency: 6 },
+);
+
+// Then patch the shell:
+const html = injectSriIntoHtml(template, entries, { match: 'basename' });`}
+      />
+
+      <h2 id="sandbox">Sandboxed remotes</h2>
+      <p>
+        For untrusted code, mount the remote inside an iframe with the
+        <code> sandbox</code> attribute and talk to it over a tiny postMessage RPC bridge that
+        pins <code>event.origin</code> and <code>event.source</code>.{' '}
+        <code>buildSandboxIframeAttrs</code> refuses dangerous tokens (
+        <code>allow-same-origin</code>, <code>allow-top-navigation</code>) that would defeat the
+        sandbox.
+      </p>
+
+      <CodeBlock
+        language="ts"
+        code={`import { buildSandboxIframeAttrs, createSandboxBridge } from '@moxjs/security';
+
+const attrs = buildSandboxIframeAttrs({
+  src: 'https://untrusted.example.com/remote.html',
+  permissions: ['allow-scripts'],
+});
+// → { src, sandbox: 'allow-scripts', referrerpolicy: 'no-referrer' }
+
+const bridge = createSandboxBridge({
+  target: iframe.contentWindow!,
+  host: window,
+  expectedOrigin: 'https://untrusted.example.com',
+});
+const result = await bridge.request('search', { q: 'react' }, 2_000);`}
+      />
+
+      <h2 id="oauth">OAuth 2.0 / OIDC + PKCE</h2>
+      <p>
+        Pure-protocol helpers — pair with any IDP (Auth0, Cognito, Keycloak, Okta).{' '}
+        <code>generatePkceChallenge</code> produces a 43-byte verifier + S256 challenge.{' '}
+        <code>buildAuthorizeUrl</code> emits the authorize redirect.
+        <code> parseAuthorizationResponse</code> validates the <code>state</code> CSRF guard.
+        <code> exchangeCodeForTokens</code> + <code>refreshTokens</code> POST the form-encoded
+        grant; <code>TokenStore</code> auto-refreshes with concurrent-call coalescing.
+      </p>
+
+      <CodeBlock
+        language="ts"
+        code={`import {
+  generatePkceChallenge, buildAuthorizeUrl,
+  parseAuthorizationResponse, exchangeCodeForTokens,
+  refreshTokens, TokenStore, tokenSetFromResponse,
+} from '@moxjs/security';
+
+// 1. login start
+const pkce = await generatePkceChallenge();
+const state = crypto.randomUUID();
+sessionStorage.setItem('pkce', JSON.stringify({ ...pkce, state }));
+location.href = buildAuthorizeUrl({
+  authorizationEndpoint: 'https://idp.example.com/authorize',
+  clientId: 'my-spa',
+  redirectUri: \`\${location.origin}/cb\`,
+  scope: ['openid', 'profile', 'email'],
+  state,
+  codeChallenge: pkce.challenge,
+});
+
+// 2. callback
+const { code } = parseAuthorizationResponse(location.href, state);
+const tokens = await exchangeCodeForTokens({
+  tokenEndpoint: 'https://idp.example.com/token',
+  clientId: 'my-spa',
+  code,
+  redirectUri: \`\${location.origin}/cb\`,
+  codeVerifier: pkce.verifier,
+});
+
+// 3. auto-refreshing store
+const store = new TokenStore(tokenSetFromResponse(tokens), {
+  refresher: async (current) => tokenSetFromResponse(
+    await refreshTokens({
+      tokenEndpoint: 'https://idp.example.com/token',
+      clientId: 'my-spa',
+      refreshToken: current.refreshToken!,
+    }),
+  ),
+});
+fetch('/api/me', { headers: { authorization: \`Bearer \${await store.getAccessToken()}\` } });`}
+      />
+
       <h2 id="allowlist">Origin allowlist</h2>
       <CodeBlock
         language="ts"
-        code={`import { RemoteAllowlist } from '@mfjs/security';
+        code={`import { RemoteAllowlist } from '@moxjs/security';
 
 const list = new RemoteAllowlist([
   'https://*.acme.com',
@@ -111,10 +302,10 @@ list.allows('https://acme.com/x.js');             // false (single-label needs s
       <h2 id="safe-json">Safe state hydration</h2>
       <CodeBlock
         language="ts"
-        code={`import { safeJsonForScript, escapeHtml, pruneProtoKeys } from '@mfjs/security';
+        code={`import { safeJsonForScript, escapeHtml, pruneProtoKeys } from '@moxjs/security';
 
 const head = \`
-  <script id="__mfjs_state" type="application/json" nonce="\${nonce}">
+  <script id="__moxjs_state" type="application/json" nonce="\${nonce}">
     \${safeJsonForScript({ user, flags })}
   </script>
 \`;
@@ -132,6 +323,82 @@ const safe = pruneProtoKeys(JSON.parse(rawConfig));`}
         helper escapes the closing-tag sequence and wraps circular-reference errors so they
         don&apos;t take down the request.
       </Callout>
+
+      <h2 id="threat-model">Threat model</h2>
+      <p>
+        Federation surfaces three threat classes. Each MOXJS primitive maps to one of them.
+      </p>
+      <table>
+        <thead>
+          <tr><th>Threat</th><th>Mitigation</th><th>Defense layer</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Untrusted remote URL (config injection)</td>
+            <td><code>RemoteAllowlist</code> with wildcard rules</td>
+            <td>Runtime — fetch time</td>
+          </tr>
+          <tr>
+            <td>CDN tampering of <code>remoteEntry.js</code></td>
+            <td>SRI hashes (<code>sriHashFromUrl</code>, <code>federation.sri</code>)</td>
+            <td>Browser — script execution</td>
+          </tr>
+          <tr>
+            <td>XSS via hydration payload</td>
+            <td><code>safeJsonForScript</code> + nonce</td>
+            <td>Serialization + CSP</td>
+          </tr>
+          <tr>
+            <td>Inline-script injection in remote markup</td>
+            <td><code>strict-dynamic</code> CSP with base64url nonce</td>
+            <td>Browser — script-src</td>
+          </tr>
+          <tr>
+            <td>Credential/token leakage in logs</td>
+            <td><code>AuditLogger</code> with <code>redactKeys</code></td>
+            <td>Application</td>
+          </tr>
+          <tr>
+            <td>Brute-force / scraping</td>
+            <td><code>createRateLimitGuard</code> token-bucket</td>
+            <td>Edge / origin</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2 id="defense-in-depth">Defense in depth recipe</h2>
+      <p>
+        Strict-CSP <em>and</em> SRI <em>and</em> allowlist together. Any one of them prevents a
+        compromise; the combination forces an attacker to break the browser, the CDN, and your
+        build pipeline simultaneously.
+      </p>
+      <CodeBlock
+        language="ts"
+        filename="edge/handler.ts"
+        code={`import { buildCsp, generateNonce, RemoteAllowlist } from '@moxjs/security';
+import { createEdgeAdapter, LruHtmlCache } from '@moxjs/ssr/edge';
+
+const allow = new RemoteAllowlist(['https://*.cdn.acme.com']);
+
+export default createEdgeAdapter({
+  App,
+  template,
+  routes,
+  csp: (_req) => {
+    const nonce = generateNonce();
+    return {
+      header: buildCsp({
+        nonce,
+        strictDynamic: true,
+        strictStyles: true,
+        extra: { 'connect-src': ["'self'", 'https://api.acme.com'] },
+      }),
+      nonce,
+    };
+  },
+  beforeRemoteLoad: (descriptor) => allow.assertAllowed(descriptor.entryUrl),
+});`}
+      />
     </>
   );
 }

@@ -1,7 +1,7 @@
 {
-  "name": "@mfjs/eslint-config",
+  "name": "@moxjs/eslint-config",
   "version": "0.1.0",
-  "description": "Shared ESLint 9 flat config for MFJS apps and libraries.",
+  "description": "Shared ESLint 9 flat config for MOXJS apps and libraries.",
   "type": "module",
   "main": "./index.js",
   "publishConfig": { "access": "public" },

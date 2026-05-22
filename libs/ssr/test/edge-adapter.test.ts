@@ -51,11 +51,11 @@ describe('createEdgeAdapter', () => {
     expect(res.headers['content-type']).toMatch(/text\/html/);
   });
 
-  it('sets x-mfjs-ssr header on every response', async () => {
+  it('sets x-moxjs-ssr header on every response', async () => {
     const handler = createEdgeAdapter({ App: EdgeApp, template: TEMPLATE, routes: ROUTES });
     const res = await handler(makeRequest('https://example.com/'));
 
-    expect(res.headers['x-mfjs-ssr']).toBe('1');
+    expect(res.headers['x-moxjs-ssr']).toBe('1');
   });
 
   it('returns 404 for an unmatched path by default', async () => {
@@ -136,13 +136,13 @@ describe('createEdgeAdapter — htmlCache (ETag before render)', () => {
 
     const first = await handler(makeRequest('https://example.com/'));
     expect(first.status).toBe(200);
-    expect(first.headers['x-mfjs-ssr-cache']).toBe('miss');
+    expect(first.headers['x-moxjs-ssr-cache']).toBe('miss');
     expect(first.headers['etag']).toMatch(/^W\/"/);
     expect(renderCount).toBe(1);
 
     const second = await handler(makeRequest('https://example.com/'));
     expect(second.status).toBe(200);
-    expect(second.headers['x-mfjs-ssr-cache']).toBe('hit');
+    expect(second.headers['x-moxjs-ssr-cache']).toBe('hit');
     expect(second.headers['etag']).toBe(first.headers['etag']);
     expect(renderCount).toBe(1);
   });

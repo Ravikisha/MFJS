@@ -1,10 +1,10 @@
 /**
- * @mfjs/types
+ * @moxjs/types
  *
- * Zero-runtime shared type library for the MFJS micro-frontend framework.
+ * Zero-runtime shared type library for the MOXJS micro-frontend framework.
  *
  * Exports:
- * - App configuration types  (`MfjsAppConfig`, `AppType`)
+ * - App configuration types  (`MoxjsAppConfig`, `AppType`)
  * - Federation config types  (`FederationConfig`, `SharedDependency`, `RemoteTarget`)
  * - Federation contract types (`FederationContract`, `defineFederationContract`,
  *                              `validateFederationContract`, `InferExposed`,
@@ -12,7 +12,7 @@
  * - Routing types            (`RouteTarget`, `RouteMatch`, `NavigateDetail`, `NavigateMode`)
  */
 
-export type { AppType, MfjsAppConfig } from './app-config.js';
+export type { AppType, MoxjsAppConfig } from './app-config.js';
 
 export type {
   SharedDependency,
@@ -39,15 +39,25 @@ export type {
 } from './routing.js';
 
 export type {
-  MfjsWorkspaceConfig,
-  MfjsRemoteConfig,
-  MfjsOrchestratorConfig,
-  MfjsFederationConfig,
-  MfjsFeaturesConfig,
-} from './mfjs-config.js';
+  MoxjsWorkspaceConfig,
+  MoxjsRemoteConfig,
+  MoxjsOrchestratorConfig,
+  MoxjsFederationConfig,
+  MoxjsFeaturesConfig,
+} from './moxjs-config.js';
 
-export type { MfjsPlugin, MfjsDevPlan, MfjsAppMeta } from './plugins.js';
+export type { MoxjsPlugin, MoxjsDevPlan, MoxjsAppMeta } from './plugins.js';
 
-export type { MfjsPageRoute, MfjsRoutesManifest, MfjsHostRoutesManifest, MfjsRoutingCompiler } from './routing-compiler.js';
+export type { MoxjsPageRoute, MoxjsRoutesManifest, MoxjsHostRoutesManifest, MoxjsRoutingCompiler } from './routing-compiler.js';
 export { defaultRoutingCompiler } from './routing-compiler.js';
+
+export {
+  contractChecks,
+  assertContract,
+  generateContractTestSource,
+  type Container,
+  type ContractCheck,
+  type ContractSuiteOptions,
+  type GenerateOptions,
+} from './contract-test.js';
 

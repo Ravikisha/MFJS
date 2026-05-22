@@ -62,10 +62,10 @@ type FederationConfig = {
 };
 
 async function ensureFederationConfigs(workspaceDir: string, apps: Array<{ dir: string; meta: AppMeta }>) {
-  const missing = apps.filter((a) => !fs.existsSync(path.join(a.dir, 'mfjs.federation.json')));
+  const missing = apps.filter((a) => !fs.existsSync(path.join(a.dir, 'moxjs.federation.json')));
   if (missing.length === 0) return false;
 
-  console.log(kleur.cyan('No mfjs.federation.json found for one or more apps. Generating...'));
+  console.log(kleur.cyan('No moxjs.federation.json found for one or more apps. Generating...'));
 
   // Run in-process; pass --dir so we never need to mutate process.cwd().
   federationCommand.exitOverride();
@@ -75,8 +75,8 @@ async function ensureFederationConfigs(workspaceDir: string, apps: Array<{ dir: 
 }
 
 async function ensureRoutesManifests(workspaceDir: string) {
-  // Best-effort: generate mfjs.routes.json and mfjs.routes.host.json if missing.
-  // This keeps "mfjs dev" behavior aligned with "just works" routing.
+  // Best-effort: generate moxjs.routes.json and moxjs.routes.host.json if missing.
+  // This keeps "moxjs dev" behavior aligned with "just works" routing.
   const appsDir = path.join(workspaceDir, 'apps');
   if (!(await fs.pathExists(appsDir))) return false;
 
@@ -84,9 +84,9 @@ async function ensureRoutesManifests(workspaceDir: string) {
   const missing: string[] = [];
   for (const folder of appFolders) {
     const appDir = path.join(appsDir, folder);
-    const metaPath = path.join(appDir, 'mfjs.app.json');
+    const metaPath = path.join(appDir, 'moxjs.app.json');
     if (!(await fs.pathExists(metaPath))) continue;
-    const routesPath = path.join(appDir, 'mfjs.routes.json');
+    const routesPath = path.join(appDir, 'moxjs.routes.json');
     if (!(await fs.pathExists(routesPath))) missing.push(routesPath);
   }
 
@@ -94,7 +94,7 @@ async function ensureRoutesManifests(workspaceDir: string) {
   const hostFolders = await Promise.all(
     appFolders.map(async (folder) => {
       const appDir = path.join(appsDir, folder);
-      const metaPath = path.join(appDir, 'mfjs.app.json');
+      const metaPath = path.join(appDir, 'moxjs.app.json');
       if (!(await fs.pathExists(metaPath))) return null;
       const meta = (await fs.readJson(metaPath)) as AppMeta;
       return meta.type === 'host' ? appDir : null;
@@ -102,13 +102,13 @@ async function ensureRoutesManifests(workspaceDir: string) {
   );
   const hostDir = hostFolders.find(Boolean) as string | undefined;
   if (hostDir) {
-    const hostRoutes = path.join(hostDir, 'mfjs.routes.host.json');
+    const hostRoutes = path.join(hostDir, 'moxjs.routes.host.json');
     if (!(await fs.pathExists(hostRoutes))) missing.push(hostRoutes);
   }
 
   if (missing.length === 0) return false;
 
-  console.log(kleur.cyan('No mfjs.routes.json found for one or more apps. Generating...'));
+  console.log(kleur.cyan('No moxjs.routes.json found for one or more apps. Generating...'));
   routesCommand.exitOverride();
   await routesCommand.parseAsync(['--dir', workspaceDir], { from: 'user' });
 
@@ -143,10 +143,10 @@ export function _devEnvForApp(args: {
   const { appType, proxyRemotes, hostFederationFile, reloadUrl, starterUrl } = args;
   const isHost = appType === 'host';
   return {
-    ...(proxyRemotes && isHost && hostFederationFile ? { MFJS_FEDERATION_FILE: hostFederationFile } : {}),
-    ...(reloadUrl ? { MFJS_DEV_RELOAD_URL: reloadUrl } : {}),
-    ...(starterUrl ? { MFJS_ON_DEMAND_STARTER_URL: starterUrl } : {}),
-    ...(starterUrl && isHost ? { MFJS_ON_DEMAND_MIDDLEWARE: '1' } : {}),
+    ...(proxyRemotes && isHost && hostFederationFile ? { MOXJS_FEDERATION_FILE: hostFederationFile } : {}),
+    ...(reloadUrl ? { MOXJS_DEV_RELOAD_URL: reloadUrl } : {}),
+    ...(starterUrl ? { MOXJS_ON_DEMAND_STARTER_URL: starterUrl } : {}),
+    ...(starterUrl && isHost ? { MOXJS_ON_DEMAND_MIDDLEWARE: '1' } : {}),
   };
 }
 
@@ -194,7 +194,7 @@ function createDevReloadServer() {
       return { url };
     },
     broadcastReload(reason: string) {
-      broadcast({ type: 'mfjs:reload', reason });
+      broadcast({ type: 'moxjs:reload', reason });
     },
     close() {
       try {
@@ -244,7 +244,7 @@ async function writeHostProxyFederation(
   hostMeta: AppMeta,
   remotes: Array<{ dir: string; meta: AppMeta }>
 ) {
-  const federationPath = path.join(hostDir, 'mfjs.federation.json');
+  const federationPath = path.join(hostDir, 'moxjs.federation.json');
 
   if (!(await fs.pathExists(federationPath))) {
     return;
@@ -256,30 +256,30 @@ async function writeHostProxyFederation(
   // Proxy approach:
   // - keep ModuleFederationPlugin wiring untouched
   // - rewrite remote spec to same-origin, and rely on devServer proxy rules
-  //   example: dashboard@http://localhost:3000/mfjs/remotes/dashboard/remoteEntry.js
+  //   example: dashboard@http://localhost:3000/moxjs/remotes/dashboard/remoteEntry.js
   const rewritten: Record<string, string> = { ...cfg.remotes };
   for (const r of remotes) {
     if (!rewritten[r.meta.name]) continue;
-    rewritten[r.meta.name] = `${r.meta.name}@http://localhost:${hostMeta.port}/mfjs/remotes/${r.meta.name}/remoteEntry.js`;
+    rewritten[r.meta.name] = `${r.meta.name}@http://localhost:${hostMeta.port}/moxjs/remotes/${r.meta.name}/remoteEntry.js`;
   }
 
-  const outPath = path.join(hostDir, 'mfjs.federation.proxy.json');
+  const outPath = path.join(hostDir, 'moxjs.federation.proxy.json');
   await fs.outputFile(outPath, JSON.stringify({ ...cfg, remotes: rewritten }, null, 2) + '\n', 'utf8');
 }
 
 export const devCommand = new Command('dev')
   .description('Run dev servers for all apps under apps/*')
   .option('-d, --dir <path>', 'Workspace root directory', process.cwd())
-  .option('--federation', 'Auto-generate mfjs.federation.json if missing (default)', true)
-  .option('--no-federation', 'Disable auto-generation of mfjs.federation.json')
+  .option('--federation', 'Auto-generate moxjs.federation.json if missing (default)', true)
+  .option('--no-federation', 'Disable auto-generation of moxjs.federation.json')
   .option(
     '--proxy-remotes',
-    'Rewrite host remotes to same-origin proxy paths and create apps/<host>/mfjs.federation.proxy.json (requires host rspack devServer proxy support)',
+    'Rewrite host remotes to same-origin proxy paths and create apps/<host>/moxjs.federation.proxy.json (requires host rspack devServer proxy support)',
     false
   )
   .option(
     '--hmr-remotes',
-    'Dev UX: when a remote recompiles, trigger a host reload (requires host to call connectMfjsDevReload())',
+    'Dev UX: when a remote recompiles, trigger a host reload (requires host to call connectMoxjsDevReload())',
     false
   )
   .option(
@@ -313,14 +313,14 @@ export const devCommand = new Command('dev')
     const appMetas: Array<{ dir: string; meta: AppMeta }> = [];
 
     for (const folder of appFolders) {
-      const metaPath = path.join(appsDir, folder, 'mfjs.app.json');
+      const metaPath = path.join(appsDir, folder, 'moxjs.app.json');
       if (!(await fs.pathExists(metaPath))) continue;
       const meta = (await fs.readJson(metaPath)) as AppMeta;
       appMetas.push({ dir: path.join(appsDir, folder), meta });
     }
 
     if (appMetas.length === 0) {
-      console.log(kleur.yellow('No apps found (missing mfjs.app.json). Generate one with `mfjs generate host|remote`.'));
+      console.log(kleur.yellow('No apps found (missing moxjs.app.json). Generate one with `moxjs generate host|remote`.'));
       return;
     }
 
@@ -371,7 +371,7 @@ export const devCommand = new Command('dev')
                 return;
               }
               const u = new URL(req.url, 'http://127.0.0.1');
-              if (u.pathname !== '/__mfjs/start-remote') {
+              if (u.pathname !== '/__moxjs/start-remote') {
                 res.statusCode = 404;
                 res.end('not found');
                 return;
@@ -400,7 +400,7 @@ export const devCommand = new Command('dev')
               console.log(kleur.cyan(`[on-demand] starting remote ${name} (port ${remote.meta.port})`));
               // Spawn remote dev server.
               children.push({
-                child: run('pnpm', ['dev'], remote.dir, reload ? { MFJS_DEV_RELOAD_URL: reload.url } : undefined),
+                child: run('pnpm', ['dev'], remote.dir, reload ? { MOXJS_DEV_RELOAD_URL: reload.url } : undefined),
                 appName: remote.meta.name,
                 appType: remote.meta.type,
               });
@@ -438,16 +438,16 @@ export const devCommand = new Command('dev')
   if (proxyRemotes && app.meta.type === 'host') {
         children.push({
           child: run('pnpm', args, app.dir, {
-            MFJS_FEDERATION_FILE: 'mfjs.federation.proxy.json',
-            ...(reload ? { MFJS_DEV_RELOAD_URL: reload.url } : {}),
-            ...(starterInfo ? { MFJS_ON_DEMAND_STARTER_URL: starterInfo.url } : {}),
+            MOXJS_FEDERATION_FILE: 'moxjs.federation.proxy.json',
+            ...(reload ? { MOXJS_DEV_RELOAD_URL: reload.url } : {}),
+            ...(starterInfo ? { MOXJS_ON_DEMAND_STARTER_URL: starterInfo.url } : {}),
           }),
           appName: app.meta.name,
           appType: app.meta.type,
         });
       } else {
         children.push({
-          child: run('pnpm', args, app.dir, reload ? { MFJS_DEV_RELOAD_URL: reload.url } : undefined),
+          child: run('pnpm', args, app.dir, reload ? { MOXJS_DEV_RELOAD_URL: reload.url } : undefined),
           appName: app.meta.name,
           appType: app.meta.type,
         });
@@ -493,7 +493,7 @@ export const devCommand = new Command('dev')
       const env = _devEnvForApp({
         appType: entry.meta.type,
         proxyRemotes,
-        hostFederationFile: 'mfjs.federation.proxy.json',
+        hostFederationFile: 'moxjs.federation.proxy.json',
         ...(reload?.url ? { reloadUrl: reload.url } : {}),
         ...(starterInfo?.url ? { starterUrl: starterInfo.url } : {}),
       });
@@ -506,18 +506,18 @@ export const devCommand = new Command('dev')
       // Use chokidar so recursive watch + de-duped events work consistently
       // across Linux/macOS/Windows. Map each watched path to the affected app.
       const watchTargets: Array<{ pattern: string; appName: string | '*' }> = [
-        { pattern: path.join(workspaceDir, 'mfjs.config.json'), appName: '*' },
-        { pattern: path.join(workspaceDir, 'mfjs.config.ts'), appName: '*' },
-        { pattern: path.join(workspaceDir, 'mfjs.config.js'), appName: '*' },
-        { pattern: path.join(workspaceDir, 'mfjs.config.mjs'), appName: '*' },
+        { pattern: path.join(workspaceDir, 'moxjs.config.json'), appName: '*' },
+        { pattern: path.join(workspaceDir, 'moxjs.config.ts'), appName: '*' },
+        { pattern: path.join(workspaceDir, 'moxjs.config.js'), appName: '*' },
+        { pattern: path.join(workspaceDir, 'moxjs.config.mjs'), appName: '*' },
       ];
       for (const app of appMetas) {
         for (const file of [
-          'mfjs.app.json',
-          'mfjs.federation.json',
-          'mfjs.federation.proxy.json',
-          'mfjs.routes.json',
-          'mfjs.routes.host.json',
+          'moxjs.app.json',
+          'moxjs.federation.json',
+          'moxjs.federation.proxy.json',
+          'moxjs.routes.json',
+          'moxjs.routes.host.json',
           'rspack.config.mjs',
           'package.json',
         ]) {
@@ -561,7 +561,7 @@ export const devCommand = new Command('dev')
       process.once('exit', () => void watcher.close());
 
       console.log(kleur.cyan('\nWatch mode:'));
-      console.log(kleur.gray('- watching mfjs.config.*, mfjs.*.json, rspack.config.mjs, package.json'));
+      console.log(kleur.gray('- watching moxjs.config.*, moxjs.*.json, rspack.config.mjs, package.json'));
       console.log(kleur.gray('- on change: restart only the affected app(s)'));
   }
     // Friendly summary.
@@ -574,19 +574,19 @@ export const devCommand = new Command('dev')
 
   if (proxyRemotes && host) {
       console.log(kleur.cyan('\nProxy mode:'));
-      console.log(kleur.gray(`- wrote ${path.relative(workspaceDir, path.join(host.dir, 'mfjs.federation.proxy.json'))}`));
-      console.log(kleur.gray('- ensure your host rspack devServer is configured to proxy /mfjs/remotes/<name>/remoteEntry.js to each remote')); 
+      console.log(kleur.gray(`- wrote ${path.relative(workspaceDir, path.join(host.dir, 'moxjs.federation.proxy.json'))}`));
+      console.log(kleur.gray('- ensure your host rspack devServer is configured to proxy /moxjs/remotes/<name>/remoteEntry.js to each remote')); 
     }
 
   if (starterInfo && host) {
       console.log(kleur.cyan('\nOn-demand remotes:'));
-      console.log(kleur.gray(`- remote starter endpoint: ${starterInfo.url}/__mfjs/start-remote?name=<remoteName>`));
+      console.log(kleur.gray(`- remote starter endpoint: ${starterInfo.url}/__moxjs/start-remote?name=<remoteName>`));
   console.log(kleur.gray('- host proxy can call this endpoint before proxying remoteEntry/chunks (supported by the default generated templates)'));
     }
 
     if (reload) {
       console.log(kleur.cyan('\nRemote reload:'));
       console.log(kleur.gray(`- dev reload server: ${reload.url}`));
-      console.log(kleur.gray('- host must call connectMfjsDevReload() to react to reload events'));
+      console.log(kleur.gray('- host must call connectMoxjsDevReload() to react to reload events'));
     }
   });

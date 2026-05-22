@@ -71,16 +71,16 @@ importers:
 
   examples/basic/apps/dashboard:
     dependencies:
-      '@mfjs/event-bus':
+      '@moxjs/event-bus':
         specifier: workspace:*
         version: link:../../../../libs/event-bus
-      '@mfjs/events':
+      '@moxjs/events':
         specifier: workspace:*
         version: link:../../../../libs/events
-      '@mfjs/runtime':
+      '@moxjs/runtime':
         specifier: workspace:*
         version: link:../../../../libs/runtime
-      '@mfjs/state':
+      '@moxjs/state':
         specifier: workspace:*
         version: link:../../../../libs/state
       react:
@@ -114,16 +114,16 @@ importers:
 
   examples/basic/apps/shell:
     dependencies:
-      '@mfjs/event-bus':
+      '@moxjs/event-bus':
         specifier: workspace:*
         version: link:../../../../libs/event-bus
-      '@mfjs/events':
+      '@moxjs/events':
         specifier: workspace:*
         version: link:../../../../libs/events
-      '@mfjs/runtime':
+      '@moxjs/runtime':
         specifier: workspace:*
         version: link:../../../../libs/runtime
-      '@mfjs/state':
+      '@moxjs/state':
         specifier: workspace:*
         version: link:../../../../libs/state
       react:
@@ -201,7 +201,7 @@ importers:
 
   libs/adapter-cloudflare:
     dependencies:
-      '@mfjs/ssr':
+      '@moxjs/ssr':
         specifier: workspace:*
         version: link:../ssr
     devDependencies:
@@ -214,7 +214,7 @@ importers:
 
   libs/adapter-node:
     dependencies:
-      '@mfjs/ssr':
+      '@moxjs/ssr':
         specifier: workspace:*
         version: link:../ssr
     devDependencies:
@@ -227,7 +227,7 @@ importers:
 
   libs/adapter-vercel:
     dependencies:
-      '@mfjs/ssr':
+      '@moxjs/ssr':
         specifier: workspace:*
         version: link:../ssr
     devDependencies:
@@ -269,6 +269,15 @@ importers:
         version: 2.1.9(@types/node@22.19.13)(jsdom@28.1.0)(lightningcss@1.32.0)
 
   libs/events:
+    devDependencies:
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.9
+        version: 2.1.9(@types/node@22.19.13)(jsdom@28.1.0)(lightningcss@1.32.0)
+
+  libs/i18n:
     devDependencies:
       typescript:
         specifier: ^5.7.3
@@ -339,10 +348,10 @@ importers:
 
   libs/ssr:
     dependencies:
-      '@mfjs/runtime':
+      '@moxjs/runtime':
         specifier: workspace:*
         version: link:../runtime
-      '@mfjs/security':
+      '@moxjs/security':
         specifier: workspace:*
         version: link:../security
     devDependencies:
@@ -420,10 +429,10 @@ importers:
       '@inquirer/prompts':
         specifier: ^6.0.1
         version: 6.0.1
-      '@mfjs/ssr':
+      '@moxjs/ssr':
         specifier: workspace:*
         version: link:../../libs/ssr
-      '@mfjs/types':
+      '@moxjs/types':
         specifier: workspace:*
         version: link:../../libs/types
       chokidar:

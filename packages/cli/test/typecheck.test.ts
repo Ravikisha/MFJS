@@ -5,7 +5,7 @@ import fs from 'fs-extra';
 import { typecheckCommand } from '../src/commands/typecheck.js';
 
 async function makeTmp(): Promise<string> {
-  return fs.mkdtemp(path.join(os.tmpdir(), 'mfjs-typecheck-')) as Promise<string>;
+  return fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-typecheck-')) as Promise<string>;
 }
 
 async function runTypecheck(argv: string[], cwd: string) {
@@ -19,7 +19,7 @@ async function runTypecheck(argv: string[], cwd: string) {
   }
 }
 
-describe('mfjs typecheck command', () => {
+describe('moxjs typecheck command', () => {
   it('typecheckCommand has name "typecheck"', () => {
     expect(typecheckCommand.name()).toBe('typecheck');
   });

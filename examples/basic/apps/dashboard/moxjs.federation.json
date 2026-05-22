@@ -1,0 +1,29 @@
+{
+  "name": "dashboard",
+  "filename": "remoteEntry.js",
+  "exposes": {
+    "./App": "./src/remote.tsx"
+  },
+  "shared": {
+    "react": {
+      "singleton": true,
+      "requiredVersion": false
+    },
+    "react-dom": {
+      "singleton": true,
+      "requiredVersion": false
+    },
+    "@moxjs/event-bus": {
+      "singleton": true,
+      "requiredVersion": false
+    },
+    "@moxjs/runtime": {
+      "singleton": true,
+      "requiredVersion": false
+    },
+    "@moxjs/state": {
+      "singleton": true,
+      "requiredVersion": false
+    }
+  }
+}

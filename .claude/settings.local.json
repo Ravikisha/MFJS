@@ -4,10 +4,20 @@
       "Bash(pnpm install *)",
       "Bash(pnpm build *)",
       "Bash(pnpm test *)",
-      "Bash(pnpm -r --if-present --filter '!docs' --filter '!@app/*' --filter '!mfjs-example-*' test)",
+      "Bash(pnpm -r --if-present --filter '!docs' --filter '!@app/*' --filter '!moxjs-example-*' test)",
       "Bash(pnpm -r build)",
       "Bash(pnpm -r --filter '@app/*' build)",
-      "Bash(pnpm add *)"
+      "Bash(pnpm add *)",
+      "Bash(pnpm vitest *)",
+      "Bash(pnpm --filter @moxjs/security --filter @moxjs/observability --filter @moxjs/ui test)",
+      "Bash(pnpm -r --if-present test)",
+      "Bash(npx tsc *)",
+      "Bash(echo \"EXIT=$?\")",
+      "Bash(npx vitest *)",
+      "Bash(pnpm --filter @moxjs/runtime --filter @moxjs/security --filter @moxjs/observability --filter @moxjs/ssr test)",
+      "Bash(pnpm -r --filter \"./libs/*\" --filter \"./packages/*\" build)",
+      "Bash(npm run *)",
+      "Bash(pnpm --filter @moxjs/runtime --filter @moxjs/security --filter @moxjs/cli test)"
     ]
   }
 }

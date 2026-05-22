@@ -3,7 +3,7 @@
  *
  * Uses Web Crypto (`crypto.subtle.digest`) so this module works in the browser,
  * Cloudflare Workers, Vercel Edge, Deno, and Node 19+. There is no longer any
- * `node:crypto` import — `import * as M from '@mfjs/security'` is safe inside
+ * `node:crypto` import — `import * as M from '@moxjs/security'` is safe inside
  * an edge bundle.
  */
 
@@ -57,7 +57,7 @@ function toBytes(content: string | Uint8Array): Uint8Array {
 
 export async function sriHash(content: string | Uint8Array, algo: SriAlgo = 'sha384'): Promise<string> {
   const subtle = (globalThis as { crypto?: { subtle?: SubtleCrypto } }).crypto?.subtle;
-  if (!subtle) throw new Error('[mfjs/security] crypto.subtle unavailable; SRI requires Web Crypto.');
+  if (!subtle) throw new Error('[moxjs/security] crypto.subtle unavailable; SRI requires Web Crypto.');
   // Copy to a fresh Uint8Array so the underlying buffer is a plain ArrayBuffer
   // (avoids SharedArrayBuffer typing issues with subtle.digest under newer libs).
   const data = toBytes(content);
@@ -90,7 +90,7 @@ export async function sriHashFromUrl(
     const parsed = new URL(url);
     if (parsed.protocol !== 'https:') {
       throw new Error(
-        `[mfjs/security] sriHashFromUrl refuses non-HTTPS URL: ${url}. Pass requireHttps:false to override.`,
+        `[moxjs/security] sriHashFromUrl refuses non-HTTPS URL: ${url}. Pass requireHttps:false to override.`,
       );
     }
   }

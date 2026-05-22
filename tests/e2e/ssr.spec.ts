@@ -1,10 +1,10 @@
 /**
- * E2E test for `mfjs ssr export` — static HTML export.
+ * E2E test for `moxjs ssr export` — static HTML export.
  *
- * This test is skipped unless MFJS_E2E=1 is set (same gate as other e2e tests).
+ * This test is skipped unless MOXJS_E2E=1 is set (same gate as other e2e tests).
  * It:
  *   1. Creates a temporary workspace with a minimal App + template.
- *   2. Calls `staticExport` directly (the same code `mfjs ssr export` invokes).
+ *   2. Calls `staticExport` directly (the same code `moxjs ssr export` invokes).
  *   3. Asserts the exported HTML files exist and contain correct content.
  *   4. Optionally serves the output via a simple http.createServer and fetches it.
  *
@@ -18,7 +18,7 @@ import path from 'node:path';
 import fs from 'node:fs/promises';
 import http from 'node:http';
 
-const SKIP = !process.env.MFJS_E2E;
+const SKIP = !process.env.MOXJS_E2E;
 
 // ── App fixture ───────────────────────────────────────────────────────────────
 
@@ -40,14 +40,14 @@ function AppFixture({
 
 const TEMPLATE = `<!doctype html>
 <html lang="en">
-<head><meta charset="UTF-8" /><title>MFJS Static</title></head>
+<head><meta charset="UTF-8" /><title>MOXJS Static</title></head>
 <body><div id="root"><!--ssr-outlet--></div></body>
 </html>`;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 async function makeTmp() {
-  return fs.mkdtemp(path.join(os.tmpdir(), 'mfjs-ssr-e2e-'));
+  return fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-ssr-e2e-'));
 }
 
 function startFileServer(dir: string): Promise<{ url: string; close: () => void }> {
@@ -82,7 +82,7 @@ function startFileServer(dir: string): Promise<{ url: string; close: () => void 
 test.skip(SKIP, () => {});
 
 test('static export — generates index.html for root "/"', async () => {
-  const { staticExport } = await import('@mfjs/ssr');
+  const { staticExport } = await import('@moxjs/ssr');
   const outDir = await makeTmp();
 
   await staticExport({
@@ -103,7 +103,7 @@ test('static export — generates index.html for root "/"', async () => {
 });
 
 test('static export — generates nested file for "/dashboard/settings"', async () => {
-  const { staticExport } = await import('@mfjs/ssr');
+  const { staticExport } = await import('@moxjs/ssr');
   const outDir = await makeTmp();
 
   await staticExport({
@@ -121,7 +121,7 @@ test('static export — generates nested file for "/dashboard/settings"', async 
 });
 
 test('static export — injects params into the rendered page', async () => {
-  const { staticExport } = await import('@mfjs/ssr');
+  const { staticExport } = await import('@moxjs/ssr');
   const outDir = await makeTmp();
 
   await staticExport({
@@ -140,7 +140,7 @@ test('static export — injects params into the rendered page', async () => {
 });
 
 test('static export — all exported files are serveable via http', async () => {
-  const { staticExport } = await import('@mfjs/ssr');
+  const { staticExport } = await import('@moxjs/ssr');
   const outDir = await makeTmp();
 
   const routes = [
@@ -167,7 +167,7 @@ test('static export — all exported files are serveable via http', async () => 
 });
 
 test('streaming SSR — renders full HTML via stream with correct content', async () => {
-  const { renderRouteToStream, collectStream } = await import('@mfjs/ssr');
+  const { renderRouteToStream, collectStream } = await import('@moxjs/ssr');
   const { PassThrough } = await import('node:stream');
 
   const result = renderRouteToStream(AppFixture, { path: '/stream' });
@@ -183,7 +183,7 @@ test('streaming SSR — renders full HTML via stream with correct content', asyn
 });
 
 test('edge adapter — handles request and returns correct HTML', async () => {
-  const { createEdgeAdapter } = await import('@mfjs/ssr');
+  const { createEdgeAdapter } = await import('@moxjs/ssr');
 
   const handler = createEdgeAdapter({
     App: AppFixture,
@@ -200,7 +200,7 @@ test('edge adapter — handles request and returns correct HTML', async () => {
 });
 
 test('edge adapter — returns 404 for unmatched path', async () => {
-  const { createEdgeAdapter } = await import('@mfjs/ssr');
+  const { createEdgeAdapter } = await import('@moxjs/ssr');
 
   const handler = createEdgeAdapter({
     App: AppFixture,
@@ -218,7 +218,7 @@ test('edge adapter — returns 404 for unmatched path', async () => {
 });
 
 test('server router — createServerRouter is safe in Node.js (no window)', async () => {
-  const { createServerRouter } = await import('@mfjs/runtime');
+  const { createServerRouter } = await import('@moxjs/runtime');
 
   const router = createServerRouter('/dashboard/settings');
   expect(router.getPath()).toBe('/dashboard/settings');

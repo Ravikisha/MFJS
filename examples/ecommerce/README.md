@@ -1,10 +1,10 @@
-# MFJS E-commerce example
+# MOXJS E-commerce example
 
-This example focuses on **SSR/SSG** using `mfjs ssr export`.
+This example focuses on **SSR/SSG** using `moxjs ssr export`.
 
 ## What it demonstrates
 
-- `mfjs ssr export` producing a static HTML output directory (`dist-ssg/`)
+- `moxjs ssr export` producing a static HTML output directory (`dist-ssg/`)
 - Basic route list + params (`/products/:sku`)
 
 ## Scripts

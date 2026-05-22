@@ -67,5 +67,19 @@ export function TabsTrigger({ value, children }: { value: string; children: Reac
 export function TabsContent({ value, children }: { value: string; children: React.ReactNode }) {
   const ctx = React.useContext(TabsContext);
   if (!ctx || ctx.active !== value) return null;
-  return <div className="p-4">{children}</div>;
+  // When a TabsContent's only child is a <CodeBlock>, the outer Tabs card
+  // already provides the rounded border — flatten the inner code-block so we
+  // don't render two stacked cards. For prose children, padding kicks in via
+  // the `:not(:has(...))` selector so text layouts still get a comfortable gutter.
+  return (
+    <div
+      className={cn(
+        'tabs-content',
+        '[&>.code-block]:my-0 [&>.code-block]:rounded-none [&>.code-block]:border-0 [&>.code-block]:shadow-none',
+        '[&:not(:has(>.code-block:only-child))]:p-4',
+      )}
+    >
+      {children}
+    </div>
+  );
 }

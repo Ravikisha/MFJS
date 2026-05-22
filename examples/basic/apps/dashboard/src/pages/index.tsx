@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { dispatchMfjsNavigate } from '@mfjs/runtime';
-import { getEventBus } from '@mfjs/event-bus';
-import { getSimpleStore } from '@mfjs/state';
-import type { MfAppEvents } from '@mfjs/events';
+import { dispatchMoxjsNavigate } from '@moxjs/runtime';
+import { getEventBus } from '@moxjs/event-bus';
+import { getSimpleStore } from '@moxjs/state';
+import type { MfAppEvents } from '@moxjs/events';
 
 // Key must match shell/src/bootstrap.tsx SHELL_READY_KEY
 const SHELL_READY_KEY = 'shell:ready:ts';
@@ -33,7 +33,7 @@ export default function DashboardHome() {
   // to demonstrate remote → shell communication in the e2e test.
   function handleGoToSettings() {
     getEventBus<MfAppEvents>().emit('dashboard:action', { action: 'navigate', payload: '/dashboard/settings' });
-    dispatchMfjsNavigate({ to: '/dashboard/settings' });
+    dispatchMoxjsNavigate({ to: '/dashboard/settings' });
   }
 
   return (
@@ -61,7 +61,7 @@ export default function DashboardHome() {
         </button>
         <button
           data-testid="nav-to-user"
-          onClick={() => dispatchMfjsNavigate({ to: '/dashboard/users/42' })}
+          onClick={() => dispatchMoxjsNavigate({ to: '/dashboard/users/42' })}
           style={{ padding: '8px 16px', borderRadius: 6, background: '#6366f1', color: 'white', border: 'none', cursor: 'pointer' }}
         >
           View User 42

@@ -25,20 +25,20 @@ async function waitForHttpOk(url: string, timeoutMs: number) {
 
 describe('integration: rspack federation remoteEntry is served', () => {
   it(
-    'starts remote dev server and serves /remoteEntry.js when mfjs.federation.json exists',
+    'starts remote dev server and serves /remoteEntry.js when moxjs.federation.json exists',
     async () => {
-      if (process.env.MFJS_SMOKE !== '1') {
+      if (process.env.MOXJS_SMOKE !== '1') {
         // This test requires spawning a dev server and making HTTP requests.
         // Keep it opt-in to avoid flaky CI/dev environments.
         return;
       }
 
       const repoRoot = path.resolve(__dirname, '..', '..', '..');
-  const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'mfjs-it-'))) as string;
+  const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-it-'))) as string;
 
       // pnpm needs a workspace root manifest.
       await fs.writeJson(path.join(tmp, 'package.json'), {
-        name: 'mfjs-it',
+        name: 'moxjs-it',
         private: true
       });
 
@@ -96,7 +96,7 @@ describe('integration: rspack federation remoteEntry is served', () => {
         'utf8'
       );
 
-      await fs.writeJson(path.join(remoteDir, 'mfjs.federation.json'), {
+      await fs.writeJson(path.join(remoteDir, 'moxjs.federation.json'), {
         name: 'dashboard',
         filename: 'remoteEntry.js',
         exposes: {
@@ -107,12 +107,12 @@ describe('integration: rspack federation remoteEntry is served', () => {
 
       await fs.writeFile(
         path.join(remoteDir, 'rspack.config.mjs'),
-        `import { rspack } from '@rspack/core';\nimport path from 'node:path';\nimport fs from 'node:fs';\n\nconst federationPath = path.join(process.cwd(), 'mfjs.federation.json');\nconst federation = fs.existsSync(federationPath)\n  ? JSON.parse(fs.readFileSync(federationPath, 'utf8'))\n  : null;\n\nexport default {\n  mode: 'development',\n  entry: './src/main.tsx',\n  devServer: { port: 4101, historyApiFallback: true },\n  output: { uniqueName: 'dashboard', publicPath: 'auto' },\n  resolve: { extensions: ['.tsx', '.ts', '.js'] },\n  module: {\n    rules: [\n      {\n        test: /\\.(ts|tsx)$/,\n        exclude: /node_modules/,\n        loader: 'builtin:swc-loader',\n        options: {\n          jsc: {\n            parser: { syntax: 'typescript', tsx: true },\n            transform: { react: { runtime: 'automatic' } }\n          }\n        }\n      }\n    ]\n  },\n  plugins: [\n    new rspack.HtmlRspackPlugin({ template: './index.html' }),\n    ...(federation\n      ? [\n          new rspack.container.ModuleFederationPlugin({\n            name: federation.name,\n            filename: federation.filename,\n            exposes: federation.exposes,\n            remotes: federation.remotes,\n            shared: federation.shared\n          })\n        ]\n      : [])\n  ]\n};\n`,
+        `import { rspack } from '@rspack/core';\nimport path from 'node:path';\nimport fs from 'node:fs';\n\nconst federationPath = path.join(process.cwd(), 'moxjs.federation.json');\nconst federation = fs.existsSync(federationPath)\n  ? JSON.parse(fs.readFileSync(federationPath, 'utf8'))\n  : null;\n\nexport default {\n  mode: 'development',\n  entry: './src/main.tsx',\n  devServer: { port: 4101, historyApiFallback: true },\n  output: { uniqueName: 'dashboard', publicPath: 'auto' },\n  resolve: { extensions: ['.tsx', '.ts', '.js'] },\n  module: {\n    rules: [\n      {\n        test: /\\.(ts|tsx)$/,\n        exclude: /node_modules/,\n        loader: 'builtin:swc-loader',\n        options: {\n          jsc: {\n            parser: { syntax: 'typescript', tsx: true },\n            transform: { react: { runtime: 'automatic' } }\n          }\n        }\n      }\n    ]\n  },\n  plugins: [\n    new rspack.HtmlRspackPlugin({ template: './index.html' }),\n    ...(federation\n      ? [\n          new rspack.container.ModuleFederationPlugin({\n            name: federation.name,\n            filename: federation.filename,\n            exposes: federation.exposes,\n            remotes: federation.remotes,\n            shared: federation.shared\n          })\n        ]\n      : [])\n  ]\n};\n`,
         'utf8'
       );
 
       // Install deps at the real repo root (so we can reuse workspace resolution + the pnpm store).
-      // Then point the temp app at the local @mfjs/event-bus package via a file: dependency.
+      // Then point the temp app at the local @moxjs/event-bus package via a file: dependency.
       await execa('pnpm', ['install'], {
         cwd: repoRoot,
         env: process.env,

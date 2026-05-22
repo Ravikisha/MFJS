@@ -1,6 +1,6 @@
-# MFJS Basic Example
+# MOXJS Basic Example
 
-This is a minimal runnable example workspace generated to prove the current MFJS Module Federation wiring works end-to-end.
+This is a minimal runnable example workspace generated to prove the current MOXJS Module Federation wiring works end-to-end.
 
 ## What it contains
 
@@ -17,7 +17,7 @@ From the repo root:
 cd examples/basic
 pnpm install
 
-# Start both apps via the MFJS CLI (recommended)
+# Start both apps via the MOXJS CLI (recommended)
 pnpm -C ../../packages/cli dev -- --dir . --proxy-remotes
 
 # Optional: also enable remote rebuild -> host reload
@@ -33,4 +33,4 @@ You should see the host page and the remote rendered inside it.
 ## Notes
 
 - The host expects the remote entry at `http://localhost:3001/remoteEntry.js`.
-- If you change ports, regenerate federation configs (or edit `apps/shell/mfjs.federation.json`).
+- If you change ports, regenerate federation configs (or edit `apps/shell/moxjs.federation.json`).

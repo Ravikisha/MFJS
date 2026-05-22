@@ -27,7 +27,7 @@ describe('saas example - SSG export output', () => {
     const cli = path.resolve(exampleRoot, '..', '..', 'packages', 'cli', 'dist', 'index.js');
     const r = spawnSync(
       process.execPath,
-      [cli, 'ssr', 'export', '--dir', '.', '--config', 'mfjs.ssr.json'],
+      [cli, 'ssr', 'export', '--dir', '.', '--config', 'moxjs.ssr.json'],
       { cwd: exampleRoot, stdio: 'inherit' },
     );
     if (r.status !== 0) {
@@ -39,7 +39,7 @@ describe('saas example - SSG export output', () => {
     const outDir = path.resolve(__dirname, '..', 'dist-ssg');
 
     const indexHtml = await read(path.join(outDir, 'index.html'));
-    expect(indexHtml).toContain('MFJS SaaS');
+    expect(indexHtml).toContain('MOXJS SaaS');
   expect(indexHtml).toContain('data-testid="page-home"');
 
     const pricingHtml = await read(path.join(outDir, 'pricing', 'index.html'));

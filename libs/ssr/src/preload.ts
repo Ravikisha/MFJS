@@ -1,4 +1,4 @@
-import { escapeHtml } from '@mfjs/security';
+import { escapeHtml } from '@moxjs/security';
 
 export interface PreloadLink {
   href: string;

@@ -1,5 +1,5 @@
 /**
- * Compile-time type tests for @mfjs/types.
+ * Compile-time type tests for @moxjs/types.
  *
  * Checked by `tsc --noEmit`. None of the code below runs at runtime.
  * Vitest excludes *.types.test.ts files by convention.
@@ -11,19 +11,19 @@ import {
   type InferEmits,
   type InferListens,
   type FederationContract,
-  type MfjsAppConfig,
+  type MoxjsAppConfig,
   type RouteTarget,
   type NavigateDetail,
   type NavigateMode,
 } from '../src/index.js';
 
-// ── MfjsAppConfig ─────────────────────────────────────────────────────────────
+// ── MoxjsAppConfig ─────────────────────────────────────────────────────────────
 
-const hostConfig: MfjsAppConfig = { name: 'shell', type: 'host', port: 3000 };
+const hostConfig: MoxjsAppConfig = { name: 'shell', type: 'host', port: 3000 };
 void hostConfig;
 
 // type must be 'host' | 'remote' — nothing else
-const _badType: MfjsAppConfig = {
+const _badType: MoxjsAppConfig = {
   name: 'x',
   // @ts-expect-error — 'gateway' is not assignable to AppType
   type: 'gateway',

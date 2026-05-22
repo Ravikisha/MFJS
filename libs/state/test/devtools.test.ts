@@ -39,17 +39,17 @@ function installFakeExtension(): { ext: { connect: () => FakeConn }; conn: FakeC
     emit: (msg: unknown) => listener?.(msg),
   };
   const ext = { connect: () => conn };
-  (globalThis as { __MFJS_STATE_DEVTOOLS__?: typeof ext }).__MFJS_STATE_DEVTOOLS__ = ext;
+  (globalThis as { __MOXJS_STATE_DEVTOOLS__?: typeof ext }).__MOXJS_STATE_DEVTOOLS__ = ext;
   return { ext, conn };
 }
 
 describe('connectDevtools', () => {
   beforeEach(() => {
-    delete (globalThis as { __MFJS_STATE_DEVTOOLS__?: unknown }).__MFJS_STATE_DEVTOOLS__;
+    delete (globalThis as { __MOXJS_STATE_DEVTOOLS__?: unknown }).__MOXJS_STATE_DEVTOOLS__;
     delete (globalThis as { __REDUX_DEVTOOLS_EXTENSION__?: unknown }).__REDUX_DEVTOOLS_EXTENSION__;
   });
   afterEach(() => {
-    delete (globalThis as { __MFJS_STATE_DEVTOOLS__?: unknown }).__MFJS_STATE_DEVTOOLS__;
+    delete (globalThis as { __MOXJS_STATE_DEVTOOLS__?: unknown }).__MOXJS_STATE_DEVTOOLS__;
   });
 
   it('returns a no-op when extension is absent', () => {

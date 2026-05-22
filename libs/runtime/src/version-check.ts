@@ -27,7 +27,7 @@ export function checkVersions(opts: VersionCheckOptions): VersionMismatch[] {
     if (!majorMatches(hostVer, remoteVer)) {
       const severity: 'warn' | 'error' = singletons.has(dep) ? 'error' : 'warn';
       mismatches.push({ dep, host: hostVer, remote: remoteVer, severity });
-      log(severity, `[mfjs] version mismatch for "${dep}": host ${hostVer} vs remote ${remoteVer}`);
+      log(severity, `[moxjs] version mismatch for "${dep}": host ${hostVer} vs remote ${remoteVer}`);
     }
   }
 

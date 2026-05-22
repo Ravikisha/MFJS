@@ -1,5 +1,5 @@
 /**
- * @mfjs/ssr/node — Node-only surface (streams, static export, dynamic imports).
+ * @moxjs/ssr/node — Node-only surface (streams, static export, dynamic imports).
  */
 
 export * from './edge.js';
@@ -18,6 +18,14 @@ export {
   type StaticExportExtraOptions,
   type StaticExportManifestEntry,
 } from './static-export.js';
+
+export {
+  revalidateStaticPages,
+  type RevalidateStaticPagesOptions,
+  type RevalidateResult,
+  type RevalidationManifest,
+  type RevalidationManifestEntry,
+} from './revalidate.js';
 
 export {
   ssrLoadRemote,

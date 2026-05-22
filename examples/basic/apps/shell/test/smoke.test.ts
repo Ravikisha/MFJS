@@ -3,9 +3,9 @@ import {
   loadRemoteModule,
   resolveRoute,
   createRouter,
-  dispatchMfjsNavigate,
+  dispatchMoxjsNavigate,
   type RouteTarget,
-} from '@mfjs/runtime';
+} from '@moxjs/runtime';
 
 const HOST_ROUTES: RouteTarget[] = [
   { path: '/dashboard/*', remote: 'dashboard', module: './App' },
@@ -13,7 +13,7 @@ const HOST_ROUTES: RouteTarget[] = [
 ];
 
 describe('shell example app — routing', () => {
-  it('loadRemoteModule is exported from @mfjs/runtime', () => {
+  it('loadRemoteModule is exported from @moxjs/runtime', () => {
     expect(typeof loadRemoteModule).toBe('function');
   });
 
@@ -63,12 +63,12 @@ describe('shell example app — routing', () => {
     expect(subpath).toBe('/');
   });
 
-  it('createRouter is exported from @mfjs/runtime', () => {
+  it('createRouter is exported from @moxjs/runtime', () => {
     expect(typeof createRouter).toBe('function');
   });
 
-  it('dispatchMfjsNavigate is exported from @mfjs/runtime', () => {
-    expect(typeof dispatchMfjsNavigate).toBe('function');
+  it('dispatchMoxjsNavigate is exported from @moxjs/runtime', () => {
+    expect(typeof dispatchMoxjsNavigate).toBe('function');
   });
 });
 

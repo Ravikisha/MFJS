@@ -13,7 +13,7 @@ export interface DiscoveredApp {
   dir: string;
   /** Folder basename. Note: may differ from `meta.name`. */
   folder: string;
-  /** Parsed `mfjs.app.json`. */
+  /** Parsed `moxjs.app.json`. */
   meta: AppMeta;
 }
 
@@ -21,7 +21,7 @@ const NOISE = new Set(['node_modules', 'dist', 'build', '.cache', '.next', 'cove
 
 /**
  * Walk `<workspaceDir>/apps/*`, return every directory that contains a
- * `mfjs.app.json`. Skips dotfiles, symlinks, and well-known noise directories.
+ * `moxjs.app.json`. Skips dotfiles, symlinks, and well-known noise directories.
  *
  * Replaces the duplicated discovery loops in `dev.ts`, `build.ts`,
  * `federation.ts`, `routes.ts`, `ci.ts`, `typecheck.ts`.
@@ -44,7 +44,7 @@ export async function discoverApps(workspaceDir: string): Promise<DiscoveredApp[
     }
     if (!stat.isDirectory() || stat.isSymbolicLink()) continue;
 
-    const metaPath = path.join(dir, 'mfjs.app.json');
+    const metaPath = path.join(dir, 'moxjs.app.json');
     if (!(await fs.pathExists(metaPath))) continue;
 
     let meta: AppMeta;
@@ -67,7 +67,7 @@ export async function findHostApp(workspaceDir: string): Promise<DiscoveredApp |
   if (hosts.length === 0) return null;
   if (hosts.length > 1) {
     throw new Error(
-      `Multiple host apps found (${hosts.map((h) => h.meta.name).join(', ')}). MFJS supports a single host per workspace.`,
+      `Multiple host apps found (${hosts.map((h) => h.meta.name).join(', ')}). MOXJS supports a single host per workspace.`,
     );
   }
   return hosts[0]!;

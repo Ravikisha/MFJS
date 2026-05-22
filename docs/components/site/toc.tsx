@@ -14,7 +14,7 @@ export function DocsToc({ className }: { className?: string }) {
   const [active, setActive] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    const article = document.querySelector('article.prose-mfjs');
+    const article = document.querySelector('article.prose-moxjs');
     if (!article) return;
     const nodes = Array.from(article.querySelectorAll<HTMLElement>('h2, h3'));
     const list: Heading[] = [];

@@ -1,5 +1,5 @@
 /**
- * @mfjs/types — File-based routing compiler (phase-0 foundation).
+ * @moxjs/types — File-based routing compiler (phase-0 foundation).
  *
  * The CLI currently implements route scanning directly.
  * This module formalizes the contract so we can:
@@ -8,25 +8,25 @@
  * - support non-React runtimes
  */
 
-export type MfjsPageRoute = {
+export type MoxjsPageRoute = {
   /** Route pathname relative to app base, e.g. "/" or "/reports/:id" */
   path: string;
   /** Source file path, relative to app root */
   file: string;
 };
 
-export type MfjsRoutesManifest = {
+export type MoxjsRoutesManifest = {
   app: string;
   basePath: string;
-  routes: MfjsPageRoute[];
+  routes: MoxjsPageRoute[];
 };
 
-export type MfjsHostRoutesManifest = {
+export type MoxjsHostRoutesManifest = {
   host: string;
   routes: Array<{ path: string; remote: string; module: string }>;
 };
 
-export type MfjsRoutingCompiler = {
+export type MoxjsRoutingCompiler = {
   /**
    * Convert a page file (relative to `src/pages/`) into a route path.
    *
@@ -38,14 +38,14 @@ export type MfjsRoutingCompiler = {
   routeFromPageFile(relFromPages: string): string;
 
   /** Sort routes by matching priority (most specific first). */
-  sortRoutesForMatching(routes: MfjsPageRoute[]): MfjsPageRoute[];
+  sortRoutesForMatching(routes: MoxjsPageRoute[]): MoxjsPageRoute[];
 };
 
-export const defaultRoutingCompiler: MfjsRoutingCompiler = {
+export const defaultRoutingCompiler: MoxjsRoutingCompiler = {
   routeFromPageFile(relFromPages: string) {
     if (!relFromPages) {
       throw new Error(
-        '[mfjs/types] routeFromPageFile: empty input. Pass a path relative to src/pages/.',
+        '[moxjs/types] routeFromPageFile: empty input. Pass a path relative to src/pages/.',
       );
     }
     let withoutExt = relFromPages.replace(/\.(tsx|ts|jsx|js)$/, '');
@@ -99,7 +99,7 @@ export const defaultRoutingCompiler: MfjsRoutingCompiler = {
       for (const r of sorted) {
         if (seen.has(r.path)) {
           // eslint-disable-next-line no-console
-          console.warn(`[mfjs/types] sortRoutesForMatching: duplicate route path "${r.path}" — first match wins.`);
+          console.warn(`[moxjs/types] sortRoutesForMatching: duplicate route path "${r.path}" — first match wins.`);
         }
         seen.add(r.path);
       }

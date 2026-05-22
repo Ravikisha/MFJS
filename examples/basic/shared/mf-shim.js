@@ -2,7 +2,7 @@
 // Some loaders (and some tooling) still look for webpack-style __webpack_init_sharing__ / __webpack_share_scopes__.
 // This shim bridges the two so runtime loaders work reliably in both the host and in remotes.
 
-(function mfjsFederationShim() {
+(function moxjsFederationShim() {
   const g =
     typeof globalThis !== 'undefined'
       ? globalThis

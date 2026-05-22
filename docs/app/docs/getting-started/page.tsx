@@ -10,7 +10,7 @@ import { ArrowRight, CheckIcon, RocketIcon, ShieldIcon, NetworkIcon } from '@/co
 export const metadata = {
   title: 'Getting started',
   description:
-    'Scaffold a production-ready MFJS workspace in five commands. Host + remote, file-based routing, federation, dev server with HMR.',
+    'Scaffold a production-ready MOXJS workspace in five commands. Host + remote, file-based routing, federation, dev server with HMR.',
 };
 
 export default function GettingStarted() {
@@ -21,7 +21,7 @@ export default function GettingStarted() {
       </Badge>
       <h1>Getting started</h1>
       <p>
-        MFJS scaffolds a complete micro-frontend workspace in five commands. By the end of this
+        MOXJS scaffolds a complete micro-frontend workspace in five commands. By the end of this
         guide you&apos;ll have a host, a remote, file-based routing, and a dev server with HMR
         running on the same origin.
       </p>
@@ -34,16 +34,33 @@ export default function GettingStarted() {
       <h2 id="prerequisites">Prerequisites</h2>
       <ul>
         <li>
-          <strong>Node.js 20+</strong> on Linux, macOS, or Windows.
+          <strong>Node.js 20+ (LTS recommended)</strong> on Linux, macOS, or Windows. The CLI uses{' '}
+          <code>node:test</code> / native <code>fetch</code> / <code>structuredClone</code>, so 18.x
+          may work but is not covered by CI.
         </li>
         <li>
-          <strong>pnpm 9.15+</strong> (npm and yarn also work — see{' '}
-          <Link href="/docs/troubleshooting">Troubleshooting</Link>).
+          <strong>pnpm 9.15+</strong> is the supported package manager. <code>npm 10+</code> and{' '}
+          <code>yarn 4+</code> also work — see{' '}
+          <Link href="/docs/troubleshooting">Troubleshooting</Link> if symlinks or workspace
+          resolution misbehave.
         </li>
         <li>
-          A terminal that can run <code>npx</code> / <code>pnpm dlx</code>.
+          A terminal that can run <code>npx</code> / <code>pnpm dlx</code>, plus{' '}
+          <code>git</code> for the generated project&apos;s default <code>.gitignore</code> /
+          GitHub Actions templates.
+        </li>
+        <li>
+          Optional but recommended: <strong>VS Code</strong> with the TypeScript and ESLint
+          extensions. Generated projects ship a <code>.vscode/settings.json</code> that enables
+          workspace-relative typing and ESLint-on-save.
         </li>
       </ul>
+
+      <Callout variant="info" title="What does &quot;production-ready&quot; mean here?">
+        The scaffold ships TypeScript strict-mode, ESLint, Vitest, Playwright, GitHub Actions for
+        CI + deploy, a CSP-aware SSR template, and Rspack Module Federation pre-configured for
+        React-singleton sharing. No follow-up wiring required to push to staging.
+      </Callout>
 
       <Tabs defaultValue="pnpm">
         <TabsList>
@@ -54,14 +71,14 @@ export default function GettingStarted() {
         <TabsContent value="pnpm">
           <CodeBlock
             language="bash"
-            code={`corepack enable\ncorepack prepare pnpm@9.15.5 --activate\npnpm dlx @mfjs/cli@latest init my-app`}
+            code={`corepack enable\ncorepack prepare pnpm@9.15.5 --activate\npnpm dlx @moxjs/cli@latest init my-app`}
           />
         </TabsContent>
         <TabsContent value="npm">
-          <CodeBlock language="bash" code={`npx @mfjs/cli@latest init my-app`} />
+          <CodeBlock language="bash" code={`npx @moxjs/cli@latest init my-app`} />
         </TabsContent>
         <TabsContent value="yarn">
-          <CodeBlock language="bash" code={`yarn dlx @mfjs/cli@latest init my-app`} />
+          <CodeBlock language="bash" code={`yarn dlx @moxjs/cli@latest init my-app`} />
         </TabsContent>
       </Tabs>
 
@@ -70,12 +87,16 @@ export default function GettingStarted() {
       <Steps>
         <Step title="Initialize a workspace" active>
           <p className="mt-2">
-            <code>mfjs init</code> writes <code>mfjs.config.json</code>, a TS config, a workspace
-            <code> tsconfig.base.json</code>, GitHub Actions for CI, and a deploy workflow.
+            <code>moxjs init</code> writes <code>moxjs.config.ts</code>, a workspace{' '}
+            <code>tsconfig.base.json</code>, <code>pnpm-workspace.yaml</code>, a{' '}
+            <code>.gitignore</code>, GitHub Actions for CI (<code>typecheck</code> →{' '}
+            <code>lint</code> → <code>test</code> → <code>perf budget</code>), and a deploy
+            workflow scaffolded for the target you pick. Add <code>--tailwind</code> to wire
+            Tailwind v3 + PostCSS in every generated app.
           </p>
           <CodeBlock
             language="bash"
-            code={`pnpm dlx @mfjs/cli@latest init my-app\ncd my-app`}
+            code={`pnpm dlx @moxjs/cli@latest init my-app\ncd my-app\n\n# Inspect the new workspace\nls\n# .github/  .vscode/  apps/  libs/  moxjs.config.ts  package.json  pnpm-workspace.yaml  tsconfig.base.json`}
           />
         </Step>
         <Step title="Generate a host and a remote">
@@ -85,13 +106,13 @@ export default function GettingStarted() {
           </p>
           <CodeBlock
             language="bash"
-            code={`# Wizard (recommended on first run)\nmfjs scaffold app\n\n# Non-interactive\nmfjs generate host shell --port 3000\nmfjs generate remote dashboard --port 3001\nmfjs federation`}
+            code={`# Wizard (recommended on first run)\nmoxjs scaffold app\n\n# Non-interactive\nmoxjs generate host shell --port 3000\nmoxjs generate remote dashboard --port 3001\nmoxjs federation`}
           />
         </Step>
         <Step title="Run the dev server">
           <CodeBlock
             language="bash"
-            code={`mfjs dev --proxy-remotes --hmr-remotes`}
+            code={`moxjs dev --proxy-remotes --hmr-remotes`}
           />
           <p className="mt-2">
             <code>--proxy-remotes</code> serves every remote on the host&apos;s origin so CSP, cookies,
@@ -101,7 +122,7 @@ export default function GettingStarted() {
         </Step>
         <Step title="Add a route">
           <p className="mt-2">
-            Drop a file in <code>apps/dashboard/src/pages/</code>. MFJS uses Next.js-style file
+            Drop a file in <code>apps/dashboard/src/pages/</code>. MOXJS uses Next.js-style file
             conventions: <code>index.tsx</code>, <code>[id].tsx</code>, <code>(group)/</code>.
           </p>
           <CodeBlock
@@ -110,14 +131,14 @@ export default function GettingStarted() {
             code={`export default function Settings() {\n  return (\n    <main>\n      <h2>Settings</h2>\n      <p>Configure your account.</p>\n    </main>\n  );\n}`}
           />
           <p>
-            Re-scan with <code>mfjs routes --watch</code>. The host now matches{' '}
+            Re-scan with <code>moxjs routes --watch</code>. The host now matches{' '}
             <code>/dashboard/settings</code>.
           </p>
         </Step>
         <Step title="Build for production">
           <CodeBlock
             language="bash"
-            code={`mfjs build              # all apps\nmfjs build --app shell  # one app`}
+            code={`moxjs build              # all apps\nmoxjs build --app shell  # one app`}
           />
           <p className="mt-2">
             Output lands under <code>apps/&lt;name&gt;/dist/</code>. Asset filenames carry content
@@ -133,18 +154,18 @@ export default function GettingStarted() {
               <TabsTrigger value="node">Node / Docker</TabsTrigger>
             </TabsList>
             <TabsContent value="vercel">
-              <CodeBlock language="bash" code={`mfjs deploy --target vercel\nvercel deploy`} />
+              <CodeBlock language="bash" code={`moxjs deploy --target vercel\nvercel deploy`} />
             </TabsContent>
             <TabsContent value="cloudflare">
               <CodeBlock
                 language="bash"
-                code={`mfjs deploy --target cloudflare\nwrangler pages deploy apps/shell/dist`}
+                code={`moxjs deploy --target cloudflare\nwrangler pages deploy apps/shell/dist`}
               />
             </TabsContent>
             <TabsContent value="node">
               <CodeBlock
                 language="bash"
-                code={`mfjs deploy --target node\ndocker build -t shell .\ndocker run -p 3000:3000 shell`}
+                code={`moxjs deploy --target node\ndocker build -t shell .\ndocker run -p 3000:3000 shell`}
               />
             </TabsContent>
           </Tabs>
@@ -155,6 +176,116 @@ export default function GettingStarted() {
         Most teams need nothing else for their first deployment. The pages below cover advanced
         topics: typed routes, security headers, observability, and adapter customization.
       </Callout>
+
+      <h2 id="project-layout">Project layout</h2>
+      <p>
+        Every workspace follows the same conventions. Knowing where things live makes the rest of
+        the docs read in any order.
+      </p>
+      <CodeBlock
+        language="text"
+        code={`my-app/
+├── apps/
+│   ├── shell/                  # Host — owns "/", layout, auth chrome
+│   │   ├── public/             # Static assets served by Rspack dev-server
+│   │   ├── src/
+│   │   │   ├── App.tsx         # Root React component (used by both CSR + SSR)
+│   │   │   ├── bootstrap.tsx   # Client entry — calls getRouter()
+│   │   │   ├── index.ts        # async import of bootstrap (federation boundary)
+│   │   │   └── moxjs.routes.ts  # Auto-generated by 'moxjs routes'
+│   │   ├── moxjs.app.json       # App manifest: name, type, port, exposes
+│   │   ├── moxjs.federation.json# Generated by 'moxjs federation'
+│   │   └── rspack.config.mjs   # Rspack + ModuleFederationPlugin
+│   └── dashboard/              # Remote — owns "/dashboard/*"
+│       └── src/
+│           ├── remote.tsx      # Exposed entry point (./App)
+│           └── pages/          # File-based routes scanned by 'moxjs routes'
+├── libs/                       # Shared libraries (contracts, ui-kit, etc.)
+├── moxjs.config.ts              # Workspace config: federation, security, deploy
+├── pnpm-workspace.yaml         # pnpm workspace declaration
+├── tsconfig.base.json          # Strict TS settings shared by every app
+└── .github/workflows/          # CI: typecheck / lint / test / build`}
+      />
+
+      <h2 id="lifecycle">Anatomy of a request</h2>
+      <p>
+        Understanding what runs where saves hours when debugging. The dev-server walkthrough below
+        traces a single page navigation end-to-end.
+      </p>
+      <Steps>
+        <Step title="1. Browser hits the host">
+          <p className="mt-2">
+            <code>GET /dashboard/settings</code> arrives at the Rspack dev-server on port{' '}
+            <code>3000</code>. The host serves <code>index.html</code> with its bootstrap chunk.
+          </p>
+        </Step>
+        <Step title="2. Host bootstraps">
+          <p className="mt-2">
+            <code>bootstrap.tsx</code> calls <code>getRouter()</code> (singleton, StrictMode-safe)
+            and mounts <code>&lt;RemoteOutlet routes remotes /&gt;</code>. <code>usePathname()</code>{' '}
+            returns <code>/dashboard/settings</code>.
+          </p>
+        </Step>
+        <Step title="3. Outlet matches the route">
+          <p className="mt-2">
+            <code>RemoteOutlet</code> walks <code>HOST_ROUTES</code>, finds{' '}
+            <code>/dashboard/*</code> → <code>{`{ remote: 'dashboard', module: './App' }`}</code>,
+            and triggers <code>REMOTES.dashboard()</code> — a native dynamic{' '}
+            <code>import(&apos;dashboard/App&apos;)</code>.
+          </p>
+        </Step>
+        <Step title="4. Federation loads the remote">
+          <p className="mt-2">
+            Rspack&apos;s <code>ModuleFederationPlugin</code> fetches{' '}
+            <code>/moxjs/remotes/dashboard/remoteEntry.js</code> (proxied to{' '}
+            <code>http://localhost:3001</code> by <code>--proxy-remotes</code>), bridges the React
+            share scope, and resolves <code>./App</code>.
+          </p>
+        </Step>
+        <Step title="5. Remote renders its sub-route">
+          <p className="mt-2">
+            <code>&lt;RemoteApp subpath=&quot;/settings&quot; pages={'{pages}'} /&gt;</code> matches{' '}
+            <code>settings.tsx</code> from the generated <code>moxjs.routes.ts</code>, lazy-imports
+            the chunk, and renders the page.
+          </p>
+        </Step>
+      </Steps>
+
+      <h2 id="cheat-sheet">Daily commands cheat-sheet</h2>
+      <p>The 80% of CLI flags you&apos;ll touch every day.</p>
+      <CodeBlock
+        language="bash"
+        code={`# Develop
+moxjs dev --proxy-remotes --hmr-remotes          # most common
+moxjs routes --watch                              # in a second terminal, per remote
+
+# Verify before pushing
+moxjs typecheck                                   # tsc --noEmit per package
+moxjs lint                                        # ESLint workspace-wide
+moxjs test                                        # Vitest, parallel
+moxjs perf                                        # bundle-size budgets
+moxjs diagnose                                    # env, ports, configs
+
+# Ship
+moxjs build                                       # all apps, host first
+moxjs build --app dashboard --compress            # one app + gz/br
+moxjs deploy --target vercel                      # writes vercel.json`}
+      />
+
+      <h2 id="first-issue">If something breaks</h2>
+      <ol>
+        <li>
+          Run <code>moxjs diagnose</code>. It checks Node, pnpm, Rspack versions, ports in use,
+          generated federation configs, and React duplication risks.
+        </li>
+        <li>
+          Set <code>MOXJS_DEBUG=1</code> in your shell to surface full stack traces from CLI errors.
+        </li>
+        <li>
+          See <Link href="/docs/troubleshooting">Troubleshooting</Link> for the most-hit issues
+          (Invalid hook call, remote 404, hydration mismatch).
+        </li>
+      </ol>
 
       <h2 id="next">What&apos;s next?</h2>
 
@@ -184,7 +315,7 @@ export default function GettingStarted() {
       <p className="text-sm text-muted-foreground">
         <CheckIcon className="mr-1 inline h-4 w-4 text-emerald-500" /> Made it through the
         quickstart? Star the repo on{' '}
-        <a href="https://github.com/mfjs/mfjs" target="_blank" rel="noopener noreferrer">
+        <a href="https://github.com/moxjs/moxjs" target="_blank" rel="noopener noreferrer">
           GitHub
         </a>
         .

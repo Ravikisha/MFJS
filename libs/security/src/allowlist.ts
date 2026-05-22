@@ -43,7 +43,7 @@ export class RemoteAllowlist {
   assertAllowed(url: string, remoteName?: string): void {
     if (!this.isAllowed(url, remoteName)) {
       throw new Error(
-        `[mfjs/security] Remote "${remoteName ?? 'unknown'}" at "${url}" is not in the allowlist.`,
+        `[moxjs/security] Remote "${remoteName ?? 'unknown'}" at "${url}" is not in the allowlist.`,
       );
     }
   }

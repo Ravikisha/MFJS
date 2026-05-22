@@ -1,5 +1,5 @@
 /**
- * @mfjs/runtime — React routing components & hooks
+ * @moxjs/runtime — React routing components & hooks
  *
  * Provides:
  *   useRouter()     — access the singleton Router instance
@@ -9,7 +9,7 @@
  */
 
 import React from 'react';
-import { createRouter, dispatchMfjsNavigate, type Router, type RouterOptions } from './router.js';
+import { createRouter, dispatchMoxjsNavigate, type Router, type RouterOptions } from './router.js';
 import { resolveRoute, type RouteTarget, type ResolvedRoute } from './routes.js';
 import { ErrorBoundary } from './error-boundary.js';
 import { prefetchRoute } from './prefetch.js';
@@ -18,7 +18,7 @@ import type { FederationRemote } from './remote-loader.js';
 
 // ── Singleton router (pinned to globalThis for MF-singleton survival) ──────
 
-const ROUTER_KEY = '__MFJS_ROUTER_SINGLETON__';
+const ROUTER_KEY = '__MOXJS_ROUTER_SINGLETON__';
 type GlobalWithRouter = typeof globalThis & { [ROUTER_KEY]?: Router };
 
 export function getRouter(opts?: RouterOptions): Router {
@@ -47,7 +47,7 @@ export function usePathname(): string {
   const [pathname, setPathname] = React.useState(() => {
     if (!isBrowser) return '/';
     try {
-      return new URL(router.getPath(), 'http://mfjs.local').pathname;
+      return new URL(router.getPath(), 'http://moxjs.local').pathname;
     } catch {
       return '/';
     }
@@ -55,7 +55,7 @@ export function usePathname(): string {
 
   React.useEffect(() => {
     const unsub = router.subscribe((path) => {
-      const p = new URL(path, 'http://mfjs.local').pathname;
+      const p = new URL(path, 'http://moxjs.local').pathname;
       setPathname(p);
     });
     return unsub;
@@ -163,7 +163,7 @@ export function NavLink({
       style={{ ...dynamicStyle, ...(style ?? {}), ...(isActive ? (activeStyle ?? {}) : {}) }}
       onClick={(e) => {
         e.preventDefault();
-        dispatchMfjsNavigate({ to: cleanTo || '/' });
+        dispatchMoxjsNavigate({ to: cleanTo || '/' });
       }}
       onMouseEnter={triggerPrefetch}
       onFocus={triggerPrefetch}
@@ -215,7 +215,7 @@ class LRU<K, V> {
   }
 }
 
-const REMOTE_CACHE_KEY = '__MFJS_REMOTE_OUTLET_CACHE__';
+const REMOTE_CACHE_KEY = '__MOXJS_REMOTE_OUTLET_CACHE__';
 type GlobalWithRemoteCache = typeof globalThis & {
   [REMOTE_CACHE_KEY]?: LRU<string, React.ComponentType<{ subpath?: string }>>;
 };

@@ -25,7 +25,7 @@ export default function Checklist() {
     {
       category: 'Performance',
       tasks: [
-        'mfjs perf budgets green in CI',
+        'moxjs perf budgets green in CI',
         'Bundle analyzer run before each release',
         'Remote preload tags in SSR head (remoteEntryPreloads)',
         'Cache-Control tuned per route (cacheControl helper)',
@@ -47,8 +47,8 @@ export default function Checklist() {
       category: 'Deploy',
       tasks: [
         'Adapter scaffolded (Vercel / Cloudflare / Node / Docker)',
-        'CDN publicPath set in mfjs.config.ts',
-        'Preview deploy per PR (mfjs ci affected)',
+        'CDN publicPath set in moxjs.config.ts',
+        'Preview deploy per PR (moxjs ci affected)',
         'Rollback plan documented',
         'Secrets stored in the platform secret manager — never in .env checked in',
       ],
@@ -60,7 +60,7 @@ export default function Checklist() {
         'SemVer for every published package',
         'CHANGELOG.md per package up to date',
         'Git tags for each release',
-        '`@mfjs/cli` version printed in every error report',
+        '`@moxjs/cli` version printed in every error report',
       ],
     },
   ];

@@ -1,0 +1,107 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://moxjs.dev/schemas/moxjs.config.json",
+  "title": "MOXJS Workspace Config",
+  "description": "Schema for moxjs.config.json — workspace-level configuration consumed by @moxjs/cli.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "$schema": { "type": "string" },
+    "name": { "type": "string", "description": "Workspace name; appears in tooling output." },
+    "appsDir": { "type": "string", "default": "apps" },
+    "libsDir": { "type": "string", "default": "libs" },
+    "framework": { "type": "string", "enum": ["react"] },
+    "remotes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string", "pattern": "^[A-Za-z_$][A-Za-z0-9_$]*$" },
+          "routes": { "type": "array", "items": { "type": "string" } },
+          "remoteEntry": { "type": "string", "format": "uri" }
+        }
+      }
+    },
+    "federation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "shared": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "publicPath": { "type": "string" },
+        "sri": {
+          "oneOf": [
+            { "type": "boolean" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "algo": { "type": "string", "enum": ["sha256", "sha384", "sha512"] }
+              }
+            }
+          ]
+        },
+        "allowlist": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "versionCheck": { "type": "boolean" }
+      }
+    },
+    "orchestrator": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mode": { "type": "string", "enum": ["parallel", "on-demand"] },
+        "proxyRemotes": { "type": "boolean" },
+        "hmrRemotes": { "type": "boolean" }
+      }
+    },
+    "features": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tailwind": { "type": "boolean" }
+      }
+    },
+    "security": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "csp": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "reportUri": { "type": "string", "format": "uri-reference" }
+          }
+        },
+        "allowInlineScripts": { "type": "boolean" }
+      }
+    },
+    "observability": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "adapter": { "type": "string", "enum": ["console", "sentry", "none"] },
+        "webVitals": { "type": "boolean" }
+      }
+    },
+    "deploy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "target": { "type": "string", "enum": ["vercel", "cloudflare", "netlify", "node", "docker"] }
+      }
+    },
+    "build": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "compress": { "type": "boolean" }
+      }
+    },
+    "plugins": {
+      "type": "array",
+      "description": "Plugin instances (typically populated from moxjs.config.ts, not JSON)."
+    }
+  }
+}

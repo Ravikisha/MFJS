@@ -15,11 +15,11 @@ async function write(p: string, content: string) {
 }
 
 describe('loadWorkspaceConfig', () => {
-  it('loads mfjs.config.json when present', async () => {
-    const dir = await mkTmpDir('mfjs-config-json-');
+  it('loads moxjs.config.json when present', async () => {
+    const dir = await mkTmpDir('moxjs-config-json-');
 
     await write(
-      path.join(dir, 'mfjs.config.json'),
+      path.join(dir, 'moxjs.config.json'),
       JSON.stringify(
         {
           name: 'json-only',
@@ -38,11 +38,11 @@ describe('loadWorkspaceConfig', () => {
     expect(plugins).toEqual([]);
   });
 
-  it('loads mfjs.config.ts when a compiled .js sibling is present, and merges with JSON', async () => {
-    const dir = await mkTmpDir('mfjs-config-ts-');
+  it('loads moxjs.config.ts when a compiled .js sibling is present, and merges with JSON', async () => {
+    const dir = await mkTmpDir('moxjs-config-ts-');
 
     await write(
-      path.join(dir, 'mfjs.config.json'),
+      path.join(dir, 'moxjs.config.json'),
       JSON.stringify(
         {
           name: 'base',
@@ -56,9 +56,9 @@ describe('loadWorkspaceConfig', () => {
 
     // The CLI no longer imports raw .ts; ship a compiled .js sibling. The
     // marker .ts is kept to verify the loader picks the .js up.
-    await write(path.join(dir, 'mfjs.config.ts'), '// source\n');
+    await write(path.join(dir, 'moxjs.config.ts'), '// source\n');
     await write(
-      path.join(dir, 'mfjs.config.js'),
+      path.join(dir, 'moxjs.config.js'),
       [
         "const plugin = { name: 'p1', configResolved: (cfg) => ({ ...cfg, name: 'from-ts' }) };",
         'export default {',
@@ -86,22 +86,22 @@ describe('loadWorkspaceConfig', () => {
     expect(plugins.map((p) => p.name)).toEqual(['p1']);
   });
 
-  it('throws a clear MfjsCliError when mfjs.config.ts has no compiled .js sibling', async () => {
-    const dir = await mkTmpDir('mfjs-config-badts-');
+  it('throws a clear MoxjsCliError when moxjs.config.ts has no compiled .js sibling', async () => {
+    const dir = await mkTmpDir('moxjs-config-badts-');
 
     await write(
-      path.join(dir, 'mfjs.config.ts'),
+      path.join(dir, 'moxjs.config.ts'),
       'export default (this is not valid ts);\n',
     );
 
-    await expect(loadWorkspaceConfig(dir)).rejects.toThrow(/CONFIG-002|no compiled mfjs.config.js/);
+    await expect(loadWorkspaceConfig(dir)).rejects.toThrow(/CONFIG-002|no compiled moxjs.config.js/);
   });
 
-  it('loads a compiled mfjs.config.js sibling', async () => {
-    const dir = await mkTmpDir('mfjs-config-jsts-');
-    await write(path.join(dir, 'mfjs.config.ts'), '// source\n');
+  it('loads a compiled moxjs.config.js sibling', async () => {
+    const dir = await mkTmpDir('moxjs-config-jsts-');
+    await write(path.join(dir, 'moxjs.config.ts'), '// source\n');
     await write(
-      path.join(dir, 'mfjs.config.js'),
+      path.join(dir, 'moxjs.config.js'),
       "export default { name: 'from-js' };\n",
     );
     const { cfg } = await loadWorkspaceConfig(dir);

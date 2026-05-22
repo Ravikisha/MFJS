@@ -24,8 +24,8 @@ function defaultShared(): FederationConfig['shared'] {
   return {
     react: { singleton: true, eager: true, requiredVersion: false },
     'react-dom': { singleton: true, eager: true, requiredVersion: false },
-    '@mfjs/event-bus': { singleton: true, eager: true, requiredVersion: false },
-    '@mfjs/runtime': { singleton: true, eager: true, requiredVersion: false },
+    '@moxjs/event-bus': { singleton: true, eager: true, requiredVersion: false },
+    '@moxjs/runtime': { singleton: true, eager: true, requiredVersion: false },
   };
 }
 
@@ -56,7 +56,7 @@ async function detectAppName(appDir: string, meta: AppMeta): Promise<string> {
 async function detectExposes(appDir: string, meta: AppMeta): Promise<Record<string, string> | undefined> {
   if (meta.type !== 'remote') return undefined;
 
-  // If exposes are explicitly set in mfjs.app.json, respect them.
+  // If exposes are explicitly set in moxjs.app.json, respect them.
   if (meta.exposes && Object.keys(meta.exposes).length > 0) {
     return { ...meta.exposes };
   }
@@ -88,7 +88,7 @@ async function detectSharedFromPackageJson(appDir: string) {
   const deps = { ...(pkg.dependencies ?? {}), ...(pkg.peerDependencies ?? {}) };
 
   // Safe defaults: only include deps that are likely to be shared singletons.
-  const candidates = ['react', 'react-dom', 'react-router-dom', '@mfjs/event-bus', '@mfjs/runtime', '@mfjs/state', '@mfjs/ui'];
+  const candidates = ['react', 'react-dom', 'react-router-dom', '@moxjs/event-bus', '@moxjs/runtime', '@moxjs/state', '@moxjs/ui'];
   const shared: FederationConfig['shared'] = {};
   for (const name of candidates) {
     if (deps[name]) shared[name] = { singleton: true, requiredVersion: false };
@@ -106,7 +106,7 @@ async function detectSharedFromSource(appDir: string) {
   const files = entries.filter((f) => f.endsWith('.ts') || f.endsWith('.tsx') || f.endsWith('.js') || f.endsWith('.jsx'));
 
   const shared: FederationConfig['shared'] = {};
-  const lookFor = ['react', 'react-dom', 'react-router-dom', '@mfjs/event-bus', '@mfjs/state', '@mfjs/ui', '@mfjs/runtime'];
+  const lookFor = ['react', 'react-dom', 'react-router-dom', '@moxjs/event-bus', '@moxjs/state', '@moxjs/ui', '@moxjs/runtime'];
 
   for (const file of files) {
     const content = await fs.readFile(path.join(srcDir, file), 'utf8');
@@ -129,7 +129,7 @@ async function findApps(workspaceDir: string) {
 
   for (const folder of folders) {
     const dir = path.join(appsDir, folder);
-    const metaPath = path.join(dir, 'mfjs.app.json');
+    const metaPath = path.join(dir, 'moxjs.app.json');
     if (!(await fs.pathExists(metaPath))) continue;
     const meta = (await fs.readJson(metaPath)) as AppMeta;
     apps.push({ dir, meta });
@@ -139,9 +139,9 @@ async function findApps(workspaceDir: string) {
 }
 
 async function writeFederationConfig(appDir: string, cfg: FederationConfig) {
-  const outPath = path.join(appDir, 'mfjs.federation.json');
+  const outPath = path.join(appDir, 'moxjs.federation.json');
   const withSchema = {
-    $schema: '../../node_modules/@mfjs/types/schemas/mfjs.federation.json',
+    $schema: '../../node_modules/@moxjs/types/schemas/moxjs.federation.json',
     ...cfg,
   };
   await fs.outputFile(outPath, JSON.stringify(withSchema, null, 2) + '\n', 'utf8');
@@ -157,7 +157,7 @@ export const federationCommand = new Command('federation')
     const apps = await findApps(workspaceDir);
 
     if (apps.length === 0) {
-      console.log(kleur.yellow('No apps found (missing apps/*/mfjs.app.json).'));
+      console.log(kleur.yellow('No apps found (missing apps/*/moxjs.app.json).'));
       return;
     }
 
@@ -196,7 +196,7 @@ export const federationCommand = new Command('federation')
       }
 
       await writeFederationConfig(remote.dir, finalCfg);
-      console.log(kleur.green(`wrote ${path.relative(workspaceDir, path.join(remote.dir, 'mfjs.federation.json'))}`));
+      console.log(kleur.green(`wrote ${path.relative(workspaceDir, path.join(remote.dir, 'moxjs.federation.json'))}`));
     }
 
     if (host) {
@@ -229,8 +229,8 @@ export const federationCommand = new Command('federation')
       }
 
       await writeFederationConfig(host.dir, finalCfg);
-      console.log(kleur.green(`wrote ${path.relative(workspaceDir, path.join(host.dir, 'mfjs.federation.json'))}`));
+      console.log(kleur.green(`wrote ${path.relative(workspaceDir, path.join(host.dir, 'moxjs.federation.json'))}`));
     }
 
-  console.log(kleur.cyan('Done. Next: run `mfjs dev` and open the host app; it should load the remote via Module Federation.'));
+  console.log(kleur.cyan('Done. Next: run `moxjs dev` and open the host app; it should load the remote via Module Federation.'));
   });

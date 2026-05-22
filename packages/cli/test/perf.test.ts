@@ -12,7 +12,7 @@ import {
 } from '../src/commands/perf.js';
 
 async function tmp() {
-  return fs.mkdtemp(path.join(os.tmpdir(), 'mfjs-perf-')) as Promise<string>;
+  return fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-perf-')) as Promise<string>;
 }
 
 describe('analyzeDist', () => {
@@ -97,7 +97,7 @@ describe('per-route budgets', () => {
   expect(res.find((r) => r.route === '/app')?.status).toBe('warn');
   });
 
-  it('loads routeAssets from stats file (mfjs.routeAssets)', async () => {
+  it('loads routeAssets from stats file (moxjs.routeAssets)', async () => {
     const dir = await tmp();
     const dist = path.join(dir, 'dist');
     await fs.ensureDir(dist);
@@ -106,7 +106,7 @@ describe('per-route budgets', () => {
       path.join(dist, 'stats.json'),
       {
         name: 'rspack',
-        mfjs: {
+        moxjs: {
           routeAssets: {
             '/': ['main.js'],
           },

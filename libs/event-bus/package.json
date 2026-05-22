@@ -1,15 +1,15 @@
 {
-  "name": "@mfjs/event-bus",
+  "name": "@moxjs/event-bus",
   "version": "0.1.0",
-  "description": "Typed pub/sub event bus for MFJS micro-frontends with wildcard, replay, and cross-tab support.",
+  "description": "Typed pub/sub event bus for MOXJS micro-frontends with wildcard, replay, and cross-tab support.",
   "license": "MIT",
-  "homepage": "https://github.com/anthropics/MFJS#readme",
+  "homepage": "https://github.com/anthropics/MOXJS#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/anthropics/MFJS.git",
+    "url": "https://github.com/anthropics/MOXJS.git",
     "directory": "libs/event-bus"
   },
-  "keywords": ["mfjs", "module-federation", "event-bus", "pubsub", "micro-frontend"],
+  "keywords": ["moxjs", "module-federation", "event-bus", "pubsub", "micro-frontend"],
   "private": false,
   "publishConfig": { "access": "public" },
   "type": "module",

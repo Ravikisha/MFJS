@@ -1,35 +1,35 @@
 /**
- * @mfjs/types — Plugin system (phase-0 foundation).
+ * @moxjs/types — Plugin system (phase-0 foundation).
  *
  * The goal is to formalize extension points without committing to a complex
  * plugin runtime yet.
  */
 
 import type { FederationConfig } from './federation-config.js';
-import type { MfjsWorkspaceConfig } from './mfjs-config.js';
+import type { MoxjsWorkspaceConfig } from './moxjs-config.js';
 
-export type MfjsAppMeta = {
+export type MoxjsAppMeta = {
   name: string;
   type: 'host' | 'remote';
   port: number;
   dir: string;
 };
 
-export type MfjsDevPlan = {
+export type MoxjsDevPlan = {
   workspaceDir: string;
-  apps: MfjsAppMeta[];
-  host?: MfjsAppMeta;
-  remotes: MfjsAppMeta[];
+  apps: MoxjsAppMeta[];
+  host?: MoxjsAppMeta;
+  remotes: MoxjsAppMeta[];
   mode: 'parallel' | 'on-demand';
   proxyRemotes: boolean;
   hmrRemotes: boolean;
 };
 
-export type MfjsPlugin = {
+export type MoxjsPlugin = {
   name: string;
 
   /** Inspect/modify resolved workspace config before commands run. */
-  configResolved?: (cfg: MfjsWorkspaceConfig) => MfjsWorkspaceConfig | void | Promise<MfjsWorkspaceConfig | void>;
+  configResolved?: (cfg: MoxjsWorkspaceConfig) => MoxjsWorkspaceConfig | void | Promise<MoxjsWorkspaceConfig | void>;
 
   /**
    * Inspect/modify the federation config right before it is written.
@@ -38,17 +38,17 @@ export type MfjsPlugin = {
    */
   federationConfig?: (args: {
     workspaceDir: string;
-    app: MfjsAppMeta;
+    app: MoxjsAppMeta;
     config: FederationConfig;
   }) => FederationConfig | void | Promise<FederationConfig | void>;
 
   /** Inspect/modify the computed dev plan. */
-  devPlan?: (plan: MfjsDevPlan) => MfjsDevPlan | void | Promise<MfjsDevPlan | void>;
+  devPlan?: (plan: MoxjsDevPlan) => MoxjsDevPlan | void | Promise<MoxjsDevPlan | void>;
 };
 
 type PluginHookValue = {
-  configResolved: MfjsWorkspaceConfig;
-  devPlan: MfjsDevPlan;
+  configResolved: MoxjsWorkspaceConfig;
+  devPlan: MoxjsDevPlan;
 };
 
 /**
@@ -58,7 +58,7 @@ type PluginHookValue = {
  */
 export async function applyPlugins<H extends 'configResolved' | 'devPlan'>(
   value: PluginHookValue[H],
-  plugins: MfjsPlugin[],
+  plugins: MoxjsPlugin[],
   hook: H,
 ): Promise<PluginHookValue[H]> {
   let out = value;
@@ -75,8 +75,8 @@ export async function applyPlugins<H extends 'configResolved' | 'devPlan'>(
  * Apply the federation hook for a specific app.
  */
 export async function applyFederationConfigPlugins(
-  args: { workspaceDir: string; app: MfjsAppMeta; config: FederationConfig },
-  plugins: MfjsPlugin[],
+  args: { workspaceDir: string; app: MoxjsAppMeta; config: FederationConfig },
+  plugins: MoxjsPlugin[],
 ): Promise<FederationConfig> {
   let cfg = args.config;
   for (const p of plugins) {

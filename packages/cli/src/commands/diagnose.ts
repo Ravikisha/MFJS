@@ -60,24 +60,24 @@ async function checkWorkspaceRoot(cwd: string): Promise<Check> {
 async function checkWorkspaceConfig(cwd: string): Promise<Check> {
   try {
     const { cfg } = await loadWorkspaceConfig(cwd);
-    if (!cfg) return { name: 'mfjs.config', status: 'warn', detail: 'not found' };
-    return { name: 'mfjs.config', status: 'ok', detail: `name=${cfg.name ?? 'anonymous'}` };
+    if (!cfg) return { name: 'moxjs.config', status: 'warn', detail: 'not found' };
+    return { name: 'moxjs.config', status: 'ok', detail: `name=${cfg.name ?? 'anonymous'}` };
   } catch (e) {
-    return { name: 'mfjs.config', status: 'fail', detail: e instanceof Error ? e.message : String(e) };
+    return { name: 'moxjs.config', status: 'fail', detail: e instanceof Error ? e.message : String(e) };
   }
 }
 
 async function checkApps(cwd: string): Promise<Check> {
   const appsDir = path.join(cwd, 'apps');
   if (!(await fs.pathExists(appsDir))) {
-    return { name: 'apps/', status: 'warn', detail: 'no apps directory — run `mfjs generate`' };
+    return { name: 'apps/', status: 'warn', detail: 'no apps directory — run `moxjs generate`' };
   }
   const dirs = await fs.readdir(appsDir);
   const valid: string[] = [];
   for (const d of dirs) {
-    if (await fs.pathExists(path.join(appsDir, d, 'mfjs.app.json'))) valid.push(d);
+    if (await fs.pathExists(path.join(appsDir, d, 'moxjs.app.json'))) valid.push(d);
   }
-  if (valid.length === 0) return { name: 'apps/', status: 'warn', detail: '0 apps with mfjs.app.json' };
+  if (valid.length === 0) return { name: 'apps/', status: 'warn', detail: '0 apps with moxjs.app.json' };
   return { name: 'apps/', status: 'ok', detail: `${valid.length} app(s): ${valid.join(', ')}` };
 }
 
@@ -94,7 +94,7 @@ async function checkTypeScript(cwd: string): Promise<Check> {
 }
 
 function printReport(checks: Check[]): void {
-  console.log(kleur.bold('\nMFJS diagnose\n'));
+  console.log(kleur.bold('\nMOXJS diagnose\n'));
   for (const c of checks) {
     const badge =
       c.status === 'ok' ? kleur.green('OK ') : c.status === 'warn' ? kleur.yellow('WRN') : kleur.red('ERR');

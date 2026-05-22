@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { describe, expect, it, vi, afterEach } from 'vitest';
-import { MFJS_NAVIGATE_EVENT, createRouter, dispatchMfjsNavigate } from '../src/router.js';
+import { MOXJS_NAVIGATE_EVENT, createRouter, dispatchMoxjsNavigate } from '../src/router.js';
 import { loadRemoteModule } from '../src/remote-loader.js';
 
 afterEach(() => {
@@ -105,7 +105,7 @@ describe('createRouter — subscribe / navigate', () => {
 });
 
 describe('createRouter — basePath filter', () => {
-  it('ignores mfjs:navigate events whose path is outside the basePath', () => {
+  it('ignores moxjs:navigate events whose path is outside the basePath', () => {
     window.history.replaceState(null, '', '/dashboard');
     const router = createRouter({ basePath: '/dashboard' });
     const cb = vi.fn();
@@ -113,14 +113,14 @@ describe('createRouter — basePath filter', () => {
     cb.mockClear(); // ignore initial sync call
 
     window.dispatchEvent(
-      new CustomEvent(MFJS_NAVIGATE_EVENT, { detail: { to: '/profile' } })
+      new CustomEvent(MOXJS_NAVIGATE_EVENT, { detail: { to: '/profile' } })
     );
 
     expect(cb).not.toHaveBeenCalled();
     router.destroy();
   });
 
-  it('accepts mfjs:navigate events whose path starts with basePath', () => {
+  it('accepts moxjs:navigate events whose path starts with basePath', () => {
     window.history.replaceState(null, '', '/dashboard');
     const router = createRouter({ basePath: '/dashboard' });
     const calls: string[] = [];
@@ -147,7 +147,7 @@ describe('createRouter — destroy', () => {
     expect(calls.length).toBe(countBefore);
   });
 
-  it('removes the mfjs:navigate listener after destroy', () => {
+  it('removes the moxjs:navigate listener after destroy', () => {
     window.history.replaceState(null, '', '/');
     const router = createRouter();
     const calls: string[] = [];
@@ -156,28 +156,28 @@ describe('createRouter — destroy', () => {
 
     const countBefore = calls.length;
     window.dispatchEvent(
-      new CustomEvent(MFJS_NAVIGATE_EVENT, { detail: { to: '/somewhere' } })
+      new CustomEvent(MOXJS_NAVIGATE_EVENT, { detail: { to: '/somewhere' } })
     );
 
     expect(calls.length).toBe(countBefore);
   });
 });
 
-describe('dispatchMfjsNavigate', () => {
-  it('dispatches mfjs:navigate CustomEvent on window with correct detail', () => {
+describe('dispatchMoxjsNavigate', () => {
+  it('dispatches moxjs:navigate CustomEvent on window with correct detail', () => {
     window.history.replaceState(null, '', '/');
     const router = createRouter();
     const calls: string[] = [];
     router.subscribe((p) => calls.push(p));
 
-    dispatchMfjsNavigate({ to: '/profile/settings' });
+    dispatchMoxjsNavigate({ to: '/profile/settings' });
 
     expect(calls.at(-1)).toBe('/profile/settings');
     router.destroy();
   });
 
   it('does not throw when no router is listening', () => {
-    expect(() => dispatchMfjsNavigate({ to: '/anywhere' })).not.toThrow();
+    expect(() => dispatchMoxjsNavigate({ to: '/anywhere' })).not.toThrow();
   });
 });
 
@@ -200,14 +200,14 @@ describe('router (legacy combined)', () => {
     router.destroy();
   });
 
-  it('reacts to mfjs:navigate CustomEvent', async () => {
+  it('reacts to moxjs:navigate CustomEvent', async () => {
     window.history.replaceState(null, '', '/');
 
     const router = createRouter();
     const calls: string[] = [];
     router.subscribe((p) => calls.push(p));
 
-    dispatchMfjsNavigate({ to: '/profile/settings' });
+    dispatchMoxjsNavigate({ to: '/profile/settings' });
 
     expect(calls.at(-1)).toBe('/profile/settings');
 
@@ -222,7 +222,7 @@ describe('router (legacy combined)', () => {
     router.subscribe(cb);
 
     // Should be ignored (outside base)
-    window.dispatchEvent(new CustomEvent(MFJS_NAVIGATE_EVENT, { detail: { to: '/profile' } }));
+    window.dispatchEvent(new CustomEvent(MOXJS_NAVIGATE_EVENT, { detail: { to: '/profile' } }));
     expect(cb).not.toHaveBeenLastCalledWith('/profile');
 
     // Should be accepted
@@ -233,7 +233,7 @@ describe('router (legacy combined)', () => {
   });
 });
 
-// ── Shell: mfjs:navigate → loadRemoteModule ───────────────────────────────────
+// ── Shell: moxjs:navigate → loadRemoteModule ───────────────────────────────────
 //
 // Simulates the shell pattern where a router subscriber resolves which remote
 // to load based on the new path and calls loadRemoteModule.
@@ -259,13 +259,13 @@ function resolveRemoteForPath(
   return routes.find((r) => pathname === r.pattern || pathname.startsWith(r.pattern + '/'));
 }
 
-describe('shell mfjs:navigate → loadRemoteModule', () => {
+describe('shell moxjs:navigate → loadRemoteModule', () => {
   afterEach(() => {
     vi.mocked(loadRemoteModule).mockClear();
     window.history.replaceState(null, '', '/');
   });
 
-  it('dispatching mfjs:navigate to /dashboard causes the shell router to load the dashboard remote module', async () => {
+  it('dispatching moxjs:navigate to /dashboard causes the shell router to load the dashboard remote module', async () => {
     window.history.replaceState(null, '', '/');
 
     const routes: RouteConfig[] = [
@@ -297,7 +297,7 @@ describe('shell mfjs:navigate → loadRemoteModule', () => {
     });
 
     // A remote fires cross-app navigation to /dashboard.
-    dispatchMfjsNavigate({ to: '/dashboard' });
+    dispatchMoxjsNavigate({ to: '/dashboard' });
 
     // Allow the async subscriber to complete.
     await vi.waitFor(() => expect(loadedModules).toHaveLength(1));

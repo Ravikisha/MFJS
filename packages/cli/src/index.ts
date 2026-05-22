@@ -22,6 +22,15 @@ import { lintCommand } from './commands/lint.js';
 import { testCommand } from './commands/test.js';
 import { envCommand } from './commands/env.js';
 import { swCommand } from './commands/sw.js';
+import { analyzeCommand } from './commands/analyze.js';
+import { loadtestCommand } from './commands/loadtest.js';
+import { perfDashboardCommand } from './commands/perf-dashboard.js';
+import { routeEditorCommand } from './commands/route-editor.js';
+import { adapterCommand } from './commands/frameworks.js';
+import { splitCommand } from './commands/split.js';
+import { typedocCommand } from './commands/typedoc.js';
+import { schemaCommand } from './commands/schema.js';
+import { turboCommand } from './commands/turbo.js';
 import { printCliError } from './errors.js';
 
 export const program = new Command();
@@ -33,27 +42,27 @@ function getCliVersion(): string {
     const pkg = JSON.parse(raw) as { version?: string };
     return pkg.version ?? '0.0.0';
   } catch (err) {
-    if (process.env['MFJS_DEBUG'] === '1') {
+    if (process.env['MOXJS_DEBUG'] === '1') {
       // eslint-disable-next-line no-console
-      console.error('[mfjs] could not read own package.json:', (err as Error).message);
+      console.error('[moxjs] could not read own package.json:', (err as Error).message);
     }
     return '0.0.0';
   }
 }
 
 program
-  .name('mfjs')
-  .description('MFJS CLI (micro-frontend framework)')
+  .name('moxjs')
+  .description('MOXJS CLI (micro-frontend framework)')
   .version(getCliVersion())
   .option('--cwd <path>', 'Workspace root directory (overrides --dir on subcommands)')
-  .option('-v, --verbose', 'Verbose logging (sets MFJS_DEBUG=1)', false)
+  .option('-v, --verbose', 'Verbose logging (sets MOXJS_DEBUG=1)', false)
   .option('--dry-run', 'Print what would be done without making changes (where supported)', false)
   .hook('preAction', (cmd) => {
     const opts = cmd.opts() as { verbose?: boolean; cwd?: string };
-    if (opts.verbose) process.env['MFJS_DEBUG'] = '1';
+    if (opts.verbose) process.env['MOXJS_DEBUG'] = '1';
     if (opts.cwd) {
       // Don't chdir — surface the value through env so subcommands can opt in.
-      process.env['MFJS_CWD'] = path.resolve(opts.cwd);
+      process.env['MOXJS_CWD'] = path.resolve(opts.cwd);
     }
   });
 
@@ -76,6 +85,15 @@ program.addCommand(lintCommand);
 program.addCommand(testCommand);
 program.addCommand(envCommand);
 program.addCommand(swCommand);
+program.addCommand(analyzeCommand);
+program.addCommand(loadtestCommand);
+program.addCommand(perfDashboardCommand);
+program.addCommand(routeEditorCommand);
+program.addCommand(adapterCommand);
+program.addCommand(splitCommand);
+program.addCommand(typedocCommand);
+program.addCommand(schemaCommand);
+program.addCommand(turboCommand);
 
 program.showHelpAfterError('(use --help)');
 program.showSuggestionAfterError(true);
@@ -91,7 +109,7 @@ const isDirectInvocation = (() => {
     // Symlink / shim cases (npm-link, pnpm.cmd, tsx) — fall back to a looser
     // check that simply looks for our bin name in argv[1].
     try {
-      return /[\\/]mfjs(\.[cm]?js)?$/.test(process.argv[1] ?? '');
+      return /[\\/]moxjs(\.[cm]?js)?$/.test(process.argv[1] ?? '');
     } catch {
       return false;
     }

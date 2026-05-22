@@ -1,5 +1,5 @@
 /**
- * @mfjs/ssr — types shared across the SSR pipeline.
+ * @moxjs/ssr — types shared across the SSR pipeline.
  */
 
 import type { ComponentType } from 'react';
@@ -104,10 +104,10 @@ export type EdgeResponse = {
  * An edge adapter converts an `EdgeRequest` to an `EdgeResponse` by
  * server-rendering the appropriate component tree.
  *
- * Implement this interface to integrate MFJS SSR with any edge runtime:
+ * Implement this interface to integrate MOXJS SSR with any edge runtime:
  *
  * ```ts
- * import { createEdgeAdapter } from '@mfjs/ssr';
+ * import { createEdgeAdapter } from '@moxjs/ssr';
  *
  * const handler = createEdgeAdapter({ App, template, routes });
  *

@@ -1,5 +1,5 @@
 /**
- * @mfjs/state/devtools
+ * @moxjs/state/devtools
  *
  * Bridge to the Redux DevTools browser extension. Falls back to a no-op when
  * the extension is not installed (or in non-browser environments).
@@ -8,7 +8,7 @@
 import type { Store } from './index.js';
 
 export interface DevtoolsOptions {
-  /** Instance name shown in the devtools UI. Default: `'mfjs-state'`. */
+  /** Instance name shown in the devtools UI. Default: `'moxjs-state'`. */
   name?: string;
   /** Optional features payload forwarded to the extension. */
   features?: Record<string, boolean>;
@@ -28,12 +28,12 @@ interface DevtoolsExtension {
 
 interface ExtensionWindow {
   __REDUX_DEVTOOLS_EXTENSION__?: DevtoolsExtension;
-  __MFJS_STATE_DEVTOOLS__?: DevtoolsExtension;
+  __MOXJS_STATE_DEVTOOLS__?: DevtoolsExtension;
 }
 
 function getExtension(): DevtoolsExtension | undefined {
   const w = globalThis as unknown as ExtensionWindow;
-  return w.__MFJS_STATE_DEVTOOLS__ ?? w.__REDUX_DEVTOOLS_EXTENSION__;
+  return w.__MOXJS_STATE_DEVTOOLS__ ?? w.__REDUX_DEVTOOLS_EXTENSION__;
 }
 
 /**
@@ -44,7 +44,7 @@ export function connectDevtools<S, A>(store: Store<S, A>, opts: DevtoolsOptions 
   const ext = getExtension();
   if (!ext) return () => {};
 
-  const conn = ext.connect({ name: opts.name ?? 'mfjs-state', features: opts.features ?? {} });
+  const conn = ext.connect({ name: opts.name ?? 'moxjs-state', features: opts.features ?? {} });
   conn.init(store.getState());
 
   // Wrap dispatch so each action is forwarded to the panel.

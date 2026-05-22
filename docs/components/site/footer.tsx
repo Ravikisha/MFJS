@@ -33,9 +33,9 @@ const COLUMNS: Array<{ title: string; links: Array<{ href: string; label: string
   {
     title: 'Project',
     links: [
-      { href: 'https://github.com/mfjs/mfjs', label: 'GitHub', external: true },
-      { href: 'https://github.com/mfjs/mfjs/releases', label: 'Releases', external: true },
-      { href: 'https://github.com/mfjs/mfjs/issues', label: 'File an issue', external: true },
+      { href: 'https://github.com/moxjs/moxjs', label: 'GitHub', external: true },
+      { href: 'https://github.com/moxjs/moxjs/releases', label: 'Releases', external: true },
+      { href: 'https://github.com/moxjs/moxjs/issues', label: 'File an issue', external: true },
       { href: '/docs/api/runtime', label: 'Changelog' },
     ],
   },
@@ -54,7 +54,7 @@ export function SiteFooter() {
             </p>
             <div className="mt-4 flex items-center gap-3 text-muted-foreground">
               <a
-                href="https://github.com/mfjs/mfjs"
+                href="https://github.com/moxjs/moxjs"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="rounded-md border border-border p-2 transition hover:text-foreground hover:bg-background"
@@ -93,7 +93,7 @@ export function SiteFooter() {
           ))}
         </div>
         <div className="mt-12 flex flex-col gap-2 border-t border-border pt-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} MFJS. MIT licensed.</p>
+          <p>© {new Date().getFullYear()} MOXJS. MIT licensed.</p>
           <p>Built with Rspack Module Federation, React, and shadcn-style design tokens.</p>
         </div>
       </div>

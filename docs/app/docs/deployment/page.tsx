@@ -7,7 +7,7 @@ import { RocketIcon } from '@/components/icons';
 export const metadata = {
   title: 'Deployment',
   description:
-    'Deploy MFJS to Vercel Edge, Cloudflare Workers/Pages, Node.js, or Docker. mfjs deploy resolves the right adapter package automatically.',
+    'Deploy MOXJS to Vercel Edge, Cloudflare Workers/Pages, Node.js, or Docker. moxjs deploy resolves the right adapter package automatically.',
 };
 
 export default function DeploymentPage() {
@@ -18,7 +18,7 @@ export default function DeploymentPage() {
       </Badge>
       <h1>Deployment</h1>
       <p>
-        <code>mfjs deploy</code> dynamically loads the right adapter package — Vercel Edge,
+        <code>moxjs deploy</code> dynamically loads the right adapter package — Vercel Edge,
         Cloudflare, or Node — and scaffolds a working platform config. Adapters are loose deps;
         install only what you actually ship.
       </p>
@@ -35,8 +35,8 @@ export default function DeploymentPage() {
           <h2 id="vercel">Vercel Edge</h2>
           <CodeBlock
             language="bash"
-            code={`pnpm add -D @mfjs/adapter-vercel
-mfjs deploy --target vercel
+            code={`pnpm add -D @moxjs/adapter-vercel
+moxjs deploy --target vercel
 vercel deploy`}
           />
           <p>
@@ -47,10 +47,10 @@ vercel deploy`}
           <CodeBlock
             language="ts"
             filename="api/[[...slug]].ts"
-            code={`import { createVercelHandler } from '@mfjs/adapter-vercel';
+            code={`import { createVercelHandler } from '@moxjs/adapter-vercel';
 import { App } from '../src/App';
 import template from '../src/template.html?raw';
-import routes from '../src/mfjs.routes';
+import routes from '../src/moxjs.routes';
 
 export const config = { runtime: 'edge' };
 
@@ -62,8 +62,8 @@ export default createVercelHandler({ App, template, routes, etag: true });`}
           <h2 id="cloudflare">Cloudflare Workers / Pages</h2>
           <CodeBlock
             language="bash"
-            code={`pnpm add -D @mfjs/adapter-cloudflare
-mfjs deploy --target cloudflare
+            code={`pnpm add -D @moxjs/adapter-cloudflare
+moxjs deploy --target cloudflare
 wrangler deploy
 # or, for Cloudflare Pages
 wrangler pages deploy apps/shell/dist`}
@@ -71,7 +71,7 @@ wrangler pages deploy apps/shell/dist`}
           <CodeBlock
             language="ts"
             filename="src/worker.ts"
-            code={`import { createCloudflareWorker } from '@mfjs/adapter-cloudflare';
+            code={`import { createCloudflareWorker } from '@moxjs/adapter-cloudflare';
 
 const worker = createCloudflareWorker({
   App,
@@ -89,13 +89,13 @@ export default worker;`}
           <h2 id="node">Node.js</h2>
           <CodeBlock
             language="bash"
-            code={`pnpm add -D @mfjs/adapter-node
-mfjs deploy --target node`}
+            code={`pnpm add -D @moxjs/adapter-node
+moxjs deploy --target node`}
           />
           <CodeBlock
             language="ts"
             filename="server.ts"
-            code={`import { startNodeServer } from '@mfjs/adapter-node';
+            code={`import { startNodeServer } from '@moxjs/adapter-node';
 
 startNodeServer({
   App,
@@ -119,7 +119,7 @@ startNodeServer({
           <h2 id="docker">Docker</h2>
           <CodeBlock
             language="bash"
-            code={`mfjs deploy --target docker
+            code={`moxjs deploy --target docker
 docker build -t shell .
 docker run -p 3000:3000 shell`}
           />
@@ -153,7 +153,7 @@ CMD ["node", "apps/shell/dist/server.js"]`}
 
       <CodeBlock
         language="ts"
-        filename="mfjs.config.ts"
+        filename="moxjs.config.ts"
         code={`{
   federation: {
     publicPath: 'https://cdn.acme.com/dashboard/',
@@ -167,13 +167,13 @@ CMD ["node", "apps/shell/dist/server.js"]`}
       <p>
         Each adapter is just a thin bridge that turns the platform&apos;s native request type into{' '}
         <code>EdgeRequest</code>. Implement <code>scaffoldDeploy()</code> + a handler factory and{' '}
-        <code>mfjs deploy --target your-adapter</code> will pick it up.
+        <code>moxjs deploy --target your-adapter</code> will pick it up.
       </p>
 
       <CodeBlock
         language="ts"
-        filename="@your-co/mfjs-adapter-foo/src/index.ts"
-        code={`import { createEdgeAdapter } from '@mfjs/ssr';
+        filename="@your-co/moxjs-adapter-foo/src/index.ts"
+        code={`import { createEdgeAdapter } from '@moxjs/ssr';
 
 export const deployTarget = 'foo';
 

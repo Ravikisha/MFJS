@@ -1,18 +1,18 @@
 /**
- * @mfjs/events
+ * @moxjs/events
  *
- * Shared event-contract types for the MFJS example workspace.
+ * Shared event-contract types for the MOXJS example workspace.
  *
  * Both the shell (host) and any remote can import `MfAppEvents` from this
- * package.  Because `@mfjs/event-bus` is configured as a Module Federation
+ * package.  Because `@moxjs/event-bus` is configured as a Module Federation
  * singleton, all micro-frontends share the same bus instance — meaning events
  * emitted by the host are received by handlers registered in a remote, and
  * vice-versa.
  *
  * @example
  * ```ts
- * import { getEventBus } from '@mfjs/event-bus';
- * import type { MfAppEvents } from '@mfjs/events';
+ * import { getEventBus } from '@moxjs/event-bus';
+ * import type { MfAppEvents } from '@moxjs/events';
  *
  * const bus = getEventBus<MfAppEvents>();
  *

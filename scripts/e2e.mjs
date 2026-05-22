@@ -65,12 +65,12 @@ async function killChild(child) {
   await waitForExit(child);
 }
 
-if (process.env.MFJS_E2E !== '1') {
+if (process.env.MOXJS_E2E !== '1') {
   // Opt-in by design: prevents accidental long-running e2e during fast dev test loops.
   // CI invokes Playwright via `playwright.config.ts:webServer.env` which always sets
-  // MFJS_E2E=1, so a missing flag in CI means misconfiguration, not silent skip.
+  // MOXJS_E2E=1, so a missing flag in CI means misconfiguration, not silent skip.
   console.warn(
-    '[mfjs/e2e] skipped: MFJS_E2E env var not set to "1". Run with MFJS_E2E=1 (Playwright already sets this automatically).',
+    '[moxjs/e2e] skipped: MOXJS_E2E env var not set to "1". Run with MOXJS_E2E=1 (Playwright already sets this automatically).',
   );
   process.exit(0);
 }
@@ -97,13 +97,13 @@ try {
   // Build the proxy federation file the on-demand/proxy scenarios use.
   const { writeFileSync, readFileSync, existsSync } = await import('node:fs');
   const shellDir = join(exampleDir, 'apps', 'shell');
-  const basePath = join(shellDir, 'mfjs.federation.json');
+  const basePath = join(shellDir, 'moxjs.federation.json');
   if (existsSync(basePath)) {
     const cfg = JSON.parse(readFileSync(basePath, 'utf8'));
     if (cfg?.remotes?.dashboard) {
-      cfg.remotes.dashboard = 'dashboard@http://localhost:3000/mfjs/remotes/dashboard/remoteEntry.js';
+      cfg.remotes.dashboard = 'dashboard@http://localhost:3000/moxjs/remotes/dashboard/remoteEntry.js';
     }
-    writeFileSync(join(shellDir, 'mfjs.federation.proxy.json'), JSON.stringify(cfg, null, 2) + '\n', 'utf8');
+    writeFileSync(join(shellDir, 'moxjs.federation.proxy.json'), JSON.stringify(cfg, null, 2) + '\n', 'utf8');
   }
 } catch (e) {
   console.error('Build/generate phase failed:', e?.message ?? e);
@@ -141,7 +141,7 @@ async function runScenario(name, opts) {
     }
 
     const hostEnv = {};
-    if (opts.mode === 'proxy') hostEnv.MFJS_FEDERATION_FILE = 'mfjs.federation.proxy.json';
+    if (opts.mode === 'proxy') hostEnv.MOXJS_FEDERATION_FILE = 'moxjs.federation.proxy.json';
 
     if (opts.mode === 'on-demand') {
       localChildren.push(
@@ -163,7 +163,7 @@ async function runScenario(name, opts) {
     const urls = ['http://localhost:3000'];
     if (opts.mode !== 'on-demand') urls.push('http://localhost:3001/remoteEntry.js');
     if (opts.mode !== 'direct')
-      urls.push('http://localhost:3000/mfjs/remotes/dashboard/remoteEntry.js');
+      urls.push('http://localhost:3000/moxjs/remotes/dashboard/remoteEntry.js');
 
     console.log('Waiting for dev servers...');
     await waitForUrls(urls);

@@ -1,5 +1,5 @@
 /**
- * @mfjs/ssr — renderToString
+ * @moxjs/ssr — renderToString
  *
  * Synchronously renders a React component tree to an HTML string for a given
  * server-side request path. Uses React 18's `renderToString` so the output is
@@ -10,9 +10,10 @@
 
 import { createElement } from 'react';
 import { renderToString as reactRenderToString, renderToStaticMarkup } from 'react-dom/server';
-import { escapeHtml } from '@mfjs/security';
+import { escapeHtml } from '@moxjs/security';
 import type { ComponentType } from 'react';
 import { isRedirect } from './redirect.js';
+import { isJsonResponse, isNotFound } from './response.js';
 import type { SsrRenderResult, SsrRoute } from './types.js';
 
 export interface RenderRouteOptions {
@@ -33,7 +34,7 @@ export interface RenderRouteOptions {
  *
  * @example
  * ```ts
- * import { renderRouteToString } from '@mfjs/ssr';
+ * import { renderRouteToString } from '@moxjs/ssr';
  *
  * const { html } = await renderRouteToString(App, { path: '/dashboard/settings' });
  * ```
@@ -50,7 +51,7 @@ export async function renderRouteToString(
     return { html, statusCode: 200 };
   } catch (err) {
     // Control-flow errors must propagate so the adapter can handle them.
-    if (isRedirect(err)) throw err;
+    if (isRedirect(err) || isJsonResponse(err) || isNotFound(err)) throw err;
     const error = err instanceof Error ? err : new Error(String(err));
     return {
       html: `<p data-ssr-error>${escapeHtml(error.message)}</p>`,

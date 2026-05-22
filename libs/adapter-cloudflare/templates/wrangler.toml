@@ -1,4 +1,4 @@
-name = "mfjs-shell"
+name = "moxjs-shell"
 main = "dist/worker.js"
 compatibility_date = "2025-01-01"
 
@@ -10,4 +10,4 @@ pattern = "example.com/*"
 zone_name = "example.com"
 
 [vars]
-MFJS_ENV = "production"
+MOXJS_ENV = "production"

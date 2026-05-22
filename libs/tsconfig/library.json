@@ -1,5 +1,5 @@
 {
-  "display": "@mfjs/tsconfig/library",
+  "display": "@moxjs/tsconfig/library",
   "extends": "./base.json",
   "compilerOptions": {
     "declaration": true,

@@ -5,7 +5,7 @@ import kleur from 'kleur';
 import { execa } from 'execa';
 
 /**
- * `mfjs typecheck [--dir <path>]`
+ * `moxjs typecheck [--dir <path>]`
  *
  * Runs `tsc --noEmit` for every workspace package that has a `tsconfig.json`
  * with a `typecheck` script, OR — as a fallback — invokes `tsc --noEmit`

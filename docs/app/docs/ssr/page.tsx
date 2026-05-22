@@ -7,7 +7,7 @@ import { ServerIcon } from '@/components/icons';
 export const metadata = {
   title: 'SSR & Static Export',
   description:
-    'Server-render a federated app with @mfjs/ssr. renderRouteToString, streaming, ETag-before-render cache, static export with content-hash manifests.',
+    'Server-render a federated app with @moxjs/ssr. renderRouteToString, streaming, ETag-before-render cache, static export with content-hash manifests.',
 };
 
 export default function SsrPage() {
@@ -18,17 +18,17 @@ export default function SsrPage() {
       </Badge>
       <h1>SSR &amp; static export</h1>
       <p>
-        <code>@mfjs/ssr</code> renders matched routes on the server, streams them to the browser,
+        <code>@moxjs/ssr</code> renders matched routes on the server, streams them to the browser,
         and hydrates with <code>renderToString</code> by default (so the React tree carries the
-        markers needed for hydration). Edge runtimes use <code>@mfjs/ssr/edge</code>; Node uses{' '}
-        <code>@mfjs/ssr/node</code>.
+        markers needed for hydration). Edge runtimes use <code>@moxjs/ssr/edge</code>; Node uses{' '}
+        <code>@moxjs/ssr/node</code>.
       </p>
 
       <h2 id="render-to-string">renderRouteToString</h2>
       <CodeBlock
         language="ts"
         filename="apps/shell/server/render.ts"
-        code={`import { renderRouteToString, injectIntoTemplate } from '@mfjs/ssr';
+        code={`import { renderRouteToString, injectIntoTemplate } from '@moxjs/ssr';
 import { App } from '../src/App';
 
 export async function renderShell(pathname: string, template: string) {
@@ -57,7 +57,7 @@ export async function renderShell(pathname: string, template: string) {
       <CodeBlock
         language="ts"
         filename="apps/shell/server/stream.ts"
-        code={`import { renderRouteToStream, type StreamRenderResult } from '@mfjs/ssr';
+        code={`import { renderRouteToStream, type StreamRenderResult } from '@moxjs/ssr';
 
 export async function streamShell(req, res) {
   const ac = new AbortController();
@@ -75,6 +75,72 @@ export async function streamShell(req, res) {
 }`}
       />
 
+      <h3 id="streaming-edge">Streaming on edge runtimes (Web Streams)</h3>
+      <p>
+        Cloudflare Workers, Vercel Edge, and Deno Deploy do not provide{' '}
+        <code>node:stream</code>. Import <code>renderRouteToReadableStream</code> or{' '}
+        <code>renderRouteToResponse</code> from <code>@moxjs/ssr/edge</code> to get a Web{' '}
+        <code>ReadableStream&lt;Uint8Array&gt;</code> backed by React 18&apos;s{' '}
+        <code>renderToReadableStream</code>. Same options surface — <code>signal</code>,{' '}
+        <code>timeoutMs</code>, <code>bootstrapScripts</code>, <code>nonce</code>,{' '}
+        <code>onError</code> — and <code>waitForAllReady</code> for SEO crawlers that need the
+        finished shell.
+      </p>
+
+      <CodeBlock
+        language="ts"
+        filename="apps/shell/worker.ts"
+        code={`import { renderRouteToResponse } from '@moxjs/ssr/edge';
+
+export default {
+  async fetch(req: Request) {
+    return renderRouteToResponse(App, { path: new URL(req.url).pathname }, {
+      bootstrapScripts: ['/static/app.js'],
+      nonce: req.headers.get('x-csp-nonce') ?? undefined,
+      signal: req.signal,
+      timeoutMs: 5_000,
+      onError: (err) => console.error(err),
+    });
+  },
+};`}
+      />
+
+      <h2 id="fragments">Streaming remote fragments</h2>
+      <p>
+        For multi-remote pages, SSR each remote in parallel and stream their HTML in any order
+        — the host shell flushes first with placeholders, and each fragment swaps in as it
+        finishes. Matches the Cloudflare Fragments pattern.
+      </p>
+      <CodeBlock
+        language="ts"
+        filename="apps/shell/worker.ts"
+        code={`import { renderFragmentsToReadableStream } from '@moxjs/ssr/edge';
+
+const shell = \`<!doctype html><html><body>
+  <header><moxjs-fragment name="nav" /></header>
+  <main><moxjs-fragment name="cart" /></main>
+  <footer><moxjs-fragment name="recs" /></footer>
+</body></html>\`;
+
+const { stream, done } = renderFragmentsToReadableStream({
+  shell,
+  timeoutMs: 5_000,
+  fragments: [
+    { name: 'nav',  render: async () => fetch('https://nav.acme.dev/ssr').then((r) => r.text()),  fallback: '<nav/>' },
+    { name: 'cart', render: async () => fetch('https://cart.acme.dev/ssr').then((r) => r.text()), fallback: '<aside/>' },
+    { name: 'recs', render: async () => fetch('https://recs.acme.dev/ssr').then((r) => r.text()), fallback: '' },
+  ],
+  onFragment: (e) => observability.report('fragment', e),
+});
+done.then(({ outcomes }) => /* persist outcomes for SLO dashboards */ {});
+return new Response(stream, { headers: { 'content-type': 'text/html; charset=utf-8' } });`}
+      />
+      <Callout variant="info" title="Fallback first, fragment second">
+        The stream variant inlines the fallback markup inside the placeholder before any
+        fragment resolves. If a fragment times out or fails, the fallback stays on the page —
+        the swap script never runs.
+      </Callout>
+
       <h2 id="edge-adapter">Edge adapter</h2>
       <p>
         <code>createEdgeAdapter</code> turns an <code>EdgeRequest</code> into an{' '}
@@ -85,7 +151,7 @@ export async function streamShell(req, res) {
       <CodeBlock
         language="ts"
         filename="worker.ts"
-        code={`import { createEdgeAdapter, LruHtmlCache } from '@mfjs/ssr/edge';
+        code={`import { createEdgeAdapter, LruHtmlCache } from '@moxjs/ssr/edge';
 
 const handler = createEdgeAdapter({
   App,
@@ -124,7 +190,7 @@ export default { fetch: (req: Request) => toResponse(handler(toEdgeRequest(req))
         <TabsContent value="basic">
           <CodeBlock
             language="ts"
-            code={`import { staticExport } from '@mfjs/ssr/node';
+            code={`import { staticExport } from '@moxjs/ssr/node';
 
 await staticExport({
   routes: [{ path: '/' }, { path: '/about' }],
@@ -172,35 +238,135 @@ if (result.failures.length > 0) {
         </TabsContent>
       </Tabs>
 
-      <h2 id="ssr-redirects">Redirects</h2>
+      <h2 id="ssr-redirects">Redirects and response helpers</h2>
       <p>
-        Throw <code>redirect(&apos;/login&apos;, 302)</code> from anywhere in the React tree.{' '}
-        <code>renderRouteToString</code> re-throws <code>SsrRedirect</code> instead of swallowing it,
-        so the edge adapter can return a real 302 with a <code>Location</code> header.
+        Throw <code>redirect</code>, <code>json</code>, or <code>notFound</code> from anywhere in the
+        React tree. <code>renderRouteToString</code> re-throws each control-flow error so the edge
+        adapter can map it to a real HTTP response (302, JSON 4xx/5xx, or the configured 404 page).
       </p>
 
       <CodeBlock
         language="tsx"
-        code={`import { redirect } from '@mfjs/ssr';
+        code={`import { redirect, json, notFound } from '@moxjs/ssr';
 
-export default function ProtectedPage() {
+export default function User({ params }: { params: { id: string } }) {
   if (!isLoggedIn()) throw redirect('/login', 302);
-  return <Dashboard />;
+
+  const user = lookup(params.id);
+  if (!user) throw notFound();                       // → 404
+  if (user.banned) throw json({ error: 'banned' }, 403);
+
+  return <Profile user={user} />;
 }`}
       />
 
+      <h2 id="loaders">Per-route data loaders</h2>
+      <p>
+        Co-locate data fetching with the route. <code>defineLoader</code> describes one loader;{' '}
+        <code>runLoaders</code> runs a list of them concurrently before render. Components read
+        results via <code>useLoaderData</code> — no second client fetch needed for hydration.
+      </p>
+      <CodeBlock
+        language="ts"
+        code={`import { defineLoader, runLoaders, useLoaderData, redirect } from '@moxjs/ssr';
+
+export const userLoader = defineLoader({
+  key: 'user',
+  cacheControl: 'private, max-age=0',
+  load: async ({ ctx, setHeader, params }) => {
+    const sid = ctx?.cookies['sid'];
+    if (!sid) throw redirect('/login', 302);
+    setHeader('Vary', 'Cookie');
+    return await fetchUser(params.id, sid);
+  },
+});
+
+// In your handler — collect headers + cache-control before render.
+const { data, headers, cacheControl } = await runLoaders({
+  loaders: [userLoader],
+  request,
+  params: match.params,
+});
+
+// In your component
+function UserPage() {
+  const user = useLoaderData<User>('user');
+  return <h1>{user?.name}</h1>;
+}`}
+      />
+
+      <h2 id="request-context">Per-request context</h2>
+      <p>
+        Components can read the inbound request via <code>getRequestContext()</code> /
+        <code> requireRequestContext()</code>. The edge adapter brackets each render with{' '}
+        <code>runWithRequestContext</code>, so concurrent requests are isolated.
+      </p>
+      <CodeBlock
+        language="tsx"
+        code={`import { requireRequestContext } from '@moxjs/ssr';
+
+export default function Page() {
+  const ctx = requireRequestContext();
+  const locale = ctx.cookies['locale'] ?? 'en';
+  return <Greeting locale={locale} />;
+}`}
+      />
+      <p>
+        The context exposes <code>url</code>, <code>method</code>, lowercase{' '}
+        <code>headers</code>, parsed <code>cookies</code>, and a free-form <code>locals</code> bag
+        you can populate from middleware (user/session/locale).
+      </p>
+
+      <h2 id="when-to-pick">When to pick which mode</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Mode</th>
+            <th>Cold TTFB</th>
+            <th>Time-to-interactive</th>
+            <th>Best for</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>SPA (client-only)</td>
+            <td>Fast — static HTML shell</td>
+            <td>Slow on big bundles</td>
+            <td>Authed dashboards, internal tools</td>
+          </tr>
+          <tr>
+            <td><code>renderRouteToString</code></td>
+            <td>Slower (full render before flush)</td>
+            <td>Fast — hydrate one tree</td>
+            <td>Marketing pages, SEO-critical routes</td>
+          </tr>
+          <tr>
+            <td><code>renderRouteToStream</code></td>
+            <td>Fast (flush shell, defer suspense)</td>
+            <td>Fast progressively</td>
+            <td>Above-the-fold-heavy pages with data fetch</td>
+          </tr>
+          <tr>
+            <td><code>staticExport</code></td>
+            <td>CDN-fast</td>
+            <td>Fast — pure HTML</td>
+            <td>Docs, blog, status pages</td>
+          </tr>
+        </tbody>
+      </table>
+
       <h2 id="state-hydration">Safe state hydration</h2>
       <p>
-        Use <code>safeJsonForScript</code> from <code>@mfjs/security</code> to inject server state.
+        Use <code>safeJsonForScript</code> from <code>@moxjs/security</code> to inject server state.
         It escapes <code>&lt;/script&gt;</code> sequences and validates nonces against the base64url
         alphabet.
       </p>
 
       <CodeBlock
         language="ts"
-        code={`import { safeJsonForScript } from '@mfjs/security';
+        code={`import { safeJsonForScript } from '@moxjs/security';
 
-const head = \`<script id="__mfjs_state" type="application/json" nonce="\${nonce}">\${
+const head = \`<script id="__moxjs_state" type="application/json" nonce="\${nonce}">\${
   safeJsonForScript({ user, flags })
 }</script>\`;`}
       />

@@ -1,15 +1,15 @@
 {
-  "name": "@mfjs/ui",
+  "name": "@moxjs/ui",
   "version": "0.1.0",
-  "description": "Lightweight React UI primitives for MFJS micro-frontends with theming and a11y defaults.",
+  "description": "Lightweight React UI primitives for MOXJS micro-frontends with theming and a11y defaults.",
   "license": "MIT",
-  "homepage": "https://github.com/anthropics/MFJS#readme",
+  "homepage": "https://github.com/anthropics/MOXJS#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/anthropics/MFJS.git",
+    "url": "https://github.com/anthropics/MOXJS.git",
     "directory": "libs/ui"
   },
-  "keywords": ["mfjs", "module-federation", "ui", "react", "components"],
+  "keywords": ["moxjs", "module-federation", "ui", "react", "components"],
   "private": false,
   "publishConfig": { "access": "public" },
   "type": "module",

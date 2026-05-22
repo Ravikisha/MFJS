@@ -36,6 +36,8 @@ export const DOC_NAV: DocSection[] = [
     title: 'Runtime extras',
     links: [
       { href: '/docs/css-isolation', label: 'CSS isolation (Shadow DOM)' },
+      { href: '/docs/image', label: 'Image optimization' },
+      { href: '/docs/fonts', label: 'Font optimization' },
       { href: '/docs/service-worker', label: 'Service Worker' },
       { href: '/docs/rsc', label: 'React Server Components' },
     ],
@@ -53,12 +55,12 @@ export const DOC_NAV: DocSection[] = [
   {
     title: 'API reference',
     links: [
-      { href: '/docs/api/runtime', label: '@mfjs/runtime' },
-      { href: '/docs/api/ssr', label: '@mfjs/ssr' },
-      { href: '/docs/api/security', label: '@mfjs/security' },
-      { href: '/docs/api/observability', label: '@mfjs/observability' },
-      { href: '/docs/api/state', label: '@mfjs/state' },
-      { href: '/docs/api/event-bus', label: '@mfjs/event-bus' },
+      { href: '/docs/api/runtime', label: '@moxjs/runtime' },
+      { href: '/docs/api/ssr', label: '@moxjs/ssr' },
+      { href: '/docs/api/security', label: '@moxjs/security' },
+      { href: '/docs/api/observability', label: '@moxjs/observability' },
+      { href: '/docs/api/state', label: '@moxjs/state' },
+      { href: '/docs/api/event-bus', label: '@moxjs/event-bus' },
     ],
   },
 ];

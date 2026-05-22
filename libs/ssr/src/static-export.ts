@@ -1,11 +1,11 @@
 /**
- * @mfjs/ssr — staticExport
+ * @moxjs/ssr — staticExport
  *
  * Pre-renders a list of routes to static HTML files.
  *
  * @example
  * ```ts
- * import { staticExport } from '@mfjs/ssr';
+ * import { staticExport } from '@moxjs/ssr';
  *
  * await staticExport({
  *   routes: [
@@ -23,7 +23,7 @@
 import { writeFile, mkdir } from 'node:fs/promises';
 import { dirname, resolve, sep } from 'node:path';
 import { createHash } from 'node:crypto';
-import { isSafePathname } from '@mfjs/security';
+import { isSafePathname } from '@moxjs/security';
 import { renderRouteToString, injectIntoTemplate } from './render-to-string.js';
 import type { StaticExportOptions, StaticPage } from './types.js';
 

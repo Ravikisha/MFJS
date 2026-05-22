@@ -1,4 +1,4 @@
-# @mfjs/prettier-config
+# @moxjs/prettier-config
 
 Shared Prettier config.
 
@@ -6,6 +6,6 @@ Shared Prettier config.
 
 ```json
 {
-  "prettier": "@mfjs/prettier-config"
+  "prettier": "@moxjs/prettier-config"
 }
 ```

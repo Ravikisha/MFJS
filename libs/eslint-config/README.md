@@ -1,18 +1,18 @@
-# @mfjs/eslint-config
+# @moxjs/eslint-config
 
-Shared ESLint 9 flat config for MFJS projects.
+Shared ESLint 9 flat config for MOXJS projects.
 
 ## Use
 
 ```js
 // eslint.config.js
-import mfjs from '@mfjs/eslint-config';
-export default mfjs;
+import moxjs from '@moxjs/eslint-config';
+export default moxjs;
 ```
 
 React apps:
 
 ```js
-import mfjs from '@mfjs/eslint-config/react';
-export default mfjs;
+import moxjs from '@moxjs/eslint-config/react';
+export default moxjs;
 ```

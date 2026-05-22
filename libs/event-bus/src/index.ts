@@ -1,5 +1,19 @@
 export type EventMap = Record<string, unknown>;
 
+export { connectBroadcast } from './broadcast.js';
+export type {
+  BroadcastConnection,
+  ConnectBroadcastOptions,
+} from './broadcast.js';
+
+export { attachSchemaRegistry } from './schema.js';
+export type {
+  Validator,
+  SchemaMap,
+  AttachSchemaOptions,
+  SchemaRegistryHandle,
+} from './schema.js';
+
 export type Handler<T> = (payload: T) => void;
 export type WildcardHandler<Events extends EventMap> = <K extends keyof Events>(
   event: K,
@@ -130,12 +144,12 @@ export class EventBus<Events extends EventMap = EventMap> {
 
 function defaultErrorHandler(err: unknown, event: string): void {
   // eslint-disable-next-line no-console
-  console.error(`[mfjs/event-bus] handler for "${event}" threw:`, err);
+  console.error(`[moxjs/event-bus] handler for "${event}" threw:`, err);
 }
 
 // ── globalThis-pinned singleton ────────────────────────────────────────────
 
-const BUS_KEY = '__MFJS_EVENT_BUS_SINGLETON__';
+const BUS_KEY = '__MOXJS_EVENT_BUS_SINGLETON__';
 type GlobalWithBus = typeof globalThis & { [BUS_KEY]?: EventBus<EventMap> };
 
 export function getEventBus<Events extends EventMap = EventMap>(): EventBus<Events> {

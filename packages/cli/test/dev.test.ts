@@ -59,7 +59,7 @@ async function run(argv: string[], cwd: string) {
   }
 }
 
-describe('mfjs dev', () => {
+describe('moxjs dev', () => {
   const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined);
 
   beforeEach(() => {
@@ -71,40 +71,40 @@ describe('mfjs dev', () => {
   });
 
   it('auto-generates federation configs when missing (default)', async () => {
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'mfjs-cli-'))) as string;
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-cli-'))) as string;
     const appsDir = path.join(tmp, 'apps');
     await fs.ensureDir(path.join(appsDir, 'shell'));
     await fs.ensureDir(path.join(appsDir, 'dashboard'));
 
-    await fs.writeJson(path.join(appsDir, 'shell', 'mfjs.app.json'), { name: 'shell', type: 'host', port: 3000 });
-    await fs.writeJson(path.join(appsDir, 'dashboard', 'mfjs.app.json'), { name: 'dashboard', type: 'remote', port: 3001 });
+    await fs.writeJson(path.join(appsDir, 'shell', 'moxjs.app.json'), { name: 'shell', type: 'host', port: 3000 });
+    await fs.writeJson(path.join(appsDir, 'dashboard', 'moxjs.app.json'), { name: 'dashboard', type: 'remote', port: 3001 });
 
     await run(['--dir', tmp], tmp);
 
-    expect(await fs.pathExists(path.join(appsDir, 'shell', 'mfjs.federation.json'))).toBe(true);
-    expect(await fs.pathExists(path.join(appsDir, 'dashboard', 'mfjs.federation.json'))).toBe(true);
+    expect(await fs.pathExists(path.join(appsDir, 'shell', 'moxjs.federation.json'))).toBe(true);
+    expect(await fs.pathExists(path.join(appsDir, 'dashboard', 'moxjs.federation.json'))).toBe(true);
   });
 
-  it('proxy mode writes mfjs.federation.proxy.json for the host', async () => {
-  const workspaceDir = (await fs.mkdtemp(path.join(os.tmpdir(), 'mfjs-dev-proxy-'))) as string;
+  it('proxy mode writes moxjs.federation.proxy.json for the host', async () => {
+  const workspaceDir = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-dev-proxy-'))) as string;
 
     // Minimal workspace
     await fs.ensureDir(path.join(workspaceDir, 'apps', 'shell'));
     await fs.ensureDir(path.join(workspaceDir, 'apps', 'dashboard'));
 
-    await fs.writeJson(path.join(workspaceDir, 'apps', 'shell', 'mfjs.app.json'), {
+    await fs.writeJson(path.join(workspaceDir, 'apps', 'shell', 'moxjs.app.json'), {
       name: 'shell',
       type: 'host',
       port: 3000
     });
-    await fs.writeJson(path.join(workspaceDir, 'apps', 'dashboard', 'mfjs.app.json'), {
+    await fs.writeJson(path.join(workspaceDir, 'apps', 'dashboard', 'moxjs.app.json'), {
       name: 'dashboard',
       type: 'remote',
       port: 3001
     });
 
     // Pretend federation already exists.
-    await fs.writeJson(path.join(workspaceDir, 'apps', 'shell', 'mfjs.federation.json'), {
+    await fs.writeJson(path.join(workspaceDir, 'apps', 'shell', 'moxjs.federation.json'), {
       name: 'shell',
       filename: 'remoteEntry.js',
       remotes: {
@@ -115,9 +115,9 @@ describe('mfjs dev', () => {
     devCommand.exitOverride();
     await devCommand.parseAsync(['--dir', workspaceDir, '--proxy-remotes'], { from: 'user' });
 
-    const proxyCfgPath = path.join(workspaceDir, 'apps', 'shell', 'mfjs.federation.proxy.json');
+    const proxyCfgPath = path.join(workspaceDir, 'apps', 'shell', 'moxjs.federation.proxy.json');
     const proxyCfg = await fs.readJson(proxyCfgPath);
-    expect(proxyCfg.remotes.dashboard).toBe('dashboard@http://localhost:3000/mfjs/remotes/dashboard/remoteEntry.js');
+    expect(proxyCfg.remotes.dashboard).toBe('dashboard@http://localhost:3000/moxjs/remotes/dashboard/remoteEntry.js');
 
   // Also ensure the host process is started with federation override env.
     const calls = (spawn as unknown as { mock: { calls: any[][] } }).mock.calls;
@@ -126,41 +126,41 @@ describe('mfjs dev', () => {
         (c[0] === 'pnpm' || c[0] === 'pnpm.cmd') &&
         Array.isArray(c[1]) &&
         (c[1][0] === 'dev' || (c[1][0] === 'run' && c[1][1] === 'dev')) &&
-        String(c[2]?.cwd || '').includes('mfjs-dev-proxy-') &&
+        String(c[2]?.cwd || '').includes('moxjs-dev-proxy-') &&
         // Accept both POSIX and Windows separators.
         /[\\/]apps[\\/]shell$/.test(String(c[2]?.cwd || '')),
     );
   expect(hostSpawnCall).toBeTruthy();
-    expect(hostSpawnCall?.[2]?.env?.MFJS_FEDERATION_FILE).toBe('mfjs.federation.proxy.json');
+    expect(hostSpawnCall?.[2]?.env?.MOXJS_FEDERATION_FILE).toBe('moxjs.federation.proxy.json');
   });
 
   it('does not auto-generate federation configs when --no-federation is used', async () => {
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'mfjs-cli-'))) as string;
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-cli-'))) as string;
     const appsDir = path.join(tmp, 'apps');
     await fs.ensureDir(path.join(appsDir, 'shell'));
     await fs.ensureDir(path.join(appsDir, 'dashboard'));
 
-    await fs.writeJson(path.join(appsDir, 'shell', 'mfjs.app.json'), { name: 'shell', type: 'host', port: 3000 });
-    await fs.writeJson(path.join(appsDir, 'dashboard', 'mfjs.app.json'), { name: 'dashboard', type: 'remote', port: 3001 });
+    await fs.writeJson(path.join(appsDir, 'shell', 'moxjs.app.json'), { name: 'shell', type: 'host', port: 3000 });
+    await fs.writeJson(path.join(appsDir, 'dashboard', 'moxjs.app.json'), { name: 'dashboard', type: 'remote', port: 3001 });
 
     await run(['--dir', tmp, '--no-federation'], tmp);
 
-    expect(await fs.pathExists(path.join(appsDir, 'shell', 'mfjs.federation.json'))).toBe(false);
-    expect(await fs.pathExists(path.join(appsDir, 'dashboard', 'mfjs.federation.json'))).toBe(false);
+    expect(await fs.pathExists(path.join(appsDir, 'shell', 'moxjs.federation.json'))).toBe(false);
+    expect(await fs.pathExists(path.join(appsDir, 'dashboard', 'moxjs.federation.json'))).toBe(false);
   });
 
   it('SIGINT terminates all spawned child processes', async () => {
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'mfjs-sigint-'))) as string;
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-sigint-'))) as string;
     const appsDir = path.join(tmp, 'apps');
     await fs.ensureDir(path.join(appsDir, 'shell'));
     await fs.ensureDir(path.join(appsDir, 'dashboard'));
 
-    await fs.writeJson(path.join(appsDir, 'shell', 'mfjs.app.json'), {
+    await fs.writeJson(path.join(appsDir, 'shell', 'moxjs.app.json'), {
       name: 'shell',
       type: 'host',
       port: 3000,
     });
-    await fs.writeJson(path.join(appsDir, 'dashboard', 'mfjs.app.json'), {
+    await fs.writeJson(path.join(appsDir, 'dashboard', 'moxjs.app.json'), {
       name: 'dashboard',
       type: 'remote',
       port: 3001,
@@ -192,24 +192,24 @@ describe('mfjs dev', () => {
 
 // ── Dev server proxy rules ────────────────────────────────────────────────────
 
-describe('mfjs dev — proxy rules', () => {
+describe('moxjs dev — proxy rules', () => {
   it('proxy remoteEntry: rewrites remote URL to same-origin proxy path on host port', async () => {
-    const workspaceDir = (await fs.mkdtemp(path.join(os.tmpdir(), 'mfjs-proxy-get-'))) as string;
+    const workspaceDir = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-proxy-get-'))) as string;
 
     await fs.ensureDir(path.join(workspaceDir, 'apps', 'shell'));
     await fs.ensureDir(path.join(workspaceDir, 'apps', 'dashboard'));
 
-    await fs.writeJson(path.join(workspaceDir, 'apps', 'shell', 'mfjs.app.json'), {
+    await fs.writeJson(path.join(workspaceDir, 'apps', 'shell', 'moxjs.app.json'), {
       name: 'shell',
       type: 'host',
       port: 3000,
     });
-    await fs.writeJson(path.join(workspaceDir, 'apps', 'dashboard', 'mfjs.app.json'), {
+    await fs.writeJson(path.join(workspaceDir, 'apps', 'dashboard', 'moxjs.app.json'), {
       name: 'dashboard',
       type: 'remote',
       port: 3001,
     });
-    await fs.writeJson(path.join(workspaceDir, 'apps', 'shell', 'mfjs.federation.json'), {
+    await fs.writeJson(path.join(workspaceDir, 'apps', 'shell', 'moxjs.federation.json'), {
       name: 'shell',
       filename: 'remoteEntry.js',
       remotes: {
@@ -221,20 +221,20 @@ describe('mfjs dev — proxy rules', () => {
     await devCommand.parseAsync(['--dir', workspaceDir, '--proxy-remotes'], { from: 'user' });
 
     // The proxy federation config rewrites the remote entry URL to the same-origin proxy path:
-    // GET /mfjs/remotes/dashboard/remoteEntry.js  →  forwards to  http://localhost:3001/remoteEntry.js
+    // GET /moxjs/remotes/dashboard/remoteEntry.js  →  forwards to  http://localhost:3001/remoteEntry.js
     const proxyCfg = await fs.readJson(
-      path.join(workspaceDir, 'apps', 'shell', 'mfjs.federation.proxy.json')
+      path.join(workspaceDir, 'apps', 'shell', 'moxjs.federation.proxy.json')
     );
 
     // Proxy URL encodes the forwarding target in a same-origin path on port 3000 (host port).
     expect(proxyCfg.remotes.dashboard).toBe(
-      'dashboard@http://localhost:3000/mfjs/remotes/dashboard/remoteEntry.js'
+      'dashboard@http://localhost:3000/moxjs/remotes/dashboard/remoteEntry.js'
     );
 
-    // The proxy path segment encodes the actual remote target: /mfjs/remotes/<name>/remoteEntry.js
+    // The proxy path segment encodes the actual remote target: /moxjs/remotes/<name>/remoteEntry.js
     // which rspack devServer proxy rules forward to http://localhost:3001/remoteEntry.js
-    const proxyPath = '/mfjs/remotes/dashboard/remoteEntry.js';
-    const targetUrl = `http://localhost:3001${proxyPath.replace(/^\/mfjs\/remotes\/dashboard/, '')}`;
+    const proxyPath = '/moxjs/remotes/dashboard/remoteEntry.js';
+    const targetUrl = `http://localhost:3001${proxyPath.replace(/^\/moxjs\/remotes\/dashboard/, '')}`;
     expect(targetUrl).toBe('http://localhost:3001/remoteEntry.js');
   });
 });

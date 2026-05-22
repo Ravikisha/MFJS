@@ -1,10 +1,10 @@
-# MFJS SaaS example
+# MOXJS SaaS example
 
-This example focuses on **SSR/SSG** using `mfjs ssr export`.
+This example focuses on **SSR/SSG** using `moxjs ssr export`.
 
 ## What it demonstrates
 
-- `mfjs ssr export` producing a static HTML output directory (`dist-ssg/`)
+- `moxjs ssr export` producing a static HTML output directory (`dist-ssg/`)
 - A small “marketing + app” route set
 
 ## Scripts

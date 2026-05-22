@@ -22,10 +22,10 @@ const DEFAULT_SUSPICIOUS_PATTERNS: Array<{ pattern: string; regex: RegExp; messa
     pattern: "import('remote/App')",
     regex: /import\(\s*['\"][^'\"]+\/[A-Za-z0-9_.-]+['\"]\s*\)/g,
     message:
-      'Detected dynamic import of a federation exposed module in built output. Prefer loading remotes via @mfjs/runtime loadRemoteModule in the host runtime so the bundle stays lean.',
+      'Detected dynamic import of a federation exposed module in built output. Prefer loading remotes via @moxjs/runtime loadRemoteModule in the host runtime so the bundle stays lean.',
   },
   {
-    pattern: 'mfjs: eager remote entry reference',
+    pattern: 'moxjs: eager remote entry reference',
     regex: /remoteEntry\.js/g,
     message:
       'Detected remoteEntry.js string in a bundle. This can indicate the build inlined remote entry URLs. Ensure remotes are configured as runtime remotes (name@url) and loaded at runtime.',

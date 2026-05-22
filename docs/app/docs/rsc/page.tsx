@@ -27,9 +27,9 @@ export default function Rsc() {
 
       <h2>Our approach when RSC lands</h2>
       <ol>
-        <li>Add <code>@mfjs/rsc</code> package with RSC-aware remote loader.</li>
+        <li>Add <code>@moxjs/rsc</code> package with RSC-aware remote loader.</li>
         <li>Extend <code>RemoteOutlet</code> to accept an RSC payload stream.</li>
-        <li>Ship <code>createRscHandler</code> in <code>@mfjs/ssr</code> for edge runtimes.</li>
+        <li>Ship <code>createRscHandler</code> in <code>@moxjs/ssr</code> for edge runtimes.</li>
         <li>Document the server/client split — <code>"use client"</code> boundary marks.</li>
       </ol>
 

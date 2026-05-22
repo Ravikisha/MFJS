@@ -25,7 +25,7 @@ export function safeJsonForScript(value: unknown): string {
     json = JSON.stringify(value);
   } catch (err) {
     throw new Error(
-      `[mfjs/security] safeJsonForScript: failed to serialize value (${
+      `[moxjs/security] safeJsonForScript: failed to serialize value (${
         err instanceof Error ? err.message : String(err)
       }). Avoid circular references in SSR state.`,
     );

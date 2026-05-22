@@ -1,6 +1,6 @@
-# MFJS Production Readiness Plan
+# MOXJS Production Readiness Plan
 
-Audit of current MFJS micro-frontend framework vs production-grade targets (Next.js / Nx parity). Lists what exists, what gaps remain, prioritized roadmap to ship.
+Audit of current MOXJS micro-frontend framework vs production-grade targets (Next.js / Nx parity). Lists what exists, what gaps remain, prioritized roadmap to ship.
 
 ---
 
@@ -27,7 +27,7 @@ Audit of current MFJS micro-frontend framework vs production-grade targets (Next
 ## Strengths (Keep)
 
 - Opinionated CLI — fast scaffold (Rspack + React + federation).
-- Type-safe federation contracts via `@mfjs/types` (`InferExposed` / `InferEmits` / `InferListens`).
+- Type-safe federation contracts via `@moxjs/types` (`InferExposed` / `InferEmits` / `InferListens`).
 - Lightweight runtime. Router + remote loader small, no heavy deps.
 - File-based routes with `:param` + `*` splat.
 - SSR primitives built: `renderRouteToString`, `renderRouteToStream`, `staticExport`, `createEdgeAdapter`, `ssrRenderRemote`.
@@ -50,14 +50,14 @@ Audit of current MFJS micro-frontend framework vs production-grade targets (Next
 - `localStorage` remote cache in plaintext.
 - No auth/session propagation primitives.
 - No sandbox option (main thread only).
-- **Action:** ship `@mfjs/security` helpers. CSP builder, SRI hash generator at build, allowlist config in `mfjs.config.ts`, iframe-sandbox remote option, OAuth/session propagation example + helper hook.
+- **Action:** ship `@moxjs/security` helpers. CSP builder, SRI hash generator at build, allowlist config in `moxjs.config.ts`, iframe-sandbox remote option, OAuth/session propagation example + helper hook.
 
 ### 3. Observability
 - No structured logger. Only `console.log` + `console.error`.
 - No error reporting hook (Sentry/Rollbar/DataDog).
 - No perf metrics collection (LCP/FCP/CLS/TTFB).
 - No remote-load telemetry (load time, failure count, retries).
-- **Action:** `@mfjs/observability` package. `onError(fn)`, `onMetric(fn)`, `onRemoteLoad(fn)` hooks. Adapter stubs for Sentry, OTEL. Web Vitals collector. Include in runtime default (noop unless wired).
+- **Action:** `@moxjs/observability` package. `onError(fn)`, `onMetric(fn)`, `onRemoteLoad(fn)` hooks. Adapter stubs for Sentry, OTEL. Web Vitals collector. Include in runtime default (noop unless wired).
 
 ### 4. Production Runtime Gaps
 - No Suspense wrapper for `RemoteOutlet` — devs must wrap manually.
@@ -86,27 +86,27 @@ Audit of current MFJS micro-frontend framework vs production-grade targets (Next
 - No CSS isolation (global leak possible).
 - No asset `publicPath` config for CDN deployment.
 - No build stats output (shared versions, conflicts).
-- No schema validation for `mfjs.federation.json` + `mfjs.app.json`.
-- **Action:** `RemoteRegistry` singleton with runtime `register(name, url)`. Version compare + warn in `loadRemoteEntry`. CSS module / scoped CSS generator option. `publicPath` field in `mfjs.config.ts`. `mfjs build --stats` JSON output. Zod schemas published to `https://mfjs.dev/schemas/*`.
+- No schema validation for `moxjs.federation.json` + `moxjs.app.json`.
+- **Action:** `RemoteRegistry` singleton with runtime `register(name, url)`. Version compare + warn in `loadRemoteEntry`. CSS module / scoped CSS generator option. `publicPath` field in `moxjs.config.ts`. `moxjs build --stats` JSON output. Zod schemas published to `https://moxjs.dev/schemas/*`.
 
 ### 7. Deployment Adapters
 - Only Netlify workflow generated.
 - No Vercel, Cloudflare Pages, Cloudflare Workers, AWS Amplify, Docker.
 - No CDN push command.
 - No env validation / `.env.example` generator.
-- **Action:** adapter packages `@mfjs/adapter-vercel`, `@mfjs/adapter-cloudflare`, `@mfjs/adapter-node`, `@mfjs/adapter-docker`. `mfjs deploy --target=<adapter>`. `mfjs env check` validates required vars.
+- **Action:** adapter packages `@moxjs/adapter-vercel`, `@moxjs/adapter-cloudflare`, `@moxjs/adapter-node`, `@moxjs/adapter-docker`. `moxjs deploy --target=<adapter>`. `moxjs env check` validates required vars.
 
 ---
 
 ## High-Value Additions (v0.5 → v1.0)
 
 ### 8. CLI Enhancements
-- Missing: `mfjs lint`, `mfjs test`, `mfjs deploy`, `mfjs routes --watch`, `mfjs diagnose`, `--dry-run`, `--verbose`.
-- Partial: `mfjs image`, `mfjs lazy` (stubbed only).
+- Missing: `moxjs lint`, `moxjs test`, `moxjs deploy`, `moxjs routes --watch`, `moxjs diagnose`, `--dry-run`, `--verbose`.
+- Partial: `moxjs image`, `moxjs lazy` (stubbed only).
 - **Action:** wrap existing tooling into uniform subcommands. Diagnostic command checks Node version, pnpm version, federation config health, port conflicts, missing deps.
 
 ### 9. Shared Configs (DX Multiplier)
-- No `@mfjs/eslint-config`, `@mfjs/prettier-config`, `@mfjs/tsconfig`, `@mfjs/tailwind-preset`.
+- No `@moxjs/eslint-config`, `@moxjs/prettier-config`, `@moxjs/tsconfig`, `@moxjs/tailwind-preset`.
 - Each generated app copy-pastes config.
 - **Action:** extract shared configs into packages. Generated apps extend via `extends` / `preset`. Version-pin.
 
@@ -120,45 +120,45 @@ Audit of current MFJS micro-frontend framework vs production-grade targets (Next
 - **Action:** add middleware API. `createSelector()`. `persist()` wrapper. `serialize()`/`hydrate()` on store. Optional replay buffer (bounded ring). Redux DevTools bridge.
 
 ### 11. Design System + UI
-- `@mfjs/ui` is stub `Button()` only.
+- `@moxjs/ui` is stub `Button()` only.
 - No Storybook.
 - No design tokens / tailwind preset.
 - **Action:** build actual component library (Button, Input, Modal, Tabs, Toast, Dropdown). Storybook in docs site. Tailwind preset package. Design tokens as CSS vars + TS exports.
 
 ### 12. i18n
 - None shipped.
-- **Action:** `@mfjs/i18n` wrapper around `formatjs` or `i18next`. Per-remote message catalogs. SSR locale detection via `Accept-Language`.
+- **Action:** `@moxjs/i18n` wrapper around `formatjs` or `i18next`. Per-remote message catalogs. SSR locale detection via `Accept-Language`.
 
 ### 13. Testing Coverage
 - Contract tests absent — remote→host compatibility not validated.
 - No visual regression (Playwright screenshot compare).
 - No a11y (jest-axe / axe-playwright).
 - Routes generator untested.
-- E2E gated behind `MFJS_E2E=1` — CI may skip.
+- E2E gated behind `MOXJS_E2E=1` — CI may skip.
 - **Action:** generate contract-test file from `defineFederationContract()`. Add `@playwright/experimental-ct-react` + snapshot diff. Axe runs on e2e. Unit tests for `generateRoutesFile()`. Remove opt-in gate in CI.
 
 ### 14. Performance
-- `mfjs perf` budget-check exists but no bundle analyzer.
+- `moxjs perf` budget-check exists but no bundle analyzer.
 - No lighthouse CI integration.
 - No automatic image optimization (command stub only).
 - No historical perf tracking.
-- **Action:** wire `rspack-bundle-analyzer`. Lighthouse GH Action in scaffolded CI. Implement `mfjs image` via `sharp`. Output `perf.json` artifact per build for trending.
+- **Action:** wire `rspack-bundle-analyzer`. Lighthouse GH Action in scaffolded CI. Implement `moxjs image` via `sharp`. Output `perf.json` artifact per build for trending.
 
 ### 15. Docs Completeness
 - No auto-generated API reference.
 - No production deployment checklist.
 - No troubleshooting / FAQ.
 - No migration guide (v0 → v1).
-- Schema URL `https://mfjs.dev/schemas/...` referenced but not published.
+- Schema URL `https://moxjs.dev/schemas/...` referenced but not published.
 - **Action:** TypeDoc → Starlight. Dedicated pages: "Production Checklist", "Troubleshooting", "Upgrading", "Advanced Routing", "Cross-Remote Auth". Publish schemas.
 
 ---
 
 ## Innovation Layer (v1.x+)
 
-- **Dynamic remote discovery**: registry service + `mfjs.config.ts` `discover: { url }`. Remotes self-register at deploy time.
-- **Visual route editor**: web UI → flowchart → generates `mfjs.routes.host.json`.
-- **Perf dashboard during dev**: live size/load metrics per remote in `mfjs dev` output.
+- **Dynamic remote discovery**: registry service + `moxjs.config.ts` `discover: { url }`. Remotes self-register at deploy time.
+- **Visual route editor**: web UI → flowchart → generates `moxjs.routes.host.json`.
+- **Perf dashboard during dev**: live size/load metrics per remote in `moxjs dev` output.
 - **Runtime resilience**: auto-fallback on remote 404/timeout — cached last-good version or disabled-state UI.
 - **One-click deploy integration**: partnership with Zephyr Cloud / Netlify / Vercel for single-command MFE push.
 - **Framework adapters**: Vue + Angular + Svelte via pluggable scaffolders. Core runtime already framework-agnostic at remote-loader level.
@@ -171,14 +171,14 @@ Audit of current MFJS micro-frontend framework vs production-grade targets (Next
 
 ### Phase 0 — Stabilize (2 weeks)
 1. Changesets + release pipeline. Bump to `0.1.0`.
-2. Schema publish (`mfjs.config`, `mfjs.app`, `mfjs.federation`).
+2. Schema publish (`moxjs.config`, `moxjs.app`, `moxjs.federation`).
 3. `CHANGELOG.md` per package. Git tags.
 4. Fix `0.0.0` versioning everywhere.
-5. Shared `@mfjs/eslint-config`, `@mfjs/tsconfig`, `@mfjs/prettier-config`.
+5. Shared `@moxjs/eslint-config`, `@moxjs/tsconfig`, `@moxjs/prettier-config`.
 
 ### Phase 1 — Production Minimums (4 weeks)
 1. Security: CSP builder + SRI + remote allowlist + auth hook.
-2. Observability: `@mfjs/observability` + error/metric/remote-load hooks + Sentry adapter.
+2. Observability: `@moxjs/observability` + error/metric/remote-load hooks + Sentry adapter.
 3. Runtime: Suspense + 404 + guards + timeout config + `useSearchParams` / `useParams` / `useRemoteData`.
 4. SSR: cache headers, redirects, state serialization + hydration helpers.
 5. Federation: runtime `RemoteRegistry`, version-mismatch warn, CSS isolation option, `publicPath` config.
@@ -186,11 +186,11 @@ Audit of current MFJS micro-frontend framework vs production-grade targets (Next
 7. CLI: `lint`, `test`, `deploy`, `diagnose`, `routes --watch`.
 
 ### Phase 2 — DX + Ecosystem (6 weeks)
-1. Design system: real `@mfjs/ui` components + Storybook + Tailwind preset.
+1. Design system: real `@moxjs/ui` components + Storybook + Tailwind preset.
 2. State upgrades: middleware, selectors, persistence, SSR hydrate, devtools.
 3. i18n package.
 4. Contract tests + visual regression + a11y.
-5. Bundle analyzer + Lighthouse CI + `mfjs image` via sharp.
+5. Bundle analyzer + Lighthouse CI + `moxjs image` via sharp.
 6. API reference (TypeDoc) + production checklist + troubleshooting + migration docs.
 
 ### Phase 3 — Innovation (ongoing)
@@ -207,19 +207,19 @@ Audit of current MFJS micro-frontend framework vs production-grade targets (Next
 
 | Package | Purpose | Phase |
 |---|---|---|
-| `@mfjs/eslint-config` | Shared lint rules | 0 |
-| `@mfjs/tsconfig` | Shared TS base | 0 |
-| `@mfjs/prettier-config` | Shared formatter | 0 |
-| `@mfjs/security` | CSP, SRI, allowlist | 1 |
-| `@mfjs/observability` | Error/metric/telemetry hooks | 1 |
-| `@mfjs/adapter-vercel` | Vercel deploy | 1 |
-| `@mfjs/adapter-cloudflare` | CF Pages + Workers | 1 |
-| `@mfjs/adapter-node` | Node.js server | 1 |
-| `@mfjs/adapter-docker` | Dockerfile scaffold | 1 |
-| `@mfjs/tailwind-preset` | Design tokens | 2 |
-| `@mfjs/i18n` | Translations + SSR | 2 |
-| `@mfjs/devtools` | Redux DevTools bridge | 2 |
-| `@mfjs/discovery` | Runtime remote registry | 3 |
+| `@moxjs/eslint-config` | Shared lint rules | 0 |
+| `@moxjs/tsconfig` | Shared TS base | 0 |
+| `@moxjs/prettier-config` | Shared formatter | 0 |
+| `@moxjs/security` | CSP, SRI, allowlist | 1 |
+| `@moxjs/observability` | Error/metric/telemetry hooks | 1 |
+| `@moxjs/adapter-vercel` | Vercel deploy | 1 |
+| `@moxjs/adapter-cloudflare` | CF Pages + Workers | 1 |
+| `@moxjs/adapter-node` | Node.js server | 1 |
+| `@moxjs/adapter-docker` | Dockerfile scaffold | 1 |
+| `@moxjs/tailwind-preset` | Design tokens | 2 |
+| `@moxjs/i18n` | Translations + SSR | 2 |
+| `@moxjs/devtools` | Redux DevTools bridge | 2 |
+| `@moxjs/discovery` | Runtime remote registry | 3 |
 
 ---
 
@@ -228,8 +228,8 @@ Audit of current MFJS micro-frontend framework vs production-grade targets (Next
 1. Decide SemVer strategy. Bump packages `0.0.0 → 0.1.0`.
 2. Install `@changesets/cli`. Add `.changeset/config.json`.
 3. Write `.github/workflows/release.yml` — publish on changeset-version merge.
-4. Create `@mfjs/eslint-config`, `@mfjs/tsconfig` packages. Migrate repo apps.
-5. Publish JSON schemas referenced by generated `mfjs.config.ts`.
+4. Create `@moxjs/eslint-config`, `@moxjs/tsconfig` packages. Migrate repo apps.
+5. Publish JSON schemas referenced by generated `moxjs.config.ts`.
 6. Add `CHANGELOG.md` per package with initial `0.1.0` entry.
 
 ---

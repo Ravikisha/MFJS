@@ -41,10 +41,10 @@ export default function Home() {
 /* ── Hero ──────────────────────────────────────────────────────────────── */
 
 function Hero() {
-  const cliCmd = `npx @mfjs/cli@latest init my-app`;
+  const cliCmd = `npx @moxjs/cli@latest init my-app`;
   const exampleCode = `// apps/shell/src/main.tsx
-import { createRouter, RemoteOutlet } from '@mfjs/runtime';
-import { remotes } from './mfjs.routes.host';
+import { createRouter, RemoteOutlet } from '@moxjs/runtime';
+import { remotes } from './moxjs.routes.host';
 
 const router = createRouter({
   remotes,
@@ -70,7 +70,7 @@ export default function App() {
               <span className="gradient-text">production teams reach for.</span>
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-              MFJS gives you Next.js-level DX on top of Rspack Module Federation. Zero-config
+              MOXJS gives you Next.js-level DX on top of Rspack Module Federation. Zero-config
               workspaces, typed federation contracts, file-based routing, SSR &amp; static export,
               edge adapters, and a CLI that just works.
             </p>
@@ -81,7 +81,7 @@ export default function App() {
               <ButtonLink href="/docs/concepts" variant="outline" size="lg">
                 Read the concepts
               </ButtonLink>
-              <ButtonLink href="https://github.com/mfjs/mfjs" external variant="ghost" size="lg">
+              <ButtonLink href="https://github.com/moxjs/moxjs" external variant="ghost" size="lg">
                 <GitHubIcon /> Star on GitHub
               </ButtonLink>
             </div>
@@ -182,7 +182,7 @@ function FeatureGrid() {
     {
       icon: <NetworkIcon />,
       title: 'Zero-config federation',
-      body: 'Auto-detects exposes, shared deps, and remote URLs from mfjs.app.json. No webpack wrestling.',
+      body: 'Auto-detects exposes, shared deps, and remote URLs from moxjs.app.json. No webpack wrestling.',
     },
     {
       icon: <CodeIcon />,
@@ -212,7 +212,7 @@ function FeatureGrid() {
     {
       icon: <RocketIcon />,
       title: 'Deploy anywhere',
-      body: 'Adapters for Vercel Edge, Cloudflare Workers/Pages, Node.js, and Docker. One mfjs deploy.',
+      body: 'Adapters for Vercel Edge, Cloudflare Workers/Pages, Node.js, and Docker. One moxjs deploy.',
     },
     {
       icon: <PuzzleIcon />,
@@ -225,12 +225,12 @@ function FeatureGrid() {
     <section className="border-b border-border py-20 md:py-28">
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center">
-          <Badge variant="outline">Why MFJS</Badge>
+          <Badge variant="outline">Why MOXJS</Badge>
           <h2 className="mt-4 text-3xl font-bold tracking-tight md:text-4xl">
             Everything a production MFE stack needs
           </h2>
           <p className="mt-4 text-muted-foreground">
-            Drop the YAML graveyard. MFJS gives you the small, opinionated runtime that&apos;s
+            Drop the YAML graveyard. MOXJS gives you the small, opinionated runtime that&apos;s
             already shipped to thousands of users — without locking you out of the bundler.
           </p>
         </div>
@@ -260,7 +260,7 @@ function FeatureGrid() {
 function FrameworksAndDeploys() {
   const frameworks = [
     { name: 'React 18 / 19', body: 'First-class. Hooks, Suspense, Server Components, transitions.' },
-    { name: 'Vue 3', body: 'Mount Vue remotes via the runtime; share state through @mfjs/event-bus.' },
+    { name: 'Vue 3', body: 'Mount Vue remotes via the runtime; share state through @moxjs/event-bus.' },
     { name: 'Web Components', body: 'Drop any custom-element remote — Shadow DOM isolation built in.' },
     { name: 'Solid / Svelte', body: 'Federation works at the bundler level, agnostic to UI library.' },
   ];
@@ -279,7 +279,7 @@ function FrameworksAndDeploys() {
             Bring any framework. Federate anything.
           </h2>
           <p className="mt-3 text-muted-foreground">
-            Module Federation is a bundler concept — MFJS is framework-agnostic at the seam. Use
+            Module Federation is a bundler concept — MOXJS is framework-agnostic at the seam. Use
             React in the host and Vue in a remote, or ship plain Web Components.
           </p>
           <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -303,7 +303,7 @@ function FrameworksAndDeploys() {
             One CLI. Every runtime.
           </h2>
           <p className="mt-3 text-muted-foreground">
-            <code className="rounded bg-secondary px-1 py-0.5 text-foreground">mfjs deploy</code>{' '}
+            <code className="rounded bg-secondary px-1 py-0.5 text-foreground">moxjs deploy</code>{' '}
             dynamically loads the right adapter package — Vercel Edge, Cloudflare, or Node — and
             scaffolds a working config in seconds.
           </p>
@@ -330,15 +330,15 @@ function FrameworksAndDeploys() {
 /* ── Code showcase ─────────────────────────────────────────────────────── */
 
 function CodeShowcase() {
-  const config = `// mfjs.config.ts
-import type { MfjsWorkspaceConfig } from '@mfjs/types';
+  const config = `// moxjs.config.ts
+import type { MoxjsWorkspaceConfig } from '@moxjs/types';
 
-const config: MfjsWorkspaceConfig = {
+const config: MoxjsWorkspaceConfig = {
   name: 'shop',
   appsDir: 'apps',
   features: { tailwind: true },
   federation: {
-    shared: ['react', 'react-dom', '@mfjs/event-bus'],
+    shared: ['react', 'react-dom', '@moxjs/event-bus'],
     allowlist: ['*.acme.dev', '**.cdn.cloudflare.net'],
     sri: true,
   },
@@ -347,8 +347,8 @@ const config: MfjsWorkspaceConfig = {
 export default config;`;
 
   const remote = `// apps/dashboard/src/pages/users/[id].tsx
-import { useParams } from '@mfjs/runtime';
-import { useRemoteData } from '@mfjs/runtime';
+import { useParams } from '@moxjs/runtime';
+import { useRemoteData } from '@moxjs/runtime';
 
 export default function UserPage() {
   const { id } = useParams<{ id: string }>();
@@ -375,7 +375,7 @@ export default function UserPage() {
           </p>
         </div>
         <div className="mt-14 grid gap-6 lg:grid-cols-2">
-          <CodeBlock code={config} filename="mfjs.config.ts" language="ts" />
+          <CodeBlock code={config} filename="moxjs.config.ts" language="ts" />
           <CodeBlock code={remote} filename="apps/dashboard/src/pages/users/[id].tsx" language="tsx" />
         </div>
       </div>
@@ -387,18 +387,18 @@ export default function UserPage() {
 
 function PackageMatrix() {
   const pkgs = [
-    { name: '@mfjs/cli', icon: <TerminalIcon />, body: 'Project scaffolding, dev orchestration, deploy.' },
-    { name: '@mfjs/runtime', icon: <BoltIcon />, body: 'Router, remote loader, hooks, telemetry, guards.' },
-    { name: '@mfjs/ssr', icon: <ServerIcon />, body: 'Render to string/stream, static export, edge adapter.' },
-    { name: '@mfjs/security', icon: <ShieldIcon />, body: 'CSP, SRI, allowlist, safe JSON hydration.' },
-    { name: '@mfjs/observability', icon: <ChartIcon />, body: 'onError / onMetric / onRemoteLoad + Web Vitals.' },
-    { name: '@mfjs/state', icon: <BoxIcon />, body: 'Singleton store registry + React adapter + persistence.' },
-    { name: '@mfjs/event-bus', icon: <NetworkIcon />, body: 'Typed pub/sub. onAny + replay + per-bus errors.' },
-    { name: '@mfjs/types', icon: <LayersIcon />, body: 'Federation contracts. JSON schemas for config files.' },
-    { name: '@mfjs/ui', icon: <PaletteIcon />, body: 'Headless primitives — Button, ThemeProvider.' },
-    { name: '@mfjs/adapter-vercel', icon: <GlobeIcon />, body: 'Vercel Edge functions + immutable assets.' },
-    { name: '@mfjs/adapter-cloudflare', icon: <GlobeIcon />, body: 'Cloudflare Workers + Pages Functions.' },
-    { name: '@mfjs/adapter-node', icon: <ServerIcon />, body: 'Hardened Node HTTP server + Docker template.' },
+    { name: '@moxjs/cli', icon: <TerminalIcon />, body: 'Project scaffolding, dev orchestration, deploy.' },
+    { name: '@moxjs/runtime', icon: <BoltIcon />, body: 'Router, remote loader, hooks, telemetry, guards.' },
+    { name: '@moxjs/ssr', icon: <ServerIcon />, body: 'Render to string/stream, static export, edge adapter.' },
+    { name: '@moxjs/security', icon: <ShieldIcon />, body: 'CSP, SRI, allowlist, safe JSON hydration.' },
+    { name: '@moxjs/observability', icon: <ChartIcon />, body: 'onError / onMetric / onRemoteLoad + Web Vitals.' },
+    { name: '@moxjs/state', icon: <BoxIcon />, body: 'Singleton store registry + React adapter + persistence.' },
+    { name: '@moxjs/event-bus', icon: <NetworkIcon />, body: 'Typed pub/sub. onAny + replay + per-bus errors.' },
+    { name: '@moxjs/types', icon: <LayersIcon />, body: 'Federation contracts. JSON schemas for config files.' },
+    { name: '@moxjs/ui', icon: <PaletteIcon />, body: 'Headless primitives — Button, ThemeProvider.' },
+    { name: '@moxjs/adapter-vercel', icon: <GlobeIcon />, body: 'Vercel Edge functions + immutable assets.' },
+    { name: '@moxjs/adapter-cloudflare', icon: <GlobeIcon />, body: 'Cloudflare Workers + Pages Functions.' },
+    { name: '@moxjs/adapter-node', icon: <ServerIcon />, body: 'Hardened Node HTTP server + Docker template.' },
   ];
   return (
     <section className="border-b border-border py-20 md:py-28">
@@ -440,7 +440,7 @@ function Testimonials() {
   const quotes = [
     {
       quote:
-        'We had a Rspack + Module Federation monorepo we were terrified to touch. Migrated to MFJS in a weekend; the CLI did 90% of the wiring.',
+        'We had a Rspack + Module Federation monorepo we were terrified to touch. Migrated to MOXJS in a weekend; the CLI did 90% of the wiring.',
       author: 'Brandon Cranston',
       role: 'Co-founder / CTO, fictional',
     },

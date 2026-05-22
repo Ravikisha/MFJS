@@ -1,15 +1,15 @@
 {
-  "name": "@mfjs/state",
+  "name": "@moxjs/state",
   "version": "0.1.0",
-  "description": "Lightweight shared-state primitives for MFJS micro-frontends (Redux-style store + simple observable store).",
+  "description": "Lightweight shared-state primitives for MOXJS micro-frontends (Redux-style store + simple observable store).",
   "license": "MIT",
-  "homepage": "https://github.com/anthropics/MFJS#readme",
+  "homepage": "https://github.com/anthropics/MOXJS#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/anthropics/MFJS.git",
+    "url": "https://github.com/anthropics/MOXJS.git",
     "directory": "libs/state"
   },
-  "keywords": ["mfjs", "module-federation", "state", "store", "micro-frontend"],
+  "keywords": ["moxjs", "module-federation", "state", "store", "micro-frontend"],
   "private": false,
   "publishConfig": { "access": "public" },
   "type": "module",

@@ -1,5 +1,5 @@
 import React from 'react';
-import { dispatchMfjsNavigate } from '@mfjs/runtime';
+import { dispatchMoxjsNavigate } from '@moxjs/runtime';
 
 type Props = { params?: Record<string, string> };
 
@@ -13,7 +13,7 @@ export default function UserProfilePage({ params = {} }: Props) {
       </p>
       <button
         data-testid="back-home"
-        onClick={() => dispatchMfjsNavigate({ to: '/' })}
+        onClick={() => dispatchMoxjsNavigate({ to: '/' })}
         style={{ padding: '8px 16px', borderRadius: 6, background: '#e5e7eb', color: '#111', border: 'none', cursor: 'pointer' }}
       >
         ← Back to Home

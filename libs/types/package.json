@@ -1,15 +1,15 @@
 {
-  "name": "@mfjs/types",
+  "name": "@moxjs/types",
   "version": "0.1.0",
-  "description": "Shared TypeScript types and runtime helpers for MFJS configs, plugins, and federation contracts.",
+  "description": "Shared TypeScript types and runtime helpers for MOXJS configs, plugins, and federation contracts.",
   "license": "MIT",
-  "homepage": "https://github.com/anthropics/MFJS#readme",
+  "homepage": "https://github.com/anthropics/MOXJS#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/anthropics/MFJS.git",
+    "url": "https://github.com/anthropics/MOXJS.git",
     "directory": "libs/types"
   },
-  "keywords": ["mfjs", "module-federation", "types", "config"],
+  "keywords": ["moxjs", "module-federation", "types", "config"],
   "private": false,
   "publishConfig": { "access": "public" },
   "type": "module",
@@ -17,9 +17,10 @@
   "types": "dist/index.d.ts",
   "exports": {
     ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
-    "./schemas/mfjs.config.json": "./schemas/mfjs.config.json",
-    "./schemas/mfjs.app.json": "./schemas/mfjs.app.json",
-    "./schemas/mfjs.federation.json": "./schemas/mfjs.federation.json",
+    "./testing": { "types": "./dist/contract-test.d.ts", "import": "./dist/contract-test.js" },
+    "./schemas/moxjs.config.json": "./schemas/moxjs.config.json",
+    "./schemas/moxjs.app.json": "./schemas/moxjs.app.json",
+    "./schemas/moxjs.federation.json": "./schemas/moxjs.federation.json",
     "./package.json": "./package.json"
   },
   "files": ["dist", "schemas", "README.md", "LICENSE"],

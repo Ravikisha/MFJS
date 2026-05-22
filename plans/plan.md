@@ -3,7 +3,7 @@ Goals and Philosophy
 The new framework is designed to make building large-scale, modular web UIs easy and productive, much like Next.js did for monolithic apps. Its core goal is to enable teams to develop independent micro frontend modules that plug together seamlessly. Each micro-frontend (MFE) is an autonomous mini-application responsible for a slice of the UI. Just as microservices broke up backend systems, MFEs “are isolated frontends for particular domains” that can be built and deployed independently
 . By default the framework will be opinionated and zero-config, providing sensible defaults and conventions (folder structure, routing, state management) so developers can focus on features instead of boilerplate. In short, the philosophy is: “scale by vertical slice, not by complexity”. Performance, scalability, and a great developer experience are first-class concerns, balancing automation with flexibility so teams can move fast without reinventing the wheel.
 Key Features
-CLI Scaffolding & Presets: A single CLI (create-mfe-app / mfjs init) to generate new projects or MFEs with one command. It should prompt for or preset everything (project name, templating engine, frameworks) and create a ready-to-run repo (monorepo or multi-repo) with a host container and one or more remotes. Inspired by Next.js and Nx, commands like mfjs generate host <name> and mfjs generate remote <name> will bootstrap each piece
+CLI Scaffolding & Presets: A single CLI (create-mfe-app / moxjs init) to generate new projects or MFEs with one command. It should prompt for or preset everything (project name, templating engine, frameworks) and create a ready-to-run repo (monorepo or multi-repo) with a host container and one or more remotes. Inspired by Next.js and Nx, commands like moxjs generate host <name> and moxjs generate remote <name> will bootstrap each piece
 .
 File-Based Routing: Convention-over-configuration file routing (like Next.js) both at the host and within each MFE. The host “shell” app owns top-level routes (e.g. /dashboard/*, /profile/*), while each MFE handles its own internal sub-routes
 . The framework will automatically wire these together. Optionally a visual routing editor (new UI tool) could let developers drag-and-drop route hierarchies.
@@ -12,7 +12,7 @@ Zero-Config Module Federation: Built-in Webpack 5 (or similar) Module Federation
 State & Communication Abstractions: A built-in event bus/pub‑sub system and/or shared state store will simplify cross-MFE communication. For example, the framework could include a context or global Redux store that MFEs can hook into. Alternatively, it can export a singleton EventBus API so MFEs publish and subscribe to events (e.g. eventBus.publish('user:login'))
 . This enforces the recommended loose coupling pattern: MFEs broadcast domain events rather than tightly calling into each other
 . By default, each MFE will be completely encapsulated; shared state (like auth/user info or cart totals) must go through these explicit channels.
-Built-in Dev Server & Hot Reload: A single mfjs dev command starts up the development environment. In monorepo mode, it concurrently serves the host and any MFEs, with live-reload/HMR across all parts. When the host is served, its MFE remotes are proxied locally (or bundled) so changes propagate immediately. We’ll use Turbopack/Rspack or Webpack Dev Server under the hood for blazing-fast rebuilds
+Built-in Dev Server & Hot Reload: A single moxjs dev command starts up the development environment. In monorepo mode, it concurrently serves the host and any MFEs, with live-reload/HMR across all parts. When the host is served, its MFE remotes are proxied locally (or bundled) so changes propagate immediately. We’ll use Turbopack/Rspack or Webpack Dev Server under the hood for blazing-fast rebuilds
 . The dev server will compile pages on-demand (like Next’s next dev) so you can start up instantly without precompiling everything
 . Source maps, TypeScript type-checking, and ESLint will be on by default for instant feedback.
 SSR/SSG Support: Server-side rendering (SSR) and static-generation (SSG) will be first-class. The host shell can prerender or stream the composed page for performance and SEO. For example, on a page load the container could server-render each MFE (via Node or edge functions) and stitch the HTML. This “fragments” approach (similar to [Partial Hydration/Islands]) will allow edge computation and faster first-byte times
@@ -29,7 +29,7 @@ Shared Libraries & Design System: A convention for shared UI libraries or utilit
 Example File/Folder Architecture
 A typical monorepo layout might look like:
 /my-app/                      # Monorepo root
-  package.json, mfjs.config.js # Project config, lists MFEs and settings
+  package.json, moxjs.config.js # Project config, lists MFEs and settings
   /apps/                      # All host & micro-app projects
     /shell/                   # The container (shell) application
       public/
@@ -49,12 +49,12 @@ A typical monorepo layout might look like:
     /ui/                      # Common design system components
     /state/                   # Shared Redux logic or pub-sub types
 This structure is inspired by Nx and other monorepo patterns
-. In monorepo mode, mfjs dev will concurrently serve shell and all MFEs under /apps/. In multi-repo mode, the host’s config (mfjs.config.js) can list external endpoints for each remote. The framework will generate this layout automatically. For example, using Nx-style generators:
+. In monorepo mode, moxjs dev will concurrently serve shell and all MFEs under /apps/. In multi-repo mode, the host’s config (moxjs.config.js) can list external endpoints for each remote. The framework will generate this layout automatically. For example, using Nx-style generators:
 # Initialize shell (host) with remotes `shop` and `cart`
-mfjs generate host apps/shell --remotes=shop,cart 
+moxjs generate host apps/shell --remotes=shop,cart 
 # Initialize a new remote linked to shell
-mfjs generate remote apps/about --host=shell 
-As Nx shows, once generated you can do mfjs serve shell to start the shell, and it will automatically serve or proxy the remotes
+moxjs generate remote apps/about --host=shell 
+As Nx shows, once generated you can do moxjs serve shell to start the shell, and it will automatically serve or proxy the remotes
 . This leads to a smooth developer experience: one terminal bootstraps the entire micro-frontend environment.
 Routing
 Shell (Container) Routing: The container app manages high-level navigation. Its router is the single source of truth for top-level routes and lazy-loads MFEs accordingly. For example:
@@ -73,17 +73,17 @@ export default function ShellApp() {
   );
 }
 Here, the shell mounts each MFE at a sub-path (e.g. /dashboard/* for the dashboard micro-frontend)
-. The framework automates this wiring: declaring a route in mfjs.config.js or a special apps.json could auto-generate these import statements. We encourage no path conflicts across MFEs (each MFE gets a unique base path) and will warn if overlaps occur
+. The framework automates this wiring: declaring a route in moxjs.config.js or a special apps.json could auto-generate these import statements. We encourage no path conflicts across MFEs (each MFE gets a unique base path) and will warn if overlaps occur
 . Micro-Frontend (Remote) Routing: Each MFE contains its own internal router (file-based or manual). Those routers only see sub-routes under their base path. For example, DashboardApp (at /dashboard) might define /reports/:id or /settings within its own code
 . This scoping avoids conflicts. In practice, the framework will scaffold each MFE with a routing setup (e.g. a pages/ directory or a React Router snippet) so developers just drop in pages. Cross-App Navigation: To navigate between MFEs, we use events or a common history. A link in one MFE that points to another (e.g. “Go to Profile”) will dispatch a message to the shell. For example:
 // In Dashboard MFE:
-window.dispatchEvent(new CustomEvent('mfjs:navigate', { detail: '/profile/settings' }));
-The shell listens for mfjs:navigate and executes history.pushState() accordingly
+window.dispatchEvent(new CustomEvent('moxjs:navigate', { detail: '/profile/settings' }));
+The shell listens for moxjs:navigate and executes history.pushState() accordingly
 . Alternatively, we can expose a shared useNavigate hook that under the hood publishes to the shell’s router. This event-based approach is explicitly recommended to keep MFEs decoupled
 . Framework Support: Under the hood, we may leverage libraries like single-spa, qiankun, or Next.js Module Federation to handle mounting/unmounting for us
 . But to the user, it will “just work” – they write routes in each app and the framework composes them at runtime.
 Module Federation and Composition
-This framework uses Webpack Module Federation (or similar bundler features) to compose MFEs at runtime without shipping them to npm. Each remote MFE exposes certain components or pages, and the shell loads them over the network. By convention, mfjs build will produce a remoteEntry.js for each MFE, and the shell’s build references them.
+This framework uses Webpack Module Federation (or similar bundler features) to compose MFEs at runtime without shipping them to npm. Each remote MFE exposes certain components or pages, and the shell loads them over the network. By convention, moxjs build will produce a remoteEntry.js for each MFE, and the shell’s build references them.
 Automatic Federation Setup: The CLI sets up module-federation.config.js for each app. In most cases, no manual editing is needed. We’ll assume each app’s package.json and directory name define its federation name. For example, the dashboard app auto-exposes dashboard/DashboardApp components. Shared dependencies (React, etc.) are automatically deduped as singletons
 . Developers can override or extend this config if needed.
 Sharing Strategy: The framework encourages sharing only core libraries to avoid version skew
@@ -115,22 +115,22 @@ Edge and SSR Options: For maximum performance, we’ll support deploying the hos
 . While we may not build full edge orchestration in MVP, we will leave hooks (adapters) so that an MFE’s server code can run anywhere (node, serverless, edge).
 Developer Experience
 We will put the developer first. The framework should “just feel right”:
-CLI Tools: Commands like mfjs dev, mfjs build, mfjs test, mfjs lint will mirror Next.js/Nx tools. Scaffolding commands (mfjs new, mfjs generate) use smart defaults. The CLI should be interactive (with helpful prompts and docs) yet also fully scriptable for CI.
+CLI Tools: Commands like moxjs dev, moxjs build, moxjs test, moxjs lint will mirror Next.js/Nx tools. Scaffolding commands (moxjs new, moxjs generate) use smart defaults. The CLI should be interactive (with helpful prompts and docs) yet also fully scriptable for CI.
 TypeScript and Linting: Out of the box, projects are TypeScript-enabled with strict type checking. Linters (ESLint/TSLint) and formatters (Prettier) are preconfigured. We might adopt Next.js’s ESLint rules or Nx defaults. Any generated code (pages, components) will include example tests and TypeScript interfaces to guide developers.
 Fast Refresh / Live Reload: Instant feedback is key. We’ll leverage React Fast Refresh (or Vue’s HMR) so that changes in code update the browser without full reload. Even when editing one MFE, the shell will reflect changes immediately thanks to HMR proxying
 . The dev experience should feel as seamless as working in a single Next.js app.
-Editor/IDE Integration: To aid adoption, we’ll provide code snippets or a VS Code extension that recognizes mfjs.config.js and provides auto-completion (e.g. for MFE names). Path aliases for MFEs (so you can import X from 'my-mfe/path' without relative paths) will be configured automatically.
+Editor/IDE Integration: To aid adoption, we’ll provide code snippets or a VS Code extension that recognizes moxjs.config.js and provides auto-completion (e.g. for MFE names). Path aliases for MFEs (so you can import X from 'my-mfe/path' without relative paths) will be configured automatically.
 Monorepo Support: We recognize teams may prefer multiple repos. Thus, all tooling works in both monorepo and polyrepo modes. In monorepo, dependencies are hoisted (Yarn/NPM workspaces or Nx) and cached; in polyrepo, the CLI will allow adding remote URLs to the config. We may even integrate with Git submodule or GitHub repo templates for multi-repo starters.
-The emphasis is on reducing boilerplate. For example, mfjs dev should detect new MFEs added to the workspace and serve them without extra config. Everything is plug-and-play, akin to how Next.js’s create-next-app hides webpack from the user.
+The emphasis is on reducing boilerplate. For example, moxjs dev should detect new MFEs added to the workspace and serve them without extra config. Everything is plug-and-play, akin to how Next.js’s create-next-app hides webpack from the user.
 Unique Innovations
 While building on existing best practices, our framework will offer several distinct advances:
 Zero-Config Federation: Most existing MFE solutions (like manual Module Federation or single-spa) require extensive setup. Here, no webpack configs or extra libraries: the CLI handles federation automatically. Developers only worry about their code.
-Automated Orchestration: We envision a built-in orchestrator/“composer.” For example, mfjs build could produce a JSON manifest of available MFEs and routes. A “host builder” would automatically stitch their manifests into the final host. This means adding a new MFE is as simple as running mfjs generate remote; the rest of the system flows.
-Visual Router (Editor): As an innovative UX, a GUI tool (web-based or IDE-integrated) could allow teams to drag routes/MFEs in a flowchart. This visual mapping would export to mfjs.config.js. It’s an optional feature to simplify understanding complex route hierarchies.
+Automated Orchestration: We envision a built-in orchestrator/“composer.” For example, moxjs build could produce a JSON manifest of available MFEs and routes. A “host builder” would automatically stitch their manifests into the final host. This means adding a new MFE is as simple as running moxjs generate remote; the rest of the system flows.
+Visual Router (Editor): As an innovative UX, a GUI tool (web-based or IDE-integrated) could allow teams to drag routes/MFEs in a flowchart. This visual mapping would export to moxjs.config.js. It’s an optional feature to simplify understanding complex route hierarchies.
 Dynamic Discovery: Going beyond static endpoints, the framework might include an optional MFE discovery registry/service. MFEs could register themselves (via API or a config file), and the host dynamically fetches the list of active MFEs and their versions. This enables “plug-in” MFEs without redeploying the shell, akin to service discovery in microservices.
 Smart Defaults for CI/CD: We could partner with hosting platforms (like Vercel or Netlify) to offer one-click MFE deployments. For example, a mfe deploy command might automatically containerize each MFE or push it to a container registry and configure a CDN distribution (similar to Zephyr Cloud for Module Federation
 ).
-Performance Insights: Uniquely, the framework could include a performance dashboard during mfjs dev, highlighting which MFEs are largest or slowest, based on real-time profiling. It might suggest splitting or lazy-loading components that exceed a threshold.
+Performance Insights: Uniquely, the framework could include a performance dashboard during moxjs dev, highlighting which MFEs are largest or slowest, based on real-time profiling. It might suggest splitting or lazy-loading components that exceed a threshold.
 Runtime Resilience: We might incorporate health-checks for MFEs. If a remote fails to load (404 or timeout), the host can fallback to a static “feature disabled” message or a cached version, rather than breaking the whole page. This kind of automatic error handling is uncommon in MF solutions.
 By bundling these innovations, the framework will feel “smarter” than generic MFE approaches. For example, instead of manually juggling webpack configs, writing event boilerplate, and handcrafting CI scripts, developers get an all-in-one toolkit that thinks about composition, routes, and builds for them.
 Development Roadmap (Phases)

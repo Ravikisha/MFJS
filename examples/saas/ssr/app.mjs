@@ -11,7 +11,7 @@ export default function App({ path }) {
     React.createElement(
       'header',
       null,
-      React.createElement('h1', { style: { margin: 0 } }, 'MFJS SaaS'),
+      React.createElement('h1', { style: { margin: 0 } }, 'MOXJS SaaS'),
       React.createElement(
         'p',
         { style: { marginTop: 6, opacity: 0.8 } },

@@ -1,5 +1,5 @@
 import React from 'react';
-import { MFJS_NAVIGATE_EVENT, type NavigateDetail } from './router.js';
+import { MOXJS_NAVIGATE_EVENT, type NavigateDetail } from './router.js';
 import { usePathname } from './routing.js';
 
 export type NavigationPhase = 'start' | 'complete';
@@ -31,8 +31,8 @@ export function useNavigationEvents(handler: (e: NavigationEvent) => void): void
       });
     };
 
-    window.addEventListener(MFJS_NAVIGATE_EVENT, onStart);
-    return () => window.removeEventListener(MFJS_NAVIGATE_EVENT, onStart);
+    window.addEventListener(MOXJS_NAVIGATE_EVENT, onStart);
+    return () => window.removeEventListener(MOXJS_NAVIGATE_EVENT, onStart);
   }, []);
 
   const pathname = usePathname();

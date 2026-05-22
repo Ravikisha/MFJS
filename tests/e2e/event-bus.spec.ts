@@ -9,8 +9,8 @@
  * The dashboard home page subscribes to `shell:ready` and renders a
  * `data-testid="event-bus-received"` element when the event arrives.
  *
- * Because both apps share `@mfjs/event-bus` as a singleton (configured in
- * mfjs.federation.json with `"singleton": true`), the remote receives the
+ * Because both apps share `@moxjs/event-bus` as a singleton (configured in
+ * moxjs.federation.json with `"singleton": true`), the remote receives the
  * event emitted by the host on the SAME bus instance.
  */
 

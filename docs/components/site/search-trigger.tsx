@@ -4,17 +4,12 @@ import { Kbd } from '@/components/ui/kbd';
 import { SearchIcon } from '@/components/icons';
 import { cn } from '@/lib/utils';
 
-/**
- * Visual-only search trigger. Hooking up a real index (Algolia DocSearch,
- * Pagefind, or Orama) is left as a follow-up — opening the trigger today
- * focuses the URL bar fallback.
- */
 export function SearchTrigger({ className }: { className?: string }) {
   return (
     <button
       type="button"
       onClick={() => {
-        const event = new CustomEvent('mfjs:search-open');
+        const event = new CustomEvent('moxjs:search-open');
         window.dispatchEvent(event);
       }}
       className={cn(

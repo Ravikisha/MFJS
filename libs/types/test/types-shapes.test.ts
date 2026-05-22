@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type {
-  MfjsAppConfig,
+  MoxjsAppConfig,
   FederationConfig,
   RouteTarget,
   RouteMatch,
@@ -9,17 +9,17 @@ import type {
   SharedDependency,
 } from '../src/index.js';
 
-// ── MfjsAppConfig ─────────────────────────────────────────────────────────────
+// ── MoxjsAppConfig ─────────────────────────────────────────────────────────────
 
-describe('MfjsAppConfig shape', () => {
+describe('MoxjsAppConfig shape', () => {
   it('accepts a minimal host config', () => {
-    const cfg: MfjsAppConfig = { name: 'shell', type: 'host', port: 3000 };
+    const cfg: MoxjsAppConfig = { name: 'shell', type: 'host', port: 3000 };
     expect(cfg.name).toBe('shell');
     expect(cfg.type).toBe('host');
   });
 
   it('accepts a remote config with exposes', () => {
-    const cfg: MfjsAppConfig = {
+    const cfg: MoxjsAppConfig = {
       name: 'dashboard',
       type: 'remote',
       port: 3001,
@@ -29,7 +29,7 @@ describe('MfjsAppConfig shape', () => {
   });
 
   it('accepts optional shared list', () => {
-    const cfg: MfjsAppConfig = {
+    const cfg: MoxjsAppConfig = {
       name: 'payments',
       type: 'remote',
       port: 3002,

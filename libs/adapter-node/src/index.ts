@@ -3,8 +3,8 @@ import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createEdgeAdapter } from '@mfjs/ssr';
-import type { EdgeAdapterOptions, EdgeAdapterExtraOptions } from '@mfjs/ssr';
+import { createEdgeAdapter } from '@moxjs/ssr';
+import type { EdgeAdapterOptions, EdgeAdapterExtraOptions } from '@moxjs/ssr';
 
 export interface NodeAdapterOptions extends EdgeAdapterOptions, EdgeAdapterExtraOptions {
   /** Directory with pre-built static assets. Default: 'dist'. */
@@ -52,8 +52,8 @@ export function createNodeServer(options: NodeAdapterOptions): http.Server {
   const maxBodyBytes = options.maxBodyBytes ?? 1024 * 1024;
   const bodyTimeoutMs = options.bodyTimeoutMs ?? 30_000;
   const log = options.logger ?? {
-    info: (m: string) => console.log(`[mfjs] ${m}`),
-    error: (m: string) => console.error(`[mfjs] ${m}`),
+    info: (m: string) => console.log(`[moxjs] ${m}`),
+    error: (m: string) => console.error(`[moxjs] ${m}`),
   };
 
   const staticRootResolved = path.resolve(staticDir);
@@ -155,8 +155,8 @@ export function startNodeServer(options: NodeAdapterOptions): http.Server {
   const port = options.port ?? Number(process.env['PORT'] ?? 3000);
   server.listen(port, () => {
     const log = options.logger ?? {
-      info: (m: string) => console.log(`[mfjs] ${m}`),
-      error: (m: string) => console.error(`[mfjs] ${m}`),
+      info: (m: string) => console.log(`[moxjs] ${m}`),
+      error: (m: string) => console.error(`[moxjs] ${m}`),
     };
     log.info(`listening on :${port}`);
   });
@@ -214,7 +214,7 @@ function readBody(
   });
 }
 
-// ── Deploy scaffold (used by `mfjs deploy --target node|docker`) ─────────────
+// ── Deploy scaffold (used by `moxjs deploy --target node|docker`) ─────────────
 
 export interface ScaffoldDeployOptions {
   cwd: string;

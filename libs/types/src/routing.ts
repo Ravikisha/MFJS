@@ -1,5 +1,5 @@
 /**
- * @mfjs/types — Routing types shared between @mfjs/runtime and apps.
+ * @moxjs/types — Routing types shared between @moxjs/runtime and apps.
  */
 
 // ── Route target ─────────────────────────────────────────────────────────────
@@ -35,7 +35,7 @@ export type RouteMatch<Target extends RouteTarget = RouteTarget> = {
 export type NavigateMode = 'push' | 'replace';
 
 /**
- * Payload carried by `mfjs:navigate` custom events and the `router.navigate()`
+ * Payload carried by `moxjs:navigate` custom events and the `router.navigate()`
  * method.
  */
 export type NavigateDetail = {

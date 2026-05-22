@@ -46,7 +46,7 @@ export function CodeBlock({
   return (
     <div
       className={cn(
-        'group relative my-4 overflow-hidden rounded-xl border border-white/5 bg-[hsl(240_10%_5%)] text-sm shadow-lg shadow-black/30',
+        'code-block group relative my-4 overflow-hidden rounded-xl border border-white/5 bg-[hsl(240_10%_5%)] text-sm shadow-lg shadow-black/30',
         className,
       )}
     >

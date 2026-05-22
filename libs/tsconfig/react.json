@@ -1,5 +1,5 @@
 {
-  "display": "@mfjs/tsconfig/react",
+  "display": "@moxjs/tsconfig/react",
   "extends": "./base.json",
   "compilerOptions": {
     "jsx": "react-jsx",

@@ -29,6 +29,6 @@ export default defineConfig({
     stdout: 'pipe',
     stderr: 'pipe',
     timeout: 240_000,
-    env: { MFJS_E2E: '1' },
+    env: { MOXJS_E2E: '1' },
   },
 });

@@ -1,10 +1,35 @@
 /**
- * @mfjs/state
+ * @moxjs/state
  *
- * Lightweight shared-state primitives for MFJS micro-frontends. Pinning the
+ * Lightweight shared-state primitives for MOXJS micro-frontends. Pinning the
  * registries to `globalThis` survives duplicate bundles when MF singleton
  * sharing fails — host/remote still see the same `Map` of stores.
  */
+
+export {
+  createSelector,
+  createSelectorWith,
+  createStructuredSelector,
+  shallowEqual,
+  type EqualityFn,
+  type MemoizedSelector,
+  type Selector,
+} from './selectors.js';
+
+export {
+  applyMiddleware,
+  createStoreWithMiddleware,
+  thunkMiddleware,
+  loggerMiddleware,
+  persistenceMiddleware,
+  type Middleware,
+  type MiddlewareApi,
+  type ThunkAction,
+  type LoggerOptions,
+  type PersistenceMiddlewareOptions,
+} from './middleware.js';
+
+export { connectDevtools, type DevtoolsOptions } from './devtools.js';
 
 export type StoreListener<T> = (value: T) => void;
 export type Unsubscribe = () => void;
@@ -79,7 +104,7 @@ export function createStore<S, A>(initialState: S, reducer: Reducer<S, A>): Stor
   function dispatch(action: A): void {
     if (isDispatching) {
       throw new Error(
-        '[mfjs/state] Reducers may not dispatch actions. Defer the second dispatch with queueMicrotask or setTimeout.',
+        '[moxjs/state] Reducers may not dispatch actions. Defer the second dispatch with queueMicrotask or setTimeout.',
       );
     }
     let next: S;
@@ -107,7 +132,7 @@ export function createStore<S, A>(initialState: S, reducer: Reducer<S, A>): Stor
 
   function replaceState(next: S): void {
     if (isDispatching) {
-      throw new Error('[mfjs/state] replaceState() may not be called inside a reducer.');
+      throw new Error('[moxjs/state] replaceState() may not be called inside a reducer.');
     }
     if (next === state) return;
     state = next;
@@ -128,8 +153,8 @@ export function createStore<S, A>(initialState: S, reducer: Reducer<S, A>): Stor
 
 // ── Singleton store factory ────────────────────────────────────────────────
 
-const REGISTRY_KEY = '__MFJS_STATE_REGISTRY__';
-const SIMPLE_REGISTRY_KEY = '__MFJS_STATE_SIMPLE_REGISTRY__';
+const REGISTRY_KEY = '__MOXJS_STATE_REGISTRY__';
+const SIMPLE_REGISTRY_KEY = '__MOXJS_STATE_SIMPLE_REGISTRY__';
 
 type StoreRecord = { store: Store<unknown, unknown>; signature: string };
 type SimpleRecord = { store: SimpleStore<unknown>; signature: string };
@@ -170,7 +195,7 @@ function warnIfDifferent(key: string, prev: string, next: string): void {
   if (isProduction()) return;
   // eslint-disable-next-line no-console
   console.warn(
-    `[mfjs/state] getStore("${key}") called with different initialState/reducer than the existing instance. The first call wins; later args are ignored.`,
+    `[moxjs/state] getStore("${key}") called with different initialState/reducer than the existing instance. The first call wins; later args are ignored.`,
   );
 }
 

@@ -1,8 +1,8 @@
 /**
- * @mfjs/ssr — public API.
+ * @moxjs/ssr — public API.
  *
  * For Cloudflare Workers / Vercel Edge / Deno Deploy, import the edge-only
- * surface (`@mfjs/ssr/edge`) instead — that bundle excludes `node:stream` and
+ * surface (`@moxjs/ssr/edge`) instead — that bundle excludes `node:stream` and
  * `node:fs/promises` so it loads cleanly under non-Node runtimes.
  */
 

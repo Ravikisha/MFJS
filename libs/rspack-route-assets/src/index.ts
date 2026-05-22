@@ -3,11 +3,11 @@ import { mkdir, writeFile } from 'node:fs/promises';
 
 export type RouteAssetsMap = Record<string, string[]>;
 
-export type MfjsRouteAssetsPluginOptions = {
+export type MoxjsRouteAssetsPluginOptions = {
   /** Route -> entry name (as used in bundler "entry" field). */
   routeEntries: Record<string, string>;
 
-  /** Where to write a minimal JSON file containing `{ mfjs: { routeAssets } }`. */
+  /** Where to write a minimal JSON file containing `{ moxjs: { routeAssets } }`. */
   outFile?: string;
 
   /** The stats filename (relative to output.path) to write assets to. Default: "stats.json". */
@@ -44,19 +44,19 @@ export function createRouteAssetsFromEntrypoints(args: {
   return out;
 }
 
-export function mfjsRspackRouteAssetsPlugin(options: MfjsRouteAssetsPluginOptions) {
+export function moxjsRspackRouteAssetsPlugin(options: MoxjsRouteAssetsPluginOptions) {
   const outPath = options.outFile;
   const statsFile = options.statsFile ?? 'stats.json';
   const emitAsset = options.emitAsset ?? true;
 
   return {
-    name: 'mfjs-rspack-route-assets',
+    name: 'moxjs-rspack-route-assets',
 
     apply(compiler: any) {
-      compiler.hooks?.thisCompilation?.tap('mfjs-rspack-route-assets', (compilation: any) => {
+      compiler.hooks?.thisCompilation?.tap('moxjs-rspack-route-assets', (compilation: any) => {
         compilation.hooks?.processAssets?.tapPromise(
           {
-            name: 'mfjs-rspack-route-assets',
+            name: 'moxjs-rspack-route-assets',
             // Use string stage to avoid importing rspack/webpack types.
             stage: (compiler.webpack?.Compilation?.PROCESS_ASSETS_STAGE_SUMMARIZE ?? 1000) as any,
           },
@@ -76,7 +76,7 @@ export function mfjsRspackRouteAssetsPlugin(options: MfjsRouteAssetsPluginOption
               routeEntries: options.routeEntries,
             });
 
-            const payload = JSON.stringify({ mfjs: { routeAssets } }, null, 2);
+            const payload = JSON.stringify({ moxjs: { routeAssets } }, null, 2);
 
             if (emitAsset && compilation.emitAsset) {
               const RawSource = compiler.webpack?.sources?.RawSource;
@@ -98,3 +98,5 @@ export function mfjsRspackRouteAssetsPlugin(options: MfjsRouteAssetsPluginOption
     },
   };
 }
+
+export * from './chunk-names.js';

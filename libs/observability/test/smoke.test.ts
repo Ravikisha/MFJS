@@ -8,7 +8,7 @@ import {
   createLogger,
 } from '../src/index.js';
 
-describe('@mfjs/observability', () => {
+describe('@moxjs/observability', () => {
   afterEach(() => clearHandlers());
 
   it('routes errors through registered handlers', () => {

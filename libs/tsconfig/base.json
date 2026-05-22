@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "display": "@mfjs/tsconfig/base",
+  "display": "@moxjs/tsconfig/base",
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
