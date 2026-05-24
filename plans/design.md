@@ -39,7 +39,7 @@ With 3–4 contributors: ~4–5 months.
 
   * [ ] Federation abstraction layer
   * [ ] Dev server orchestration model
-  * [ ] Config system (`moxjs.config.ts`)
+  * [ ] Config system (`jorvel.config.ts`)
   * [ ] Plugin system architecture
 
 * [ ] Define monorepo strategy:
@@ -81,14 +81,14 @@ Goal: **Create multi-MFE app in minutes**
 
 ### CLI Core
 
-* [x] Create `moxjs` CLI (Node + Commander)
+* [x] Create `jorvel` CLI (Node + Commander)
 * [ ] Commands:
 
-  * [x] `moxjs init`
-  * [x] `moxjs generate host`
-  * [x] `moxjs generate remote`
-  * [x] `moxjs dev` (basic: runs all `apps/*` dev servers)
-  * [x] `moxjs build` (basic: runs all `apps/*` builds)
+  * [x] `jorvel init`
+  * [x] `jorvel generate host`
+  * [x] `jorvel generate remote`
+  * [x] `jorvel dev` (basic: runs all `apps/*` dev servers)
+  * [x] `jorvel build` (basic: runs all `apps/*` builds)
 
 ### Scaffolding
 
@@ -114,17 +114,17 @@ libs/
 
 ### Tests needed
 
-* [x] `moxjs init` — assert scaffolded workspace has correct `package.json`, `pnpm-workspace.yaml`, `apps/` and `libs/` directories
-* [x] `moxjs generate host` — assert `apps/shell/` created with `index.html`, `rspack.config.mjs`, `src/main.tsx`, `moxjs.app.json`
-* [x] `moxjs generate remote` — assert `apps/dashboard/` created with correct `remoteEntry` expose in `moxjs.federation.json`
-* [x] `moxjs dev` — assert spawns one process per app and exits cleanly on `SIGINT`
-* [x] `moxjs build` — assert both apps produce `dist/index.html` and `dist/main.js`
+* [x] `jorvel init` — assert scaffolded workspace has correct `package.json`, `pnpm-workspace.yaml`, `apps/` and `libs/` directories
+* [x] `jorvel generate host` — assert `apps/shell/` created with `index.html`, `rspack.config.mjs`, `src/main.tsx`, `jorvel.app.json`
+* [x] `jorvel generate remote` — assert `apps/dashboard/` created with correct `remoteEntry` expose in `jorvel.federation.json`
+* [x] `jorvel dev` — assert spawns one process per app and exits cleanly on `SIGINT`
+* [x] `jorvel build` — assert both apps produce `dist/index.html` and `dist/main.js`
 
 ---
 
 ## 2️⃣ Module Federation Automation (Weeks 3–5)
 
-* [x] Create federation config generator (`moxjs federation`)
+* [x] Create federation config generator (`jorvel federation`)
 
 * [x] Auto-detect:
 
@@ -134,8 +134,8 @@ libs/
 
 * [x] Auto-generate:
 
-  * [x] host federation config (`moxjs.federation.json` with `remotes`)
-  * [x] remote federation config (`moxjs.federation.json` with `exposes`)
+  * [x] host federation config (`jorvel.federation.json` with `remotes`)
+  * [x] remote federation config (`jorvel.federation.json` with `exposes`)
 
 * [x] Shared singleton logic:
 
@@ -164,9 +164,9 @@ libs/
 
 ## 3️⃣ Dev Server Orchestration (Weeks 5–7)
 
-* [x] Unified `moxjs dev`
+* [x] Unified `jorvel dev`
 * [x] Concurrent process runner (spawns `rspack serve` per app)
-* [x] Auto-proxy remotes (`/moxjs/remotes/<name>/remoteEntry.js` → `http://localhost:<port>`)
+* [x] Auto-proxy remotes (`/jorvel/remotes/<name>/remoteEntry.js` → `http://localhost:<port>`)
 * [x] HMR across shell + remotes
 * [x] Source maps
 * [ ] On-demand compilation *(infrastructure exists but not verified end-to-end)*
@@ -178,11 +178,11 @@ Stretch:
 
 ### Tests needed
 
-* [x] `moxjs dev` — assert proxy rule created for each remote listed in host `moxjs.federation.json`
-* [x] `moxjs dev` — assert host defaults to port 3000, first remote defaults to port 3001
-* [x] `moxjs dev` — assert missing `moxjs.federation.json` triggers auto-generation before starting servers
-* [x] `moxjs dev` — assert `SIGINT` terminates all child processes cleanly
-* [x] Dev server proxy — assert `GET /moxjs/remotes/dashboard/remoteEntry.js` forwards to `http://localhost:3001/remoteEntry.js`
+* [x] `jorvel dev` — assert proxy rule created for each remote listed in host `jorvel.federation.json`
+* [x] `jorvel dev` — assert host defaults to port 3000, first remote defaults to port 3001
+* [x] `jorvel dev` — assert missing `jorvel.federation.json` triggers auto-generation before starting servers
+* [x] `jorvel dev` — assert `SIGINT` terminates all child processes cleanly
+* [x] Dev server proxy — assert `GET /jorvel/remotes/dashboard/remoteEntry.js` forwards to `http://localhost:3001/remoteEntry.js`
 
 ---
 
@@ -196,12 +196,12 @@ Stretch:
 ### Remotes
 
 * [x] File-based routing support *(`src/pages/` — `index.tsx`, `settings.tsx`, `users/[id].tsx`; exposed via `./Routes`)*
-* [x] Auto-register pages *(`moxjs.routes.ts` exports `pages: RemotePageRoute[]`; `remote.tsx` calls `resolveRemotePage`)*
+* [x] Auto-register pages *(`jorvel.routes.ts` exports `pages: RemotePageRoute[]`; `remote.tsx` calls `resolveRemotePage`)*
 
 ### Cross-App Navigation
 
-* [x] `moxjs:navigate` custom event dispatched via `dispatchMoxjsNavigate()`
-* [x] `createRouter` — shell listener that converts `moxjs:navigate` events into `history.pushState`
+* [x] `jorvel:navigate` custom event dispatched via `dispatchJorvelNavigate()`
+* [x] `createRouter` — shell listener that converts `jorvel:navigate` events into `history.pushState`
 * [x] `resolveRoute(routes, pathname)` — matches `RouteTarget[]` against a pathname with params/splat
 * [x] `matchPath(pattern, pathname)` — low-level matcher supporting static, `:param`, `*` splat
 * [x] Integration of routing into the example app *(shell routes via `createRouter`; remote renders file-based pages via `resolveRemotePage`)*
@@ -220,7 +220,7 @@ Stretch:
 * [x] `createRouter.navigate replace` — assert `history.replaceState` called instead of push
 * [x] `createRouter.destroy` — assert `popstate` listener removed after destroy
 * [x] `createRouter` basePath — assert events only fire when path starts with basePath
-* [x] `dispatchMoxjsNavigate` — assert `moxjs:navigate` CustomEvent dispatched on `window`
+* [x] `dispatchJorvelNavigate` — assert `jorvel:navigate` CustomEvent dispatched on `window`
 * [x] `resolveRemotePage` — assert correct page module returned for matching subpath with params
 * [x] `resolveRemotePage` — assert `null` returned when no page matches subpath
 
@@ -229,7 +229,7 @@ Stretch:
 ## 5️⃣ Communication Layer (Week 8–9)
 
 * [x] Build lightweight EventBus (`libs/event-bus/src/index.ts`)
-* [x] Singleton injection (shared via MF `@moxjs/event-bus: { singleton: true }`)
+* [x] Singleton injection (shared via MF `@jorvel/event-bus: { singleton: true }`)
 * [x] Publish/Subscribe API (`on`, `emit`)
 * [x] Typed event contracts (generic `EventBus<Events extends EventMap>`)
 
@@ -250,7 +250,7 @@ Optional:
 
 ## 6️⃣ Build System (Week 9–10)
 
-* [x] Production build pipeline (`moxjs build` → `rspack build` per app)
+* [x] Production build pipeline (`jorvel build` → `rspack build` per app)
 * [x] Chunk splitting (Rspack default code splitting)
 * [x] Content hashing (Rspack `output.filename` with `[contenthash]`)
 * [ ] Gzip/Brotli support *(not configured)*
@@ -260,17 +260,17 @@ Optional:
 
 ## 7️⃣ Performance System (Week 10–11)
 
-* [x] Bundle size analyzer (`moxjs perf analyze`) that scans `dist/` output and reports file sizes
+* [x] Bundle size analyzer (`jorvel perf analyze`) that scans `dist/` output and reports file sizes
 * [x] Performance budgets (warn/error thresholds) via `--budgets <path>` with CI-friendly exit codes
 * [ ] Advanced: per-route budgets *(not implemented)*
 * [ ] Advanced: integrate with bundler stats/metafile output *(not implemented; current approach is bundler-agnostic)*
 
 ### Tests needed
 
-* [x] `moxjs build` — assert `dist/remoteEntry.js` exists in remote output
-* [x] `moxjs build` — assert `dist/index.html` references correct `main.[hash].js`
-* [x] `moxjs build` — assert shell `dist/` does NOT bundle React separately (singleton sharing works in production build)
-* [x] `moxjs build` — assert remote `dist/remoteEntry.js` exposes `./App` container
+* [x] `jorvel build` — assert `dist/remoteEntry.js` exists in remote output
+* [x] `jorvel build` — assert `dist/index.html` references correct `main.[hash].js`
+* [x] `jorvel build` — assert shell `dist/` does NOT bundle React separately (singleton sharing works in production build)
+* [x] `jorvel build` — assert remote `dist/remoteEntry.js` exposes `./App` container
 
 ---
 
@@ -279,9 +279,9 @@ Optional:
 You should be able to run:
 
 ```bash
-moxjs init my-app
-moxjs generate host shell --remotes=dashboard
-moxjs dev
+jorvel init my-app
+jorvel generate host shell --remotes=dashboard
+jorvel dev
 ```
 
 And see:
@@ -310,29 +310,29 @@ And see:
 ## TypeScript Integration (Week 2–3)
 
 * [x] Strict TS config — `tsconfig.base.json` at monorepo root; all packages extend it; 7 strict flags beyond `strict: true`
-* [x] Shared types package — `@moxjs/types` (zero-runtime): app config, federation config, federation contracts, routing types
-* [x] Typed federation contracts — `defineFederationContract`, `InferExposed/Emits/Listens`, `validateFederationContract`, `moxjs typecheck` CLI command
+* [x] Shared types package — `@jorvel/types` (zero-runtime): app config, federation config, federation contracts, routing types
+* [x] Typed federation contracts — `defineFederationContract`, `InferExposed/Emits/Listens`, `validateFederationContract`, `jorvel typecheck` CLI command
 * [x] Typed EventBus *(generic `EventBus<Events>` implemented)*
 
 ---
 
 ## CI/CD Automation (Weeks 4–6)
 
-* [x] Generate GitHub Actions template — `moxjs ci generate` scaffolds `ci.yml`, `pr-preview.yml`, `deploy.yml`
-* [x] Affected builds detection — `moxjs ci affected [--base <ref>] [--head <ref>] [--format json]`
-* [x] Parallel remote builds — `ci.yml` build job uses affected detection + `moxjs build` per app
+* [x] Generate GitHub Actions template — `jorvel ci generate` scaffolds `ci.yml`, `pr-preview.yml`, `deploy.yml`
+* [x] Affected builds detection — `jorvel ci affected [--base <ref>] [--head <ref>] [--format json]`
+* [x] Parallel remote builds — `ci.yml` build job uses affected detection + `jorvel build` per app
 * [x] CDN deployment example — `buildDeployWorkflow` supports `netlify` / `s3`+CloudFront / `azure`
-* [x] PR preview deployment template — `moxjs ci preview` scaffolds `pr-preview.yml` with Netlify + GitHub PR comment
+* [x] PR preview deployment template — `jorvel ci preview` scaffolds `pr-preview.yml` with Netlify + GitHub PR comment
 
 ---
 
 ## Performance System (Weeks 6–8)
 
-* [x] Bundle size analyzer (`moxjs perf analyze`)
-* [x] Performance budgets (`moxjs perf analyze --budgets <path>` with warn/error thresholds)
+* [x] Bundle size analyzer (`jorvel perf analyze`)
+* [x] Performance budgets (`jorvel perf analyze --budgets <path>` with warn/error thresholds)
 * [x] Warning system *(budget summary + `--fail-on-warn` for CI behavior)*
-* [x] Lazy loading enforcement *(CLI lint: `moxjs lazy check` scans dist bundles for eager-remote patterns; warn/error in CI)*
-* [x] Image optimization plugin *(CLI: `moxjs image optimize` — generate webp/avif + responsive widths from dist output)*
+* [x] Lazy loading enforcement *(CLI lint: `jorvel lazy check` scans dist bundles for eager-remote patterns; warn/error in CI)*
+* [x] Image optimization plugin *(CLI: `jorvel image optimize` — generate webp/avif + responsive widths from dist output)*
 
 ---
 
@@ -363,7 +363,7 @@ And see:
 ## Visual Router Tool
 
 * [ ] Build React-based visual route editor
-* [ ] Export to `moxjs.config.ts`
+* [ ] Export to `jorvel.config.ts`
 * [ ] Route conflict detection
 * [ ] Graph visualization
 
@@ -537,7 +537,7 @@ This section tracks the full test spec for every implemented feature. Tests mark
 
 ---
 
-## `createRouter` / `dispatchMoxjsNavigate`
+## `createRouter` / `dispatchJorvelNavigate`
 
 | Status | Test |
 |--------|------|
@@ -548,9 +548,9 @@ This section tracks the full test spec for every implemented feature. Tests mark
 | [x] | `unsubscribe` fn returned from `subscribe()` stops further callbacks |
 | [x] | `popstate` browser event triggers subscriber callback |
 | [x] | `basePath` option: events only fire when path starts with basePath |
-| [x] | `destroy()` removes `popstate` listener and `moxjs:navigate` listener |
-| [x] | `dispatchMoxjsNavigate({ to })` dispatches `moxjs:navigate` CustomEvent on `window` |
-| [x] | shell `moxjs:navigate` listener causes correct remote module to be loaded |
+| [x] | `destroy()` removes `popstate` listener and `jorvel:navigate` listener |
+| [x] | `dispatchJorvelNavigate({ to })` dispatches `jorvel:navigate` CustomEvent on `window` |
+| [x] | shell `jorvel:navigate` listener causes correct remote module to be loaded |
 
 ---
 
@@ -566,7 +566,7 @@ This section tracks the full test spec for every implemented feature. Tests mark
 
 ---
 
-## CLI — `moxjs routes`
+## CLI — `jorvel routes`
 
 | Status | Test |
 |--------|------|
@@ -574,7 +574,7 @@ This section tracks the full test spec for every implemented feature. Tests mark
 | [x] | generates host manifest mapping remotes to base paths |
 | [x] | `[id].tsx` file name becomes `:id` in route pattern |
 | [x] | nested directories produce nested route paths |
-| [x] | re-running `moxjs routes` overwrites existing manifest cleanly |
+| [x] | re-running `jorvel routes` overwrites existing manifest cleanly |
 
 ---
 
@@ -588,8 +588,8 @@ This section tracks the full test spec for every implemented feature. Tests mark
 | [x] | routing — shell shows Dashboard Home page at `/` |
 | [x] | routing — nav to `/dashboard/settings` renders Settings page |
 | [x] | routing — nav to `/dashboard/users/1` renders User page with correct id |
-| [x] | routing — in-remote `dispatchMoxjsNavigate` navigates shell (Home → Settings button) |
-| [x] | routing — in-remote `dispatchMoxjsNavigate` navigates shell (Home → User #42 button) |
+| [x] | routing — in-remote `dispatchJorvelNavigate` navigates shell (Home → Settings button) |
+| [x] | routing — in-remote `dispatchJorvelNavigate` navigates shell (Home → User #42 button) |
 | [x] | routing — Settings back button returns to Dashboard Home |
 | [x] | routing — browser back/forward works after client-side navigation |
 | [x] | routing — deep-link `/dashboard/settings` loads correct page directly |

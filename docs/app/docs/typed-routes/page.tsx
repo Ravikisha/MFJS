@@ -27,7 +27,7 @@ export default function TypedRoutes() {
       <CodeBlock
         language="ts"
         code={`import { z } from 'zod';
-import { createRoute, defineRoutes } from '@moxjs/runtime';
+import { createRoute, defineRoutes } from '@jorvel/runtime';
 
 const userRoute = createRoute({
   path: '/users/:id',
@@ -65,7 +65,7 @@ r.match('/orders/42')?.params.orderId;  // string`}
       </p>
       <CodeBlock
         language="ts"
-        code={`import { defineRoutes, createRoute } from '@moxjs/runtime';
+        code={`import { defineRoutes, createRoute } from '@jorvel/runtime';
 import { z } from 'zod';
 
 export const routes = defineRoutes({
@@ -83,7 +83,7 @@ export const routes = defineRoutes({
 
 // Use anywhere
 const url = routes.user.build({ id: crypto.randomUUID() }, { tab: 'billing' });
-dispatchMoxjsNavigate({ to: url });`}
+dispatchJorvelNavigate({ to: url });`}
       />
 
       <h2 id="read-params">Read params inside a page</h2>
@@ -93,7 +93,7 @@ dispatchMoxjsNavigate({ to: url });`}
       </p>
       <CodeBlock
         language="tsx"
-        code={`import { useParams } from '@moxjs/runtime';
+        code={`import { useParams } from '@jorvel/runtime';
 import type { z } from 'zod';
 import { routes } from '@/routes';
 

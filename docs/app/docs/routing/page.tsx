@@ -12,7 +12,7 @@ export default function Routing() {
     <>
       <h1>Routing</h1>
       <p>
-        MOXJS routing has two tiers: the <strong>host</strong> owns top-level routes, each{' '}
+        JORVEL routing has two tiers: the <strong>host</strong> owns top-level routes, each{' '}
         <strong>remote</strong> owns its sub-routes. Both layers are built on the browser{' '}
         <code>History</code> API — no <code>react-router</code> required, no extra context, no
         wrapper providers needed in remotes.
@@ -21,7 +21,7 @@ export default function Routing() {
       <h2 id="why-two-tier">Why two tiers?</h2>
       <p>
         A single router would force the host to import every remote&apos;s page table at build
-        time, defeating the purpose of federation. MOXJS splits the table: the host decides{' '}
+        time, defeating the purpose of federation. JORVEL splits the table: the host decides{' '}
         <em>which remote handles which prefix</em>, the remote decides{' '}
         <em>how to render the sub-path</em>. The two tables meet at runtime via{' '}
         <code>usePathname()</code>.
@@ -41,8 +41,8 @@ Host tier         Remote tier
       <CodeBlock
         language="tsx"
         filename="apps/shell/src/bootstrap.tsx"
-        code={`import { NavLink, RemoteOutlet, getRouter } from '@moxjs/runtime';
-import type { RouteTarget } from '@moxjs/runtime';
+        code={`import { NavLink, RemoteOutlet, getRouter } from '@jorvel/runtime';
+import type { RouteTarget } from '@jorvel/runtime';
 
 const HOST_ROUTES: RouteTarget[] = [
   { path: '/dashboard/*', remote: 'dashboard', module: './App' },
@@ -80,15 +80,15 @@ export default function App() {
       />
 
       <p>
-        Run <code>moxjs routes</code> to compile this tree into <code>src/moxjs.routes.ts</code> and pass it to{' '}
+        Run <code>jorvel routes</code> to compile this tree into <code>src/jorvel.routes.ts</code> and pass it to{' '}
         <code>RemoteApp</code>:
       </p>
 
       <CodeBlock
         language="tsx"
         filename="apps/dashboard/src/remote.tsx"
-        code={`import { RemoteApp } from '@moxjs/runtime';
-import { pages } from './moxjs.routes.js';
+        code={`import { RemoteApp } from '@jorvel/runtime';
+import { pages } from './jorvel.routes.js';
 
 export default function RemoteRoot({ subpath = '/' }: { subpath?: string }) {
   return <RemoteApp subpath={subpath} pages={pages} />;
@@ -169,7 +169,7 @@ export default function RemoteRoot({ subpath = '/' }: { subpath?: string }) {
       <h3>useNavigate() — imperative</h3>
       <CodeBlock
         language="tsx"
-        code={`import { useNavigate } from '@moxjs/runtime';
+        code={`import { useNavigate } from '@jorvel/runtime';
 
 function LogoutButton() {
   const navigate = useNavigate();
@@ -187,7 +187,7 @@ function LogoutButton() {
       <h3>useSearchParams() — reactive query string</h3>
       <CodeBlock
         language="tsx"
-        code={`import { useSearchParams } from '@moxjs/runtime';
+        code={`import { useSearchParams } from '@jorvel/runtime';
 
 function Filters() {
   const [params, setParams] = useSearchParams();
@@ -254,7 +254,7 @@ function Filters() {
       <CodeBlock
         language="tsx"
         filename="pages/users/[id].tsx"
-        code={`import { useParams } from '@moxjs/runtime';
+        code={`import { useParams } from '@jorvel/runtime';
 
 export default function UserPage() {
   const { id } = useParams<{ id: string }>();   // matched against [id]
@@ -265,7 +265,7 @@ export default function UserPage() {
       <h2>Route guards</h2>
       <CodeBlock
         language="ts"
-        code={`import { createAuthGuard, runGuards } from '@moxjs/runtime';
+        code={`import { createAuthGuard, runGuards } from '@jorvel/runtime';
 
 const authGuard = createAuthGuard({
   isAuthenticated: () => !!localStorage.getItem('token'),
@@ -290,16 +290,16 @@ const routes = [
       <h2 id="cross-app">Cross-app navigation</h2>
       <p>
         Remote code can navigate without importing the router by dispatching a DOM event. The host
-        listens via <code>attachMoxjsNavigateListener()</code> (auto-installed by{' '}
+        listens via <code>attachJorvelNavigateListener()</code> (auto-installed by{' '}
         <code>getRouter()</code>) and turns the event into a <code>history.pushState</code>.
       </p>
       <CodeBlock
         language="ts"
-        code={`import { dispatchMoxjsNavigate } from '@moxjs/runtime';
+        code={`import { dispatchJorvelNavigate } from '@jorvel/runtime';
 
-dispatchMoxjsNavigate({ to: '/dashboard/settings' });               // push
-dispatchMoxjsNavigate({ to: '/login', mode: 'replace' });           // replace
-dispatchMoxjsNavigate({ to: '/cart', state: { from: 'product' } }); // with history state`}
+dispatchJorvelNavigate({ to: '/dashboard/settings' });               // push
+dispatchJorvelNavigate({ to: '/login', mode: 'replace' });           // replace
+dispatchJorvelNavigate({ to: '/cart', state: { from: 'product' } }); // with history state`}
       />
 
       <Callout variant="info" title="Why a DOM event instead of an import?">
@@ -312,11 +312,11 @@ dispatchMoxjsNavigate({ to: '/cart', state: { from: 'product' } }); // with hist
       <p>
         Wrap each <code>RemoteOutlet</code> in an <code>ErrorBoundary</code> so a single remote
         crash never blanks the host. The bundled boundary calls{' '}
-        <code>reportError()</code> from <code>@moxjs/observability</code> automatically.
+        <code>reportError()</code> from <code>@jorvel/observability</code> automatically.
       </p>
       <CodeBlock
         language="tsx"
-        code={`import { ErrorBoundary, RemoteOutlet } from '@moxjs/runtime';
+        code={`import { ErrorBoundary, RemoteOutlet } from '@jorvel/runtime';
 
 <ErrorBoundary fallback={(err, reset) => (
   <div role="alert">
@@ -336,8 +336,8 @@ dispatchMoxjsNavigate({ to: '/cart', state: { from: 'product' } }); // with hist
       </p>
       <CodeBlock
         language="ts"
-        code={`import { createServerRouter } from '@moxjs/runtime';
-import { renderRouteToString } from '@moxjs/ssr';
+        code={`import { createServerRouter } from '@jorvel/runtime';
+import { renderRouteToString } from '@jorvel/ssr';
 
 const ctx = createServerRouter(request.url);
 const result = await renderRouteToString(App, { path: ctx.pathname });`}

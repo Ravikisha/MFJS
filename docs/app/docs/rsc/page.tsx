@@ -4,7 +4,7 @@ import { Callout } from '@/components/docs/callout';
 export const metadata = {
   title: 'React Server Components',
   description:
-    'RSC evaluation status for MOXJS. Why federation + RSC is hard, what we ship in the meantime, what the integration looks like when the wire format stabilizes.',
+    'RSC evaluation status for JORVEL. Why federation + RSC is hard, what we ship in the meantime, what the integration looks like when the wire format stabilizes.',
 };
 
 export default function Rsc() {
@@ -51,13 +51,13 @@ export default function Rsc() {
       <h2 id="meantime">In the meantime — what to use today</h2>
       <p>
         Most of the value props RSC unlocks (zero-JS by default, progressive hydration, server-only
-        data access) are reachable with primitives MOXJS already ships:
+        data access) are reachable with primitives JORVEL already ships:
       </p>
       <table>
         <thead>
           <tr>
             <th>RSC value prop</th>
-            <th>MOXJS today</th>
+            <th>JORVEL today</th>
           </tr>
         </thead>
         <tbody>
@@ -77,7 +77,7 @@ export default function Rsc() {
           <tr>
             <td>Server-only data access</td>
             <td>
-              <code>defineLoader</code> + <code>runLoaders</code> from <code>@moxjs/ssr</code>
+              <code>defineLoader</code> + <code>runLoaders</code> from <code>@jorvel/ssr</code>
             </td>
           </tr>
           <tr>
@@ -99,7 +99,7 @@ export default function Rsc() {
       <CodeBlock
         language="tsx"
         filename="apps/dashboard/src/pages/users/[id].tsx"
-        code={`import { defineLoader, useLoaderData } from '@moxjs/ssr';
+        code={`import { defineLoader, useLoaderData } from '@jorvel/ssr';
 
 export const loader = defineLoader(async ({ params, request }) => {
   const user = await db.user.findUnique({ where: { id: params.id } });
@@ -120,18 +120,18 @@ export default function UserPage() {
       </p>
       <ol>
         <li>
-          <code>@moxjs/rsc</code> — RSC-aware remote loader, manifest stitcher, action ID rebaser.
+          <code>@jorvel/rsc</code> — RSC-aware remote loader, manifest stitcher, action ID rebaser.
         </li>
         <li>
           <code>RemoteOutlet</code> gains an <code>rscPayload</code> prop that swaps the React tree
           for an RSC stream.
         </li>
         <li>
-          <code>@moxjs/ssr/edge</code> grows <code>createRscHandler({'{ App, manifest }'})</code>{' '}
+          <code>@jorvel/ssr/edge</code> grows <code>createRscHandler({'{ App, manifest }'})</code>{' '}
           for edge runtimes that can read the React server bundle.
         </li>
         <li>
-          The generator updates <code>moxjs generate remote</code> to scaffold a{' '}
+          The generator updates <code>jorvel generate remote</code> to scaffold a{' '}
           <code>server.tsx</code> entry alongside <code>remote.tsx</code>; build emits two
           manifests.
         </li>
@@ -140,7 +140,7 @@ export default function UserPage() {
       <Callout variant="info" title="When to revisit">
         Track the upstream issue in <code>rspack/rspack</code> for the{' '}
         <code>react-server</code> condition + MF runtime alignment. Once that ships and{' '}
-        <code>react-server-dom-webpack</code> publishes a federation-ready entry, MOXJS will follow
+        <code>react-server-dom-webpack</code> publishes a federation-ready entry, JORVEL will follow
         within a release.
       </Callout>
 
@@ -152,7 +152,7 @@ export default function UserPage() {
         </li>
         <li>
           <strong>Hybrid:</strong> ship the marketing surface in Next.js (RSC), the application
-          shell in MOXJS (federation). They can share a design system and an auth domain.
+          shell in JORVEL (federation). They can share a design system and an auth domain.
         </li>
       </ul>
     </>

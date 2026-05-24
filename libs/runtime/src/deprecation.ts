@@ -2,7 +2,7 @@
  * Deprecation warnings — log each unique deprecation exactly once.
  *
  * Used internally when an API is renamed or about to be removed. Library
- * authors building on MOXJS can use the same helper to manage their own
+ * authors building on JORVEL can use the same helper to manage their own
  * deprecations.
  *
  * The default sink uses `console.warn`. The default global pin makes warnings
@@ -22,7 +22,7 @@ export interface DeprecationOptions {
   sink?: (message: string) => void;
 }
 
-const SEEN_KEY = '__MOXJS_DEPRECATIONS_SEEN__';
+const SEEN_KEY = '__JORVEL_DEPRECATIONS_SEEN__';
 
 interface GlobalSeen {
   [SEEN_KEY]?: Set<string>;
@@ -41,7 +41,7 @@ export function deprecate(message: string, opts: DeprecationOptions = {}): void 
   seen.add(key);
 
   const sink = opts.sink ?? ((m) => console.warn(m));
-  const parts: string[] = [`[moxjs] DEPRECATION: ${message}`];
+  const parts: string[] = [`[jorvel] DEPRECATION: ${message}`];
   if (opts.since) parts.push(`(since ${opts.since}`);
   if (opts.removeIn) parts.push(parts.length === 1 ? `(remove in ${opts.removeIn}` : `, remove in ${opts.removeIn}`);
   // Close the parenthesis if either was added.

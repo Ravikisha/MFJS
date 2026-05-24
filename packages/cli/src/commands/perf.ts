@@ -209,8 +209,8 @@ export async function tryLoadBundlerStats(args: {
   const raw = await fs.readJson(candidate);
 
   // Minimal parsing: Rspack/Webpack stats both tend to have `assets` and `chunks`.
-  // We optionally allow a custom `moxjs.routeAssets` extension for now.
-  const routeAssets = (raw?.moxjs?.routeAssets ?? raw?.routeAssets ?? null) as
+  // We optionally allow a custom `jorvel.routeAssets` extension for now.
+  const routeAssets = (raw?.jorvel?.routeAssets ?? raw?.routeAssets ?? null) as
     | Record<string, string[]>
     | null;
 
@@ -280,7 +280,7 @@ perfCommand
           // eslint-disable-next-line no-console
           console.log(
             kleur.yellow(
-              'Per-route budgets are configured, but no stats route mapping was found. Provide --stats (or dist/stats.json with moxjs.routeAssets).' 
+              'Per-route budgets are configured, but no stats route mapping was found. Provide --stats (or dist/stats.json with jorvel.routeAssets).' 
             )
           );
         } else {

@@ -33,9 +33,9 @@ const COLUMNS: Array<{ title: string; links: Array<{ href: string; label: string
   {
     title: 'Project',
     links: [
-      { href: 'https://github.com/Ravikisha/MFJS', label: 'GitHub', external: true },
-      { href: 'https://github.com/Ravikisha/MFJS/releases', label: 'Releases', external: true },
-      { href: 'https://github.com/Ravikisha/MFJS/issues', label: 'File an issue', external: true },
+      { href: 'https://github.com/Ravikisha/JorvelJS', label: 'GitHub', external: true },
+      { href: 'https://github.com/Ravikisha/JorvelJS/releases', label: 'Releases', external: true },
+      { href: 'https://github.com/Ravikisha/JorvelJS/issues', label: 'File an issue', external: true },
       { href: '/docs/api/runtime', label: 'Changelog' },
     ],
   },
@@ -54,7 +54,7 @@ export function SiteFooter() {
             </p>
             <div className="mt-4 flex items-center gap-3 text-muted-foreground">
               <a
-                href="https://github.com/Ravikisha/MFJS"
+                href="https://github.com/Ravikisha/JorvelJS"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="rounded-md border border-border p-2 transition hover:text-foreground hover:bg-background"
@@ -94,7 +94,7 @@ export function SiteFooter() {
         </div>
         <div className="mt-12 flex flex-col gap-2 border-t border-border pt-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <p>
-            © {new Date().getFullYear()} MOXJS · MIT licensed · Built by{' '}
+            © {new Date().getFullYear()} JORVEL · MIT licensed · Built by{' '}
             <a
               href="https://github.com/ravikisha"
               target="_blank"

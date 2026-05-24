@@ -37,9 +37,9 @@ test('@build remoteEntry.js registers the dashboard container', async () => {
   expect(content).toContain('dashboard');
 });
 
-test('@build remote moxjs.federation.json exposes "./App" container', async () => {
+test('@build remote jorvel.federation.json exposes "./App" container', async () => {
   const cfg = JSON.parse(
-    await fs.readFile(path.join(exampleRoot, 'apps', 'dashboard', 'moxjs.federation.json'), 'utf8')
+    await fs.readFile(path.join(exampleRoot, 'apps', 'dashboard', 'jorvel.federation.json'), 'utf8')
   );
   // Use direct property access — toHaveProperty('.') has path-separator ambiguity
   expect(cfg.exposes?.['./App']).toBeDefined();
@@ -82,9 +82,9 @@ test('@build shell dist/ does NOT contain standalone react chunks (singleton sha
   expect(reactChunks).toHaveLength(0);
 });
 
-test('@build shell moxjs.federation.json references dashboard remoteEntry.js', async () => {
+test('@build shell jorvel.federation.json references dashboard remoteEntry.js', async () => {
   const cfg = JSON.parse(
-    await fs.readFile(path.join(exampleRoot, 'apps', 'shell', 'moxjs.federation.json'), 'utf8')
+    await fs.readFile(path.join(exampleRoot, 'apps', 'shell', 'jorvel.federation.json'), 'utf8')
   );
   expect(cfg.remotes?.dashboard).toContain('remoteEntry.js');
 });
@@ -108,7 +108,7 @@ test('@build shell and remote produce separate JS bundles (no single-bundle merg
 
 // ── Shared EventBus in dist ───────────────────────────────────────────────────
 
-test('@build remote dist does not bundle a duplicate @moxjs/event-bus (singleton sharing)', async () => {
+test('@build remote dist does not bundle a duplicate @jorvel/event-bus (singleton sharing)', async () => {
   // The remote's remoteEntry.js should NOT contain the full event-bus source
   // because it's declared as a singleton shared module — the host provides it.
   // We check that the remoteEntry is not abnormally large.

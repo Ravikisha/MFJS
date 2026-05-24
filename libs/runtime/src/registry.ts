@@ -8,7 +8,7 @@
  *
  * Two surfaces:
  *   - `ManifestRegistry`         — host-side cache, polling, health-aware lookup.
- *   - `createRegistryHandler` — server-side `/moxjs/registry` endpoint emitting
+ *   - `createRegistryHandler` — server-side `/jorvel/registry` endpoint emitting
  *                                the manifest JSON.
  */
 
@@ -43,7 +43,7 @@ export interface RegistryManifest {
 
 export interface RegistryHandlerOptions {
   entries: () => RegistryEntry[] | Promise<RegistryEntry[]>;
-  /** URL path the handler answers. Default: `/moxjs/registry`. */
+  /** URL path the handler answers. Default: `/jorvel/registry`. */
   path?: string;
   /** Cache-Control for the response. Default: `'no-store'`. */
   cacheControl?: string;
@@ -53,7 +53,7 @@ export interface RegistryHandlerOptions {
 export function createRegistryHandler(
   opts: RegistryHandlerOptions,
 ): (req: EdgeLikeRequest) => Promise<EdgeLikeResponse> {
-  const path = opts.path ?? '/moxjs/registry';
+  const path = opts.path ?? '/jorvel/registry';
   const cacheControl = opts.cacheControl ?? 'no-store';
   const now = opts.now ?? Date.now;
   return async (req: EdgeLikeRequest): Promise<EdgeLikeResponse> => {
@@ -94,7 +94,7 @@ export interface RegistryEvent {
 export interface ManifestRegistryOptions {
   /** Initial manifest. Used until the first fetch lands. */
   initial?: RegistryEntry[];
-  /** Manifest URL (e.g. `https://host/moxjs/registry`). When omitted, registry never polls. */
+  /** Manifest URL (e.g. `https://host/jorvel/registry`). When omitted, registry never polls. */
   url?: string;
   /** Poll interval in ms. Default: 30_000. 0 disables polling. */
   pollIntervalMs?: number;
@@ -157,7 +157,7 @@ export class ManifestRegistry {
   /** Fetch the manifest once. Throws on network / parse error. */
   async refresh(): Promise<RegistryManifest> {
     if (!this.opts.url) {
-      throw new Error('[moxjs/runtime] ManifestRegistry: refresh() requires `url`');
+      throw new Error('[jorvel/runtime] ManifestRegistry: refresh() requires `url`');
     }
     const f = this.opts.fetch ?? fetch;
     let res: Response;
@@ -178,7 +178,7 @@ export class ManifestRegistry {
   }
 
   /**
-   * Fetch a remote's `/moxjs/health` and disable the registry entry when it
+   * Fetch a remote's `/jorvel/health` and disable the registry entry when it
    * answers DOWN. Use after `refresh()` to apply health-aware filtering.
    */
   async withHealth(healthUrlFor: (entry: RegistryEntry) => string): Promise<void> {
@@ -201,7 +201,7 @@ export class ManifestRegistry {
 
   /** Begin polling. Idempotent — calling twice is a no-op. */
   start(): void {
-    if (this.destroyed) throw new Error('[moxjs/runtime] ManifestRegistry: already destroyed');
+    if (this.destroyed) throw new Error('[jorvel/runtime] ManifestRegistry: already destroyed');
     if (this.timer !== null) return;
     const interval = this.opts.pollIntervalMs ?? 30_000;
     if (!this.opts.url || interval <= 0) return;

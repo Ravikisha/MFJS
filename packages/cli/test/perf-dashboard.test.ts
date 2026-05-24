@@ -98,7 +98,7 @@ describe('renderTable', () => {
 
 describe('runDashboard (NDJSON input)', () => {
   it('reads each line, applies events, returns the populated aggregator', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-perfdash-'));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-perfdash-'));
     const nd = [
       JSON.stringify({ remote: 'a', url: 'u', phase: 'start' }),
       JSON.stringify({ remote: 'a', url: 'u', phase: 'success', durationMs: 50, bytes: 1000 }),
@@ -122,7 +122,7 @@ describe('runDashboard (NDJSON input)', () => {
   });
 
   it('reads budgets from --budgets file', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-perfdash-'));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-perfdash-'));
     const budgets = path.join(tmp, 'budgets.json');
     await fs.writeJson(budgets, [{ match: 'a', maxBytes: 100 }]);
     const events = path.join(tmp, 'events.ndjson');

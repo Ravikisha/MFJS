@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://moxjs.vercel.app/schemas/moxjs.federation.json",
-  "title": "MOXJS Federation Config",
-  "description": "Schema for moxjs.federation.json — written by `moxjs federation`, consumed by Rspack ModuleFederationPlugin.",
+  "$id": "https://jorveljs.vercel.app/schemas/jorvel.federation.json",
+  "title": "JORVEL Federation Config",
+  "description": "Schema for jorvel.federation.json — written by `jorvel federation`, consumed by Rspack ModuleFederationPlugin.",
   "type": "object",
   "additionalProperties": false,
   "required": ["name", "filename", "shared"],

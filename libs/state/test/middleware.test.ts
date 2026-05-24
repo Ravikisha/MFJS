@@ -143,7 +143,7 @@ describe('loggerMiddleware', () => {
       loggerMiddleware<State, Action>({ log, format: (a) => a.type }),
     ]);
     store.dispatch({ type: 'inc' });
-    expect(log).toHaveBeenCalledWith('[moxjs/state]', 'inc');
+    expect(log).toHaveBeenCalledWith('[jorvel/state]', 'inc');
   });
 });
 

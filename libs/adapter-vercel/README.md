@@ -1,18 +1,18 @@
-# @moxjs/adapter-vercel
+# @jorvel/adapter-vercel
 
-Vercel deployment adapter for MOXJS.
+Vercel deployment adapter for JORVEL.
 
 ## Install
 
 ```sh
-pnpm add @moxjs/adapter-vercel
+pnpm add @jorvel/adapter-vercel
 ```
 
 ## Use
 
 ```ts
 // api/ssr.ts
-import { createVercelHandler } from '@moxjs/adapter-vercel';
+import { createVercelHandler } from '@jorvel/adapter-vercel';
 import App from '../src/App.js';
 import { routes } from '../src/routes.js';
 import template from '../public/index.html?raw';

@@ -10,7 +10,7 @@ const dashboardContract = defineFederationContract({
   name: 'dashboard',
   exposes: {
     './App': './src/remote.tsx',
-    './pages': './src/moxjs.routes.ts',
+    './pages': './src/jorvel.routes.ts',
   },
 });
 
@@ -102,7 +102,7 @@ describe('generateContractTestSource', () => {
       contractImport: '../src/contracts/dashboard.js',
       contractExport: 'dashboardContract',
     });
-    expect(src).toContain("import { contractChecks } from '@moxjs/types/testing';");
+    expect(src).toContain("import { contractChecks } from '@jorvel/types/testing';");
     expect(src).toContain("import { dashboardContract } from '../src/contracts/dashboard.js';");
     expect(src).toContain("import { loadContainer } from './load-container.js';");
     expect(src).toContain('describe(\'dashboardContract\'');

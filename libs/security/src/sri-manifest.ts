@@ -44,7 +44,7 @@ const DEFAULT_CONCURRENCY = 6;
 
 async function defaultFetcher(url: string): Promise<Uint8Array> {
   const res = await fetch(url);
-  if (!res.ok) throw new Error(`[moxjs/security] SRI fetch failed: ${url} (${res.status})`);
+  if (!res.ok) throw new Error(`[jorvel/security] SRI fetch failed: ${url} (${res.status})`);
   return new Uint8Array(await res.arrayBuffer());
 }
 

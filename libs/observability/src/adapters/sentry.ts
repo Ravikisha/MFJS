@@ -25,7 +25,7 @@ export function useSentryAdapter(sentry: SentryLike, opts: SentryAdapterOptions 
       sentry.captureMessage?.(`Remote ${e.phase}: ${e.remote}`, 'warning');
     }
     sentry.addBreadcrumb?.({
-      category: 'moxjs.remote',
+      category: 'jorvel.remote',
       message: `${e.remote} ${e.phase}`,
       data: { url: e.url, durationMs: e.durationMs },
       level: 'info',
@@ -35,7 +35,7 @@ export function useSentryAdapter(sentry: SentryLike, opts: SentryAdapterOptions 
   if (opts.captureMetrics) {
     disposers.push(onMetric((m) => {
       sentry.addBreadcrumb?.({
-        category: 'moxjs.metric',
+        category: 'jorvel.metric',
         message: m.name,
         data: { value: m.value, unit: m.unit, ...m.tags },
       });

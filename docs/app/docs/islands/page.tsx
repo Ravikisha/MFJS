@@ -27,7 +27,7 @@ export default function Islands() {
       <h2 id="use">Basic use</h2>
       <CodeBlock
         language="tsx"
-        code={`import { Island } from '@moxjs/runtime';
+        code={`import { Island } from '@jorvel/runtime';
 
 <Island
   strategy="visible"
@@ -94,7 +94,7 @@ export default function Islands() {
       </p>
       <CodeBlock
         language="tsx"
-        code={`import { clientBoundary } from '@moxjs/runtime';
+        code={`import { clientBoundary } from '@jorvel/runtime';
 
 const Counter = clientBoundary(function Counter() {
   const [n, set] = React.useState(0);
@@ -203,7 +203,7 @@ const Counter = clientBoundary(function Counter() {
   strategy="visible"
   load={() => import('./Carousel.js')}
   fallback={<CarouselSkeleton />}
-  onHydrate={() => reportMetric({ name: 'moxjs.island.hydrate', tags: { name: 'carousel' } })}
+  onHydrate={() => reportMetric({ name: 'jorvel.island.hydrate', tags: { name: 'carousel' } })}
 />`}
       />
 

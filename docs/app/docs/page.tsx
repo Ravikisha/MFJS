@@ -22,7 +22,7 @@ import {
 export const metadata = {
   title: 'Documentation',
   description:
-    'Build, deploy, and operate production micro-frontends with MOXJS. Quickstart, concepts, API reference, and deployment guides.',
+    'Build, deploy, and operate production micro-frontends with JORVEL. Quickstart, concepts, API reference, and deployment guides.',
 };
 
 export default function DocsIndex() {
@@ -75,7 +75,7 @@ function QuickFinds() {
     {
       icon: <CompassIcon />,
       title: 'Core concepts',
-      body: 'How MOXJS thinks about hosts, remotes, federation, and the runtime contract.',
+      body: 'How JORVEL thinks about hosts, remotes, federation, and the runtime contract.',
       href: '/docs/concepts',
     },
     {
@@ -137,7 +137,7 @@ function ByExperience() {
         },
         {
           href: '/docs/getting-started',
-          label: 'Hello, MOXJS',
+          label: 'Hello, JORVEL',
           body: 'Five-command quickstart from empty folder to dev server.',
           icon: <RocketIcon />,
         },
@@ -167,7 +167,7 @@ function ByExperience() {
         },
         {
           href: '/docs/api/runtime',
-          label: '@moxjs/runtime API',
+          label: '@jorvel/runtime API',
           body: 'createRouter, RemoteOutlet, hooks, prefetchRoute, telemetry.',
           icon: <CodeIcon />,
         },
@@ -247,7 +247,7 @@ function Frameworks() {
     {
       icon: <LayersIcon />,
       label: 'Vue',
-      body: 'Mount Vue remotes; share state via @moxjs/event-bus.',
+      body: 'Mount Vue remotes; share state via @jorvel/event-bus.',
       href: '/docs/federation',
     },
     {

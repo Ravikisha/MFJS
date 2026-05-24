@@ -152,24 +152,24 @@ body {
 
 /* ── Prose ─────────────────────────────────────────────────────────────── */
 
-.prose-moxjs {
+.prose-jorvel {
   max-width: 76ch;
   color: hsl(var(--foreground));
 }
 
-.prose-moxjs h1 {
+.prose-jorvel h1 {
   font-size: 2.5rem;
   font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1.1;
   margin: 0 0 1rem;
 }
-.prose-moxjs > p:first-of-type {
+.prose-jorvel > p:first-of-type {
   font-size: 1.125rem;
   color: hsl(var(--muted-foreground));
   line-height: 1.65;
 }
-.prose-moxjs h2 {
+.prose-jorvel h2 {
   font-size: 1.625rem;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -178,25 +178,25 @@ body {
   padding-top: 0.5rem;
   scroll-margin-top: 6rem;
 }
-.prose-moxjs h3 {
+.prose-jorvel h3 {
   font-size: 1.125rem;
   font-weight: 600;
   margin-top: 2rem;
   margin-bottom: 0.5rem;
   scroll-margin-top: 6rem;
 }
-.prose-moxjs p,
-.prose-moxjs ul,
-.prose-moxjs ol {
+.prose-jorvel p,
+.prose-jorvel ul,
+.prose-jorvel ol {
   margin: 0.85rem 0;
   line-height: 1.75;
 }
-.prose-moxjs ul { list-style: disc; padding-left: 1.5rem; }
-.prose-moxjs ol { list-style: decimal; padding-left: 1.5rem; }
-.prose-moxjs li { margin: 0.25rem 0; }
-.prose-moxjs li::marker { color: hsl(var(--muted-foreground)); }
+.prose-jorvel ul { list-style: disc; padding-left: 1.5rem; }
+.prose-jorvel ol { list-style: decimal; padding-left: 1.5rem; }
+.prose-jorvel li { margin: 0.25rem 0; }
+.prose-jorvel li::marker { color: hsl(var(--muted-foreground)); }
 
-.prose-moxjs code {
+.prose-jorvel code {
   font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
   background: hsl(var(--muted));
   color: hsl(var(--accent));
@@ -207,7 +207,7 @@ body {
   border: 1px solid hsl(var(--border));
 }
 
-.prose-moxjs pre {
+.prose-jorvel pre {
   background: hsl(240 10% 5%);
   color: hsl(0 0% 90%);
   padding: 1rem 1.25rem;
@@ -220,7 +220,7 @@ body {
   border: 1px solid hsl(240 6% 12%);
   box-shadow: 0 1px 0 hsl(240 6% 12%) inset;
 }
-.prose-moxjs pre code {
+.prose-jorvel pre code {
   background: transparent;
   border: none;
   color: inherit;
@@ -229,18 +229,18 @@ body {
   font-weight: 400;
 }
 
-.prose-moxjs a {
+.prose-jorvel a {
   color: hsl(var(--accent));
   text-decoration: underline;
   text-decoration-color: hsl(var(--accent) / 0.4);
   text-underline-offset: 3px;
   transition: text-decoration-color 0.15s;
 }
-.prose-moxjs a:hover {
+.prose-jorvel a:hover {
   text-decoration-color: hsl(var(--accent));
 }
 
-.prose-moxjs table {
+.prose-jorvel table {
   width: 100%;
   border-collapse: collapse;
   margin: 1.25rem 0;
@@ -249,19 +249,19 @@ body {
   border-radius: 0.5rem;
   overflow: hidden;
 }
-.prose-moxjs th,
-.prose-moxjs td {
+.prose-jorvel th,
+.prose-jorvel td {
   text-align: left;
   padding: 0.65rem 0.85rem;
   border-bottom: 1px solid hsl(var(--border));
 }
-.prose-moxjs th {
+.prose-jorvel th {
   font-weight: 600;
   background: hsl(var(--muted));
   color: hsl(var(--foreground));
 }
 
-.prose-moxjs blockquote {
+.prose-jorvel blockquote {
   border-left: 3px solid hsl(var(--accent));
   background: hsl(var(--accent) / 0.06);
   padding: 0.75rem 1rem;
@@ -270,7 +270,7 @@ body {
   margin: 1rem 0;
 }
 
-.prose-moxjs hr {
+.prose-jorvel hr {
   border: 0;
   border-top: 1px solid hsl(var(--border));
   margin: 2rem 0;
@@ -351,7 +351,7 @@ body {
 .tk-op       { color: hsl(330 75% 75%); }
 
 /* Inline code in prose stays a single-color chip */
-.prose-moxjs :not(pre) > code {
+.prose-jorvel :not(pre) > code {
   font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
   background: hsl(var(--muted));
   color: hsl(var(--accent));
@@ -363,12 +363,12 @@ body {
 }
 
 /* Heading anchors */
-.prose-moxjs h2,
-.prose-moxjs h3 {
+.prose-jorvel h2,
+.prose-jorvel h3 {
   position: relative;
 }
-.prose-moxjs h2 .anchor,
-.prose-moxjs h3 .anchor {
+.prose-jorvel h2 .anchor,
+.prose-jorvel h3 .anchor {
   position: absolute;
   left: -1.25rem;
   opacity: 0;
@@ -377,8 +377,8 @@ body {
   text-decoration: none;
   font-weight: 400;
 }
-.prose-moxjs h2:hover .anchor,
-.prose-moxjs h3:hover .anchor { opacity: 1; }
+.prose-jorvel h2:hover .anchor,
+.prose-jorvel h3:hover .anchor { opacity: 1; }
 
 /* Callout component (used by <Callout> + .callout class fallback) */
 .callout-root {

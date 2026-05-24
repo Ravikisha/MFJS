@@ -1,5 +1,5 @@
 /**
- * @moxjs/ssr — renderToStream
+ * @jorvel/ssr — renderToStream
  *
  * Streaming SSR via React 18's `renderToPipeableStream`. Returns a Node.js
  * `Readable` stream that yields the rendered HTML in chunks. For edge
@@ -95,7 +95,7 @@ export function renderRouteToStream(
           // Reporter must never break the host.
         }
       } else {
-        console.error('[moxjs/ssr] streaming render error:', error);
+        console.error('[jorvel/ssr] streaming render error:', error);
       }
     },
   });
@@ -120,7 +120,7 @@ export function renderRouteToStream(
   if (opts.timeoutMs && opts.timeoutMs > 0) {
     timeoutHandle = setTimeout(() => {
       abort();
-      const err = new Error(`[moxjs/ssr] streaming render timed out after ${opts.timeoutMs}ms`);
+      const err = new Error(`[jorvel/ssr] streaming render timed out after ${opts.timeoutMs}ms`);
       errors.push(err);
       rejectAll(err);
     }, opts.timeoutMs);

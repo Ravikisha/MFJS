@@ -1,11 +1,11 @@
 /**
- * `moxjs schema` — emit JSON Schemas for MOXJS config files.
+ * `jorvel schema` — emit JSON Schemas for JORVEL config files.
  *
  * Schemas:
- *   - moxjs.config       — workspace root config
- *   - moxjs.app          — per-app manifest
- *   - moxjs.federation   — federation graph
- *   - moxjs.ssr          — SSR options
+ *   - jorvel.config       — workspace root config
+ *   - jorvel.app          — per-app manifest
+ *   - jorvel.federation   — federation graph
+ *   - jorvel.ssr          — SSR options
  *
  * The schemas are pure data so they ship to the registry, the docs site, and
  * the IDE extensions from a single source of truth.
@@ -15,7 +15,7 @@ import { Command } from 'commander';
 import path from 'node:path';
 import fs from 'node:fs';
 
-export type SchemaName = 'moxjs.config' | 'moxjs.app' | 'moxjs.federation' | 'moxjs.ssr';
+export type SchemaName = 'jorvel.config' | 'jorvel.app' | 'jorvel.federation' | 'jorvel.ssr';
 
 export interface JsonSchema {
   $schema: string;
@@ -34,20 +34,20 @@ export interface SchemaCatalog {
 
 const DRAFT = 'https://json-schema.org/draft/2020-12/schema';
 
-export function buildSchemas(baseUrl = 'https://moxjs.vercel.app/schemas'): SchemaCatalog {
+export function buildSchemas(baseUrl = 'https://jorveljs.vercel.app/schemas'): SchemaCatalog {
   return {
-    'moxjs.config': configSchema(baseUrl),
-    'moxjs.app': appSchema(baseUrl),
-    'moxjs.federation': federationSchema(baseUrl),
-    'moxjs.ssr': ssrSchema(baseUrl),
+    'jorvel.config': configSchema(baseUrl),
+    'jorvel.app': appSchema(baseUrl),
+    'jorvel.federation': federationSchema(baseUrl),
+    'jorvel.ssr': ssrSchema(baseUrl),
   };
 }
 
 function configSchema(baseUrl: string): JsonSchema {
   return {
     $schema: DRAFT,
-    $id: `${baseUrl}/moxjs.config.json`,
-    title: 'MOXJS workspace config',
+    $id: `${baseUrl}/jorvel.config.json`,
+    title: 'JORVEL workspace config',
     type: 'object',
     additionalProperties: false,
     properties: {
@@ -78,7 +78,7 @@ function configSchema(baseUrl: string): JsonSchema {
           ],
         },
       },
-      ssr: { $ref: `${baseUrl}/moxjs.ssr.json` },
+      ssr: { $ref: `${baseUrl}/jorvel.ssr.json` },
     },
     required: ['name'],
   };
@@ -87,8 +87,8 @@ function configSchema(baseUrl: string): JsonSchema {
 function appSchema(baseUrl: string): JsonSchema {
   return {
     $schema: DRAFT,
-    $id: `${baseUrl}/moxjs.app.json`,
-    title: 'MOXJS app manifest',
+    $id: `${baseUrl}/jorvel.app.json`,
+    title: 'JORVEL app manifest',
     type: 'object',
     additionalProperties: false,
     properties: {
@@ -109,8 +109,8 @@ function appSchema(baseUrl: string): JsonSchema {
 function federationSchema(baseUrl: string): JsonSchema {
   return {
     $schema: DRAFT,
-    $id: `${baseUrl}/moxjs.federation.json`,
-    title: 'MOXJS federation manifest',
+    $id: `${baseUrl}/jorvel.federation.json`,
+    title: 'JORVEL federation manifest',
     type: 'object',
     additionalProperties: false,
     properties: {
@@ -141,8 +141,8 @@ function federationSchema(baseUrl: string): JsonSchema {
 function ssrSchema(baseUrl: string): JsonSchema {
   return {
     $schema: DRAFT,
-    $id: `${baseUrl}/moxjs.ssr.json`,
-    title: 'MOXJS SSR options',
+    $id: `${baseUrl}/jorvel.ssr.json`,
+    title: 'JORVEL SSR options',
     type: 'object',
     additionalProperties: false,
     properties: {
@@ -197,7 +197,7 @@ export function writeSchemas(opts: WriteSchemasOptions): WriteSchemasResult {
 /**
  * Lightweight runtime validator — checks `$schema` + the required keys + the
  * property type for top-level keys. Not a full JSON Schema engine (we'd pull
- * `ajv` for that); enough to catch typos at `moxjs init` time.
+ * `ajv` for that); enough to catch typos at `jorvel init` time.
  */
 export interface ValidateResult {
   ok: boolean;
@@ -247,9 +247,9 @@ function matchesType(value: unknown, type: string): boolean {
 }
 
 export const schemaCommand = new Command('schema')
-  .description('Emit JSON Schemas for moxjs config files (config / app / federation / ssr).')
+  .description('Emit JSON Schemas for jorvel config files (config / app / federation / ssr).')
   .option('--out <dir>', 'output directory', './schemas')
-  .option('--base-url <url>', 'base URL embedded into $id fields', 'https://moxjs.vercel.app/schemas')
+  .option('--base-url <url>', 'base URL embedded into $id fields', 'https://jorveljs.vercel.app/schemas')
   .option('--minify', 'emit compact JSON (no indent)')
   .action((opts: { out: string; baseUrl: string; minify?: boolean }) => {
     const writeOpts: WriteSchemasOptions = {

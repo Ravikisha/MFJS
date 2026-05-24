@@ -2,83 +2,101 @@
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="logo/09-orchestrator-node.svg">
     <source media="(prefers-color-scheme: light)" srcset="logo/09-orchestrator-node-light.svg">
-    <img src="logo/09-orchestrator-node.svg" alt="MOXJS" width="180" height="180">
+    <img src="logo/09-orchestrator-node.svg" alt="JORVEL" width="180" height="180">
   </picture>
 </p>
 
-<h1 align="center">MOXJS</h1>
+<h1 align="center">JORVEL</h1>
 
 <p align="center">
   <strong>Opinionated micro-frontend framework + tooling built on Rspack Module Federation.</strong>
 </p>
 
 <p align="center">
-  <a href="https://moxjs.vercel.app/">Website</a> ·
-  <a href="https://moxjs.vercel.app/docs">Docs</a> ·
-  <a href="https://moxjs.vercel.app/docs/getting-started">Quickstart</a> ·
-  <a href="https://github.com/Ravikisha/MFJS">GitHub</a> ·
-  <a href="https://github.com/Ravikisha/MFJS/issues">Issues</a>
+  <a href="https://jorveljs.vercel.app/">Website</a> ·
+  <a href="https://jorveljs.vercel.app/docs">Docs</a> ·
+  <a href="https://jorveljs.vercel.app/docs/getting-started">Quickstart</a> ·
+  <a href="https://github.com/Ravikisha/JorvelJS">GitHub</a> ·
+  <a href="https://github.com/Ravikisha/JorvelJS/issues">Issues</a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/Ravikisha/MFJS/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/Ravikisha/MFJS?color=blue"></a>
-  <a href="https://github.com/Ravikisha/MFJS/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/Ravikisha/MFJS?style=social"></a>
-  <a href="https://github.com/Ravikisha/MFJS/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/Ravikisha/MFJS"></a>
-  <a href="https://github.com/Ravikisha/MFJS/pulls"><img alt="GitHub PRs" src="https://img.shields.io/github/issues-pr/Ravikisha/MFJS"></a>
-  <a href="https://github.com/Ravikisha/MFJS/commits/main"><img alt="Last commit" src="https://img.shields.io/github/last-commit/Ravikisha/MFJS"></a>
+  <a href="https://www.npmjs.com/package/jorvel"><img alt="npm jorvel" src="https://img.shields.io/npm/v/jorvel?label=%40jorvel%2Fcli&color=cb3837&logo=npm"></a>
+  <a href="https://www.npmjs.com/package/@jorvel/runtime"><img alt="npm @jorvel/runtime" src="https://img.shields.io/npm/v/@jorvel/runtime?label=%40jorvel%2Fruntime&color=cb3837&logo=npm"></a>
+  <a href="https://www.npmjs.com/package/@jorvel/ssr"><img alt="npm @jorvel/ssr" src="https://img.shields.io/npm/v/@jorvel/ssr?label=%40jorvel%2Fssr&color=cb3837&logo=npm"></a>
+  <a href="https://github.com/Ravikisha/JorvelJS/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/Ravikisha/JorvelJS?color=blue"></a>
+  <a href="https://github.com/Ravikisha/JorvelJS/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/Ravikisha/JorvelJS?style=social"></a>
+  <a href="https://github.com/Ravikisha/JorvelJS/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/Ravikisha/JorvelJS"></a>
+  <a href="https://github.com/Ravikisha/JorvelJS/pulls"><img alt="GitHub PRs" src="https://img.shields.io/github/issues-pr/Ravikisha/JorvelJS"></a>
+  <a href="https://github.com/Ravikisha/JorvelJS/commits/main"><img alt="Last commit" src="https://img.shields.io/github/last-commit/Ravikisha/JorvelJS"></a>
   <br>
   <img alt="Node" src="https://img.shields.io/badge/node-%3E%3D20-43853d?logo=node.js&logoColor=white">
   <img alt="pnpm" src="https://img.shields.io/badge/pnpm-9.15+-f69220?logo=pnpm&logoColor=white">
   <img alt="TypeScript" src="https://img.shields.io/badge/typescript-strict-3178c6?logo=typescript&logoColor=white">
   <img alt="Rspack" src="https://img.shields.io/badge/rspack-1.7+-orange">
   <img alt="React" src="https://img.shields.io/badge/react-18%20%7C%2019-61dafb?logo=react&logoColor=white">
-  <a href="https://moxjs.vercel.app/"><img alt="Live" src="https://img.shields.io/badge/live-moxjs.vercel.app-000?logo=vercel"></a>
+  <a href="https://jorveljs.vercel.app/"><img alt="Live" src="https://img.shields.io/badge/live-jorveljs.vercel.app-000?logo=vercel"></a>
 </p>
 
 ---
 
-## Why MOXJS?
+## Why JORVEL?
 
-Micro-frontends solve a real problem — independent teams shipping independent frontends on independent cadences — but the tooling around them is fragmented. MOXJS bundles the missing pieces into one opinionated framework:
+Micro-frontends solve a real problem — independent teams shipping independent frontends on independent cadences — but the tooling around them is fragmented. JORVEL bundles the missing pieces into one opinionated framework:
 
 - **Module Federation, configured for you.** Rspack `ModuleFederationPlugin` with React-singleton sharing, SRI, allowlists, CDN-aware public-path — out of the box.
 - **A real router.** Two-tier (host owns prefixes, remotes own sub-paths), file-based, typed, guarded, prefetch-aware. No `react-router` dependency.
 - **SSR + SSG + Edge.** Render to string, stream to a `ReadableStream`, export to disk, deploy to Vercel Edge / Cloudflare Workers / Node / Docker.
 - **A production toolbelt.** CSP builder, SRI helpers, RUM beacon, structured logger, Web Vitals, rate limiter, audit log — all edge-runtime safe.
 - **Cross-app primitives.** Event bus with typed schemas, shared state with `globalThis` fallback, i18n with ICU-lite interpolation.
-- **A CLI that scaffolds the whole thing.** `moxjs init` → workspace + CI + ESLint + Vitest + Playwright in one go.
+- **A CLI that scaffolds the whole thing.** `jorvel init` → workspace + CI + ESLint + Vitest + Playwright in one go.
 
-> **Live demo + full docs:** **<https://moxjs.vercel.app/>**
+> **Live demo + full docs:** **<https://jorveljs.vercel.app/>**
 
 ---
+
+## Install
+
+All packages live under the [`@jorvel`](https://www.npmjs.com/org/jorvel) scope on npm.
+
+```sh
+# CLI (one-shot, no install needed)
+pnpm dlx jorvel@latest init my-app
+
+# Or install per-package
+pnpm add @jorvel/runtime @jorvel/ssr @jorvel/security
+pnpm add -D jorvel @jorvel/types @jorvel/tsconfig @jorvel/eslint-config @jorvel/prettier-config
+```
+
+Full package index → <https://www.npmjs.com/org/jorvel>.
 
 ## Quickstart
 
 ```sh
 # 1. Scaffold a workspace
-pnpm dlx @moxjs/cli@latest init my-app
+pnpm dlx jorvel@latest init my-app
 cd my-app
 
 # 2. Generate host + remote
-moxjs scaffold app           # interactive
+jorvel scaffold app           # interactive
 # or non-interactive:
-# moxjs generate host shell --port 3000
-# moxjs generate remote dashboard --port 3001
-# moxjs federation
+# jorvel generate host shell --port 3000
+# jorvel generate remote dashboard --port 3001
+# jorvel federation
 
 # 3. Run dev server (same-origin remotes + HMR)
-moxjs dev --proxy-remotes --hmr-remotes
+jorvel dev --proxy-remotes --hmr-remotes
 ```
 
-Open <http://localhost:3000>. Drop a file in `apps/dashboard/src/pages/` and `moxjs routes` picks it up.
+Open <http://localhost:3000>. Drop a file in `apps/dashboard/src/pages/` and `jorvel routes` picks it up.
 
 ### With Tailwind
 
 ```sh
-moxjs init my-app --tailwind
+jorvel init my-app --tailwind
 # or per app:
-moxjs generate host shell --tailwind
-moxjs generate remote dashboard --tailwind
+jorvel generate host shell --tailwind
+jorvel generate remote dashboard --tailwind
 ```
 
 ---
@@ -87,20 +105,24 @@ moxjs generate remote dashboard --tailwind
 
 | Path | Package | Purpose |
 |---|---|---|
-| `packages/cli` | `@moxjs/cli` | `moxjs` CLI — init / generate / dev / build / federation / routes / deploy / SSR |
-| `libs/runtime` | `@moxjs/runtime` | Router, routing components, hooks, remote loader, prefetch, islands, View Transitions, Shadow DOM, image, fonts |
-| `libs/ssr` | `@moxjs/ssr` | `renderRouteToString`, streaming SSR, static export, edge adapter, loaders, fragments, request context |
-| `libs/security` | `@moxjs/security` | CSP, SRI, origin allowlist, rate limit, audit log, OAuth helpers, sanitize |
-| `libs/observability` | `@moxjs/observability` | Hooks, structured logger, Web Vitals, Sentry / OTel / console adapters, RUM beacon |
-| `libs/state` | `@moxjs/state` | Simple store, reducer store, selectors, middleware, devtools |
-| `libs/event-bus` | `@moxjs/event-bus` | Typed pub/sub, replay, schema validation, cross-tab broadcast |
-| `libs/i18n` | `@moxjs/i18n` | ICU-lite interpolation, lazy catalogs, locale detection |
-| `libs/ui` | `@moxjs/ui` | Headless-ish primitives — Button, Input, Modal, Toast, Card, ThemeProvider |
-| `libs/adapter-vercel` | `@moxjs/adapter-vercel` | Vercel Edge handler factory |
-| `libs/adapter-cloudflare` | `@moxjs/adapter-cloudflare` | Cloudflare Workers / Pages handler |
-| `libs/adapter-node` | `@moxjs/adapter-node` | Hardened Node server |
-| `libs/types` | `@moxjs/types` | Shared types + federation contract DSL + JSON Schemas |
-| `libs/events`, `libs/eslint-config`, `libs/prettier-config`, `libs/tsconfig` | — | Shared configs |
+| `packages/cli` | [`jorvel`](https://www.npmjs.com/package/jorvel) | `jorvel` CLI — init / generate / dev / build / federation / routes / deploy / SSR |
+| `libs/runtime` | [`@jorvel/runtime`](https://www.npmjs.com/package/@jorvel/runtime) | Router, routing components, hooks, remote loader, prefetch, islands, View Transitions, Shadow DOM, image, fonts |
+| `libs/ssr` | [`@jorvel/ssr`](https://www.npmjs.com/package/@jorvel/ssr) | `renderRouteToString`, streaming SSR, static export, edge adapter, loaders, fragments, request context |
+| `libs/security` | [`@jorvel/security`](https://www.npmjs.com/package/@jorvel/security) | CSP, SRI, origin allowlist, rate limit, audit log, OAuth helpers, sanitize |
+| `libs/observability` | [`@jorvel/observability`](https://www.npmjs.com/package/@jorvel/observability) | Hooks, structured logger, Web Vitals, Sentry / OTel / console adapters, RUM beacon |
+| `libs/state` | [`@jorvel/state`](https://www.npmjs.com/package/@jorvel/state) | Simple store, reducer store, selectors, middleware, devtools |
+| `libs/event-bus` | [`@jorvel/event-bus`](https://www.npmjs.com/package/@jorvel/event-bus) | Typed pub/sub, replay, schema validation, cross-tab broadcast |
+| `libs/i18n` | [`@jorvel/i18n`](https://www.npmjs.com/package/@jorvel/i18n) | ICU-lite interpolation, lazy catalogs, locale detection |
+| `libs/ui` | [`@jorvel/ui`](https://www.npmjs.com/package/@jorvel/ui) | Headless-ish primitives — Button, Input, Modal, Toast, Card, ThemeProvider |
+| `libs/adapter-vercel` | [`@jorvel/adapter-vercel`](https://www.npmjs.com/package/@jorvel/adapter-vercel) | Vercel Edge handler factory |
+| `libs/adapter-cloudflare` | [`@jorvel/adapter-cloudflare`](https://www.npmjs.com/package/@jorvel/adapter-cloudflare) | Cloudflare Workers / Pages handler |
+| `libs/adapter-node` | [`@jorvel/adapter-node`](https://www.npmjs.com/package/@jorvel/adapter-node) | Hardened Node server |
+| `libs/types` | [`@jorvel/types`](https://www.npmjs.com/package/@jorvel/types) | Shared types + federation contract DSL + JSON Schemas |
+| `libs/events` | [`@jorvel/events`](https://www.npmjs.com/package/@jorvel/events) | Shared event-name + payload registry |
+| `libs/rspack-route-assets` | [`@jorvel/rspack-route-assets`](https://www.npmjs.com/package/@jorvel/rspack-route-assets) | Per-route asset manifest plugin |
+| `libs/eslint-config` | [`@jorvel/eslint-config`](https://www.npmjs.com/package/@jorvel/eslint-config) | Shared ESLint 9 flat config |
+| `libs/prettier-config` | [`@jorvel/prettier-config`](https://www.npmjs.com/package/@jorvel/prettier-config) | Shared Prettier config |
+| `libs/tsconfig` | [`@jorvel/tsconfig`](https://www.npmjs.com/package/@jorvel/tsconfig) | Shared TypeScript presets |
 | `docs/` | — | Documentation site (Next.js 16) |
 | `examples/basic` | — | Runnable host + remote example |
 
@@ -112,8 +134,8 @@ moxjs generate remote dashboard --tailwind
 
 ```tsx
 // shell/src/bootstrap.tsx
-import { NavLink, RemoteOutlet, getRouter } from '@moxjs/runtime';
-import type { RouteTarget } from '@moxjs/runtime';
+import { NavLink, RemoteOutlet, getRouter } from '@jorvel/runtime';
+import type { RouteTarget } from '@jorvel/runtime';
 
 const HOST_ROUTES: RouteTarget[] = [
   { path: '/dashboard/*', remote: 'dashboard', module: './App' },
@@ -148,21 +170,21 @@ File-based pages in remotes:
 | `src/pages/users/[id].tsx` | `/users/:id` |
 | `src/pages/(marketing)/about.tsx` | `/about` (group) |
 
-Run `moxjs routes` (or `moxjs routes --watch`) to generate `src/moxjs.routes.ts`.
+Run `jorvel routes` (or `jorvel routes --watch`) to generate `src/jorvel.routes.ts`.
 
 ### Federation — Rspack Module Federation, sane defaults
 
 - Host sets `eager: true` on shared React, remote sets `eager: false`.
-- Auto-detection: `moxjs federation` reads `moxjs.app.json` and infers exposes + shared.
+- Auto-detection: `jorvel federation` reads `jorvel.app.json` and infers exposes + shared.
 - SRI: `federation.sri.algo = "sha384"` on every `remoteEntry.js`.
 - Origin allowlist with `*` / `**` wildcards.
 
 ### SSR & SSG
 
 ```sh
-moxjs ssr export                          # static export
-moxjs ssr serve --port 3000               # streaming Node server
-moxjs ssr serve --port 3000 --no-stream   # disable streaming
+jorvel ssr export                          # static export
+jorvel ssr serve --port 3000               # streaming Node server
+jorvel ssr serve --port 3000 --no-stream   # disable streaming
 ```
 
 Programmatic surface:
@@ -178,12 +200,12 @@ Programmatic surface:
 
 | Concern | Package | Highlights |
 |---|---|---|
-| Security | `@moxjs/security` | `buildCsp` strict-dynamic + nonce, `sriHash`, `RemoteAllowlist`, `createRateLimitGuard`, `AuditLogger`, OAuth PKCE helpers |
-| Observability | `@moxjs/observability` | `onError` / `onMetric` / `onRemoteLoad`, Web Vitals, Sentry + OTel adapters, RUM beacon |
-| Shared state | `@moxjs/state` | `getStore` / `getSimpleStore`, middleware (thunk/logger/persistence), Redux DevTools |
-| Cross-app events | `@moxjs/event-bus` | Typed `EventBus`, replay-on-subscribe, schema validation, `BroadcastChannel` cross-tab |
-| i18n | `@moxjs/i18n` | ICU-lite plural arms, lazy catalogs, `detectLocale(acceptLanguage, supported, fallback)` |
-| UI primitives | `@moxjs/ui` | Button, Input, Modal, Toast, Card, ThemeProvider + Storybook scaffold |
+| Security | `@jorvel/security` | `buildCsp` strict-dynamic + nonce, `sriHash`, `RemoteAllowlist`, `createRateLimitGuard`, `AuditLogger`, OAuth PKCE helpers |
+| Observability | `@jorvel/observability` | `onError` / `onMetric` / `onRemoteLoad`, Web Vitals, Sentry + OTel adapters, RUM beacon |
+| Shared state | `@jorvel/state` | `getStore` / `getSimpleStore`, middleware (thunk/logger/persistence), Redux DevTools |
+| Cross-app events | `@jorvel/event-bus` | Typed `EventBus`, replay-on-subscribe, schema validation, `BroadcastChannel` cross-tab |
+| i18n | `@jorvel/i18n` | ICU-lite plural arms, lazy catalogs, `detectLocale(acceptLanguage, supported, fallback)` |
+| UI primitives | `@jorvel/ui` | Button, Input, Modal, Toast, Card, ThemeProvider + Storybook scaffold |
 
 ### Runtime extras
 
@@ -192,7 +214,7 @@ Programmatic surface:
 - **View Transitions.** `navigateWithTransition`, reduced-motion safe, fallback to plain swap.
 - **Islands hydration.** `<Island strategy="visible" load={...} />` — five strategies.
 - **CSS isolation.** `ShadowRemote` or `scopeCss`.
-- **Service Worker.** `moxjs sw generate` + `registerMoxjsServiceWorker`.
+- **Service Worker.** `jorvel sw generate` + `registerJorvelServiceWorker`.
 - **Image + fonts.** `<Image />`, `buildSrcset`, `buildFontFaceCss`, Google Fonts URL composer.
 - **Resilience.** `withRetry`, `createCircuitBreaker`, `withTimeout`.
 - **Blue/green + weighted remotes.** Canary, fail-over, deterministic flip.
@@ -202,16 +224,16 @@ Programmatic surface:
 
 ## Deployment
 
-`moxjs deploy --target <vercel|cloudflare|node|docker>` scaffolds the adapter and platform config.
+`jorvel deploy --target <vercel|cloudflare|node|docker>` scaffolds the adapter and platform config.
 
 | Target | Package | Notes |
 |---|---|---|
-| Vercel Edge | `@moxjs/adapter-vercel` | `export const config = { runtime: 'edge' }` |
-| Cloudflare Workers / Pages | `@moxjs/adapter-cloudflare` | KV-backed HTML cache; Durable Objects ready |
-| Node | `@moxjs/adapter-node` | Slowloris-hardened defaults, graceful SIGTERM |
+| Vercel Edge | `@jorvel/adapter-vercel` | `export const config = { runtime: 'edge' }` |
+| Cloudflare Workers / Pages | `@jorvel/adapter-cloudflare` | KV-backed HTML cache; Durable Objects ready |
+| Node | `@jorvel/adapter-node` | Slowloris-hardened defaults, graceful SIGTERM |
 | Docker | — | Multi-stage Dockerfile, optional K8s manifests |
 
-Pop remotes onto a CDN — set `federation.publicPath` in `moxjs.config.ts`.
+Pop remotes onto a CDN — set `federation.publicPath` in `jorvel.config.ts`.
 
 ---
 
@@ -219,27 +241,27 @@ Pop remotes onto a CDN — set `federation.publicPath` in `moxjs.config.ts`.
 
 ```sh
 # Most common
-moxjs dev --proxy-remotes --hmr-remotes
+jorvel dev --proxy-remotes --hmr-remotes
 
 # Routes in a second terminal (per remote)
-moxjs routes --watch
+jorvel routes --watch
 
 # Before pushing
-moxjs typecheck
-moxjs lint
-moxjs test
-moxjs perf
-moxjs diagnose
+jorvel typecheck
+jorvel lint
+jorvel test
+jorvel perf
+jorvel diagnose
 
 # Ship
-moxjs build
-moxjs build --app dashboard --compress
-moxjs deploy --target vercel
+jorvel build
+jorvel build --app dashboard --compress
+jorvel deploy --target vercel
 ```
 
-`--proxy-remotes` rewrites the host remotes list to same-origin URLs — `/moxjs/remotes/<name>/remoteEntry.js` proxies to the remote dev-server. Avoids dev-time 404s for split chunks and makes CSP behave like production.
+`--proxy-remotes` rewrites the host remotes list to same-origin URLs — `/jorvel/remotes/<name>/remoteEntry.js` proxies to the remote dev-server. Avoids dev-time 404s for split chunks and makes CSP behave like production.
 
-`--hmr-remotes` starts a tiny reload server; generated hosts call `connectMoxjsDevReload()` so the host refreshes when a remote recompiles.
+`--hmr-remotes` starts a tiny reload server; generated hosts call `connectJorvelDevReload()` so the host refreshes when a remote recompiles.
 
 ---
 
@@ -251,7 +273,7 @@ pnpm -r test
 pnpm coverage
 
 # End-to-end (Playwright)
-MOXJS_E2E=1 pnpm e2e
+JORVEL_E2E=1 pnpm e2e
 pnpm e2e:ci
 ```
 
@@ -261,7 +283,7 @@ Coverage lands under each workspace's `coverage/`. Playwright writes an HTML rep
 
 ## Project status
 
-MOXJS is in active development. The core surface is stable; adapter packages and the SSR fragment renderer are evolving.
+JORVEL is in active development. The core surface is stable; adapter packages and the SSR fragment renderer are evolving.
 
 Release model: Changesets with linked groups —
 
@@ -278,14 +300,14 @@ Release model: Changesets with linked groups —
 Issues + PRs welcome.
 
 ```sh
-git clone https://github.com/Ravikisha/MFJS.git
+git clone https://github.com/Ravikisha/JorvelJS.git
 cd MFJS
 pnpm install
 pnpm -r build
 pnpm -r test
 ```
 
-- File bugs at <https://github.com/Ravikisha/MFJS/issues>.
+- File bugs at <https://github.com/Ravikisha/JorvelJS/issues>.
 - Discuss design via PR draft or an RFC issue.
 - Run `pnpm typecheck && pnpm lint && pnpm test` before pushing.
 
@@ -302,7 +324,7 @@ pnpm -r test
 **Ravi Kishan** — [@ravikisha](https://github.com/ravikisha)
 
 - GitHub: <https://github.com/ravikisha>
-- Repository: <https://github.com/Ravikisha/MFJS>
-- Live site: <https://moxjs.vercel.app/>
+- Repository: <https://github.com/Ravikisha/JorvelJS>
+- Live site: <https://jorveljs.vercel.app/>
 
-Built because Module Federation deserved batteries-included tooling. Star the repo if MOXJS saved you a week of wiring.
+Built because Module Federation deserved batteries-included tooling. Star the repo if JORVEL saved you a week of wiring.

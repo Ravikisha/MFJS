@@ -6,7 +6,7 @@ import fs from 'fs-extra';
 import { compressDist } from '../src/commands/compress.js';
 
 async function tmp() {
-  return fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-compress-')) as Promise<string>;
+  return fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-compress-')) as Promise<string>;
 }
 
 describe('compressDist', () => {

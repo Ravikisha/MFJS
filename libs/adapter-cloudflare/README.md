@@ -1,11 +1,11 @@
-# @moxjs/adapter-cloudflare
+# @jorvel/adapter-cloudflare
 
 Cloudflare Workers / Pages deployment adapter.
 
 ## Worker
 
 ```ts
-import { createCloudflareWorker } from '@moxjs/adapter-cloudflare';
+import { createCloudflareWorker } from '@jorvel/adapter-cloudflare';
 import App from './App.js';
 import { routes } from './routes.js';
 import template from './index.html?raw';
@@ -17,7 +17,7 @@ export default createCloudflareWorker({ App, routes, template });
 
 ```ts
 // functions/[[path]].ts
-import { createPagesFunction } from '@moxjs/adapter-cloudflare';
+import { createPagesFunction } from '@jorvel/adapter-cloudflare';
 import App from '../src/App.js';
 import { routes } from '../src/routes.js';
 import template from '../public/index.html?raw';

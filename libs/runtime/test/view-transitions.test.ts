@@ -7,7 +7,7 @@ import {
   supportsViewTransitions,
   withViewTransition,
 } from '../src/view-transitions.js';
-import { MOXJS_NAVIGATE_EVENT } from '../src/router.js';
+import { JORVEL_NAVIGATE_EVENT } from '../src/router.js';
 
 afterEach(() => {
   delete (document as any).startViewTransition;
@@ -95,11 +95,11 @@ describe('withViewTransition', () => {
 });
 
 describe('navigateWithTransition', () => {
-  it('dispatches moxjs:navigate', async () => {
+  it('dispatches jorvel:navigate', async () => {
     const seen = vi.fn();
-    window.addEventListener(MOXJS_NAVIGATE_EVENT, seen);
+    window.addEventListener(JORVEL_NAVIGATE_EVENT, seen);
     await navigateWithTransition({ to: '/x' });
     expect(seen).toHaveBeenCalled();
-    window.removeEventListener(MOXJS_NAVIGATE_EVENT, seen);
+    window.removeEventListener(JORVEL_NAVIGATE_EVENT, seen);
   });
 });

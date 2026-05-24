@@ -13,7 +13,7 @@ export default function CssIsolation() {
       <h1>CSS isolation</h1>
       <p>
         Remotes ship CSS that can leak into the host — a remote that resets{' '}
-        <code>* {'{ margin: 0 }'}</code> can hose the host&apos;s typography. MOXJS offers two
+        <code>* {'{ margin: 0 }'}</code> can hose the host&apos;s typography. JORVEL offers two
         runtime isolation strategies depending on how strict you need to be, plus a couple of
         bundle-level conventions that head off most problems before they reach production.
       </p>
@@ -51,7 +51,7 @@ export default function CssIsolation() {
 
       <CodeBlock
         language="tsx"
-        code={`import { ShadowRemote } from '@moxjs/runtime';
+        code={`import { ShadowRemote } from '@jorvel/runtime';
 
 <ShadowRemote
   css={remoteCss}
@@ -96,7 +96,7 @@ export default function CssIsolation() {
       </p>
       <CodeBlock
         language="tsx"
-        code={`import { scopeCss } from '@moxjs/runtime';
+        code={`import { scopeCss } from '@jorvel/runtime';
 
 const scoped = scopeCss(rawCss, '[data-remote="dashboard"]');
 injectStyle(scoped);

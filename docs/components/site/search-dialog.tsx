@@ -51,10 +51,10 @@ export function SearchDialog() {
       setOpen(true);
     }
     window.addEventListener('keydown', onKey);
-    window.addEventListener('moxjs:search-open', onTriggerOpen as EventListener);
+    window.addEventListener('jorvel:search-open', onTriggerOpen as EventListener);
     return () => {
       window.removeEventListener('keydown', onKey);
-      window.removeEventListener('moxjs:search-open', onTriggerOpen as EventListener);
+      window.removeEventListener('jorvel:search-open', onTriggerOpen as EventListener);
     };
   }, [open]);
 

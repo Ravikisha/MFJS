@@ -22,7 +22,7 @@ const VERIFIER_BYTES = 32; // 32 random bytes → 43-char base64url string
 
 function getCrypto(): Crypto {
   const c = (globalThis as { crypto?: Crypto }).crypto;
-  if (!c?.subtle) throw new Error('[moxjs/security] OAuth helpers require Web Crypto');
+  if (!c?.subtle) throw new Error('[jorvel/security] OAuth helpers require Web Crypto');
   return c;
 }
 
@@ -87,13 +87,13 @@ export function parseAuthorizationResponse(url: string, expectedState: string): 
   const error = u.searchParams.get('error');
   if (error) {
     const desc = u.searchParams.get('error_description') ?? '';
-    throw new Error(`[moxjs/security] authorization error "${error}"${desc ? `: ${desc}` : ''}`);
+    throw new Error(`[jorvel/security] authorization error "${error}"${desc ? `: ${desc}` : ''}`);
   }
   const code = u.searchParams.get('code');
   const state = u.searchParams.get('state');
-  if (!code) throw new Error('[moxjs/security] authorization response missing "code"');
-  if (!state) throw new Error('[moxjs/security] authorization response missing "state"');
-  if (state !== expectedState) throw new Error('[moxjs/security] authorization "state" mismatch (CSRF guard)');
+  if (!code) throw new Error('[jorvel/security] authorization response missing "code"');
+  if (!state) throw new Error('[jorvel/security] authorization response missing "state"');
+  if (state !== expectedState) throw new Error('[jorvel/security] authorization "state" mismatch (CSRF guard)');
   return { code, state };
 }
 
@@ -131,7 +131,7 @@ async function postForm(
   if (!res.ok) {
     let detail = '';
     try { detail = await res.text(); } catch { /* ignore */ }
-    throw new Error(`[moxjs/security] token endpoint ${res.status}${detail ? `: ${detail}` : ''}`);
+    throw new Error(`[jorvel/security] token endpoint ${res.status}${detail ? `: ${detail}` : ''}`);
   }
   return (await res.json()) as TokenResponse;
 }
@@ -232,13 +232,16 @@ export class TokenStore {
 }
 
 function mergeTokens(prev: TokenSet, next: TokenSet): TokenSet {
-  return {
-    accessToken: next.accessToken,
-    refreshToken: next.refreshToken ?? prev.refreshToken,
-    idToken: next.idToken ?? prev.idToken,
-    scope: next.scope ?? prev.scope,
-    expiresAt: next.expiresAt ?? prev.expiresAt,
-  };
+  const out: TokenSet = { accessToken: next.accessToken };
+  const refreshToken = next.refreshToken ?? prev.refreshToken;
+  if (refreshToken !== undefined) out.refreshToken = refreshToken;
+  const idToken = next.idToken ?? prev.idToken;
+  if (idToken !== undefined) out.idToken = idToken;
+  const scope = next.scope ?? prev.scope;
+  if (scope !== undefined) out.scope = scope;
+  const expiresAt = next.expiresAt ?? prev.expiresAt;
+  if (expiresAt !== undefined) out.expiresAt = expiresAt;
+  return out;
 }
 
 /** Convert a `TokenResponse` (seconds-from-now) to a `TokenSet` (absolute ms). */

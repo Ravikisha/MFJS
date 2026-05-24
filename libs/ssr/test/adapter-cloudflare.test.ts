@@ -49,21 +49,21 @@ describe('scaffoldDeploy (cloudflare)', () => {
   });
 
   it('writes wrangler.toml', async () => {
-    dir = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-cf-'));
+    dir = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-cf-'));
     const r = await scaffoldDeploy({ cwd: dir });
     expect(r.files[0].written).toBe(true);
     expect((await fs.readFile(path.join(dir, 'wrangler.toml'), 'utf8')).length).toBeGreaterThan(0);
   });
 
   it('skips when wrangler.toml present', async () => {
-    dir = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-cf-'));
+    dir = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-cf-'));
     await fs.writeFile(path.join(dir, 'wrangler.toml'), 'name = "x"');
     const r = await scaffoldDeploy({ cwd: dir });
     expect(r.files[0].written).toBe(false);
   });
 
   it('nextHint mentions wrangler', async () => {
-    dir = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-cf-'));
+    dir = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-cf-'));
     const r = await scaffoldDeploy({ cwd: dir });
     expect(r.nextHint).toMatch(/wrangler/i);
   });

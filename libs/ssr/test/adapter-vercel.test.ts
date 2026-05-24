@@ -1,5 +1,5 @@
 /**
- * Tests for @moxjs/adapter-vercel (handler + deploy scaffold).
+ * Tests for @jorvel/adapter-vercel (handler + deploy scaffold).
  *
  * Lives under libs/ssr/test because adapter packages do not ship their own
  * vitest setup. Imports the adapter via relative path.
@@ -52,10 +52,10 @@ describe('createVercelHandler', () => {
       App,
       template: TEMPLATE,
       routes: ROUTES,
-      headers: { 'X-Moxjs': '1' },
+      headers: { 'X-Jorvel': '1' },
     });
     const res = await fetch(new Request('https://x/'));
-    expect(res.headers.get('x-moxjs')).toBe('1');
+    expect(res.headers.get('x-jorvel')).toBe('1');
   });
 });
 
@@ -74,7 +74,7 @@ describe('scaffoldDeploy (vercel)', () => {
   });
 
   it('writes vercel.json into cwd', async () => {
-    dir = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-vercel-'));
+    dir = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-vercel-'));
     const r = await scaffoldDeploy({ cwd: dir });
     expect(r.files).toHaveLength(1);
     expect(r.files[0].written).toBe(true);
@@ -83,21 +83,21 @@ describe('scaffoldDeploy (vercel)', () => {
   });
 
   it('skips existing vercel.json', async () => {
-    dir = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-vercel-'));
+    dir = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-vercel-'));
     await fs.writeFile(path.join(dir, 'vercel.json'), '{}');
     const r = await scaffoldDeploy({ cwd: dir });
     expect(r.files[0].written).toBe(false);
   });
 
   it('dry-run does not write', async () => {
-    dir = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-vercel-'));
+    dir = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-vercel-'));
     const r = await scaffoldDeploy({ cwd: dir, dryRun: true });
     expect(r.files[0].written).toBe(true); // reported as would-write
     await expect(fs.access(path.join(dir, 'vercel.json'))).rejects.toThrow();
   });
 
   it('nextHint mentions vercel deploy', async () => {
-    dir = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-vercel-'));
+    dir = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-vercel-'));
     const r = await scaffoldDeploy({ cwd: dir });
     expect(r.nextHint).toMatch(/vercel/i);
   });

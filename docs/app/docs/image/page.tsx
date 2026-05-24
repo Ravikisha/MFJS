@@ -4,7 +4,7 @@ import { Callout } from '@/components/docs/callout';
 export const metadata = {
   title: 'Image optimization',
   description:
-    'Responsive <Image>, srcset generator, sizes helper, and LCP preload links. Pairs with the moxjs image CLI for WebP/AVIF derivative output.',
+    'Responsive <Image>, srcset generator, sizes helper, and LCP preload links. Pairs with the jorvel image CLI for WebP/AVIF derivative output.',
 };
 
 export default function ImageDocs() {
@@ -12,11 +12,11 @@ export default function ImageDocs() {
     <>
       <h1>Image optimization</h1>
       <p>
-        Images are the single biggest payload on most pages. <code>@moxjs/runtime</code> ships an{' '}
+        Images are the single biggest payload on most pages. <code>@jorvel/runtime</code> ships an{' '}
         <code>&lt;Image&gt;</code> component plus pure helpers (<code>buildSrcset</code>,{' '}
         <code>buildSizes</code>, <code>buildImagePreloadLink</code>) that emit the right{' '}
         <code>srcset</code> / <code>sizes</code> attributes. Pair them with the{' '}
-        <code>moxjs image</code> CLI to actually produce WebP / AVIF derivatives in CI.
+        <code>jorvel image</code> CLI to actually produce WebP / AVIF derivatives in CI.
       </p>
 
       <h2 id="component">The Image component</h2>
@@ -28,7 +28,7 @@ export default function ImageDocs() {
       </p>
       <CodeBlock
         language="tsx"
-        code={`import { Image } from '@moxjs/runtime';
+        code={`import { Image } from '@jorvel/runtime';
 
 <Image
   src="/img/hero-{w}.jpg"
@@ -110,7 +110,7 @@ export default function ImageDocs() {
       </p>
       <CodeBlock
         language="ts"
-        code={`import { buildSrcset, buildSizes, buildImagePreloadLink } from '@moxjs/runtime';
+        code={`import { buildSrcset, buildSizes, buildImagePreloadLink } from '@jorvel/runtime';
 
 buildSrcset('/img/hero-{w}.webp', { widths: [320, 640, 1280] });
 // '/img/hero-320.webp 320w, /img/hero-640.webp 640w, /img/hero-1280.webp 1280w'
@@ -138,7 +138,7 @@ const link = buildImagePreloadLink('/img/lcp-{w}.webp', { widths: [640, 1280], f
       <CodeBlock
         language="tsx"
         filename="apps/shell/src/template.tsx"
-        code={`import { buildImagePreloadLink } from '@moxjs/runtime';
+        code={`import { buildImagePreloadLink } from '@jorvel/runtime';
 
 const heroPreload = buildImagePreloadLink('/img/hero-{w}.webp', {
   widths: [640, 1024, 1280, 1920],
@@ -163,7 +163,7 @@ export function Head() {
       </p>
       <CodeBlock
         language="bash"
-        code={`moxjs image \\
+        code={`jorvel image \\
   --app shell \\
   --formats webp,avif \\
   --widths 320,640,1024,1280,1920 \\

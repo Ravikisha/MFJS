@@ -1,11 +1,11 @@
 /**
- * Tests for `moxjs ci` — CI/CD automation commands.
+ * Tests for `jorvel ci` — CI/CD automation commands.
  *
  * Covers:
  *  - buildCiWorkflow / buildPreviewWorkflow / buildDeployWorkflow template builders
- *  - `moxjs ci generate` — scaffold GitHub Actions workflow files
- *  - `moxjs ci affected` — detect apps changed between git refs
- *  - `moxjs ci preview` — scaffold only pr-preview workflow
+ *  - `jorvel ci generate` — scaffold GitHub Actions workflow files
+ *  - `jorvel ci affected` — detect apps changed between git refs
+ *  - `jorvel ci preview` — scaffold only pr-preview workflow
  *  - detectAffectedApps utility — unit-tested with git output mocked
  */
 
@@ -25,7 +25,7 @@ import {
 // ── helpers ───────────────────────────────────────────────────────────────────
 
 async function tmp() {
-  return fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-ci-')) as Promise<string>;
+  return fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-ci-')) as Promise<string>;
 }
 
 /**
@@ -59,7 +59,7 @@ async function run(argv: string[], cwd: string) {
   }
 }
 
-/** Write a minimal moxjs.app.json so discoverApps finds the app. */
+/** Write a minimal jorvel.app.json so discoverApps finds the app. */
 async function makeApp(
   dir: string,
   name: string,
@@ -68,7 +68,7 @@ async function makeApp(
 ) {
   const appDir = path.join(dir, 'apps', name);
   await fs.ensureDir(appDir);
-  await fs.writeJson(path.join(appDir, 'moxjs.app.json'), { name, type, port });
+  await fs.writeJson(path.join(appDir, 'jorvel.app.json'), { name, type, port });
   return appDir;
 }
 
@@ -88,13 +88,13 @@ describe('buildCiWorkflow', () => {
   it('uses the supplied package manager for install and run commands', () => {
     const yml = buildCiWorkflow({ nodeVersion: '22', packageManager: 'npm' });
     expect(yml).toContain('npm install');
-    expect(yml).toContain('npm exec moxjs typecheck');
+    expect(yml).toContain('npm exec jorvel typecheck');
     expect(yml).toContain('npm test');
   });
 
-  it('includes moxjs ci affected step', () => {
+  it('includes jorvel ci affected step', () => {
     const yml = buildCiWorkflow({ nodeVersion: '22', packageManager: 'pnpm' });
-    expect(yml).toContain('moxjs ci affected');
+    expect(yml).toContain('jorvel ci affected');
   });
 
   it('triggers on push to main and pull_request', () => {
@@ -189,9 +189,9 @@ describe('buildDeployWorkflow', () => {
   });
 });
 
-// ── moxjs ci generate ──────────────────────────────────────────────────────────
+// ── jorvel ci generate ──────────────────────────────────────────────────────────
 
-describe('moxjs ci generate', () => {
+describe('jorvel ci generate', () => {
   it('creates .github/workflows/ci.yml', async () => {
     const dir = await tmp();
     await run(['generate', '--dir', dir, '--no-preview', '--no-deploy'], dir);
@@ -285,9 +285,9 @@ describe('moxjs ci generate', () => {
   });
 });
 
-// ── moxjs ci preview ───────────────────────────────────────────────────────────
+// ── jorvel ci preview ───────────────────────────────────────────────────────────
 
-describe('moxjs ci preview', () => {
+describe('jorvel ci preview', () => {
   it('creates pr-preview.yml', async () => {
     const dir = await tmp();
     await run(['preview', '--dir', dir], dir);
@@ -398,9 +398,9 @@ describe('detectAffectedApps', () => {
   });
 });
 
-// ── moxjs ci affected (CLI output format) ────────────────────────────────────
+// ── jorvel ci affected (CLI output format) ────────────────────────────────────
 
-describe('moxjs ci affected — output format', () => {
+describe('jorvel ci affected — output format', () => {
   it('command name is "affected"', () => {
     const sub = ciCommand.commands.find((c) => c.name() === 'affected');
     expect(sub).toBeDefined();

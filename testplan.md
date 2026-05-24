@@ -1,6 +1,6 @@
-# MOXJS Test Plan
+# JORVEL Test Plan
 
-Comprehensive test strategy for the MOXJS micro-frontend framework. The plan covers the public surface of every workspace package (`libs/*`, `packages/cli`, adapters) plus integration and end-to-end coverage of host+remote flows.
+Comprehensive test strategy for the JORVEL micro-frontend framework. The plan covers the public surface of every workspace package (`libs/*`, `packages/cli`, adapters) plus integration and end-to-end coverage of host+remote flows.
 
 ## Status snapshot
 
@@ -51,7 +51,7 @@ Targets: line coverage **>= 85%** in `libs/runtime`, `libs/ssr`, `libs/event-bus
 
 | Done | Area | Cases |
 |:-:|---|---|
-| [x] | `router.ts` / `getRouter()` | singleton survives StrictMode double-effect; `push` / `replace` updates pathname; `moxjs:navigate` event dispatches `pushState`; `popstate` triggers subscribers; back/forward history; query + hash preserved |
+| [x] | `router.ts` / `getRouter()` | singleton survives StrictMode double-effect; `push` / `replace` updates pathname; `jorvel:navigate` event dispatches `pushState`; `popstate` triggers subscribers; back/forward history; query + hash preserved |
 | [x] | `route-matcher.ts` / `resolveRoute` | static path, `:param`, `*` splat, multi-param, trailing slash, no-match returns null, precedence (more specific wins) |
 | [x] | `routes.ts` | route table normalization, dedupe, invalid entries throw |
 | [x] | `remote-pages.ts` | match `subpath` against `pages[]`, fallback to `/`, lazy `load()` resolves |
@@ -59,7 +59,7 @@ Targets: line coverage **>= 85%** in `libs/runtime`, `libs/ssr`, `libs/event-bus
 | [x] | `federated-router.ts` | host-side route → remote module map resolution; missing remote throws typed error |
 | [x] | `error-boundary-utils.tsx` + `error-boundary.tsx` | renders fallback on thrown render; resets on key change; logs to telemetry hook |
 | [x] | `hooks.ts` (`usePathname`, `useRouter`) | re-render on navigation; no leak (unsubscribe on unmount) |
-| [x] | `navigation-events.ts` (`dispatchMoxjsNavigate`) | event payload shape, default-prevent on `meta`/`ctrl`-clicks |
+| [x] | `navigation-events.ts` (`dispatchJorvelNavigate`) | event payload shape, default-prevent on `meta`/`ctrl`-clicks |
 | [x] | `guards.ts` | allow / deny / redirect from guard fn; async guard awaited |
 | [x] | `remote-registry.ts` | register/lookup, duplicate-name rejected |
 | [x] | `prefetch.ts` | `link[rel=prefetch]` injection; dedupe; failure clears cache |
@@ -89,7 +89,7 @@ Targets: line coverage **>= 85%** in `libs/runtime`, `libs/ssr`, `libs/event-bus
 | [x] | `cache-headers.ts` | `cacheControl`, weak ETag, `If-None-Match` matching |
 | [x] | `html-cache.ts` | LRU eviction, bump-on-get, TTL expiry, delete/clear |
 | [x] | `redirect.ts` | throws SsrRedirect, default/custom status, duck-typed `isRedirect` |
-| [x] | `state-hydration.ts` | injects `<script>window.__MOXJS_STATE__</script>`; escapes `</script>`; consume/clear |
+| [x] | `state-hydration.ts` | injects `<script>window.__JORVEL_STATE__</script>`; escapes `</script>`; consume/clear |
 
 ### 3.3 `libs/event-bus` & `libs/events`
 
@@ -103,7 +103,7 @@ Targets: line coverage **>= 85%** in `libs/runtime`, `libs/ssr`, `libs/event-bus
 ### 3.4 `libs/types`
 
 - Compile-time tests under `test/types-shapes.test.ts` and `*.types.test.ts` using `expectTypeOf` / `tsd`-style assertions.
-- Cases: `MoxjsAppConfig`, `FederationConfig`, `RouteTarget`, `RemotePageRoute`, plugin signatures.
+- Cases: `JorvelAppConfig`, `FederationConfig`, `RouteTarget`, `RemotePageRoute`, plugin signatures.
 - Federation contract validator (runtime): reject invalid `remotes` map, accept canonical form.
 
 ### 3.5 `libs/security`
@@ -165,12 +165,12 @@ Each CLI command gets a Vitest in `packages/cli/test/<cmd>.test.ts`. Pattern: cr
 | Done | Command | Cases |
 |:-:|---|---|
 | [x] | `init` | creates root files, `pnpm-workspace.yaml`, optional `--tailwind`, refuses on non-empty dir without `--force` |
-| [x] | `generate host/remote/wizard` | writes `moxjs.app.json`, `rspack.config.mjs`, `bootstrap.tsx`, port flag respected; rejects duplicate app name |
-| [x] | `scaffold` | guided multi-prompt produces host + N remotes; `moxjs.federation.json` references each; smoke test + vitest devDep |
+| [x] | `generate host/remote/wizard` | writes `jorvel.app.json`, `rspack.config.mjs`, `bootstrap.tsx`, port flag respected; rejects duplicate app name |
+| [x] | `scaffold` | guided multi-prompt produces host + N remotes; `jorvel.federation.json` references each; smoke test + vitest devDep |
 | [x] | `dev` | spawns rspack serve for each app (mocked); `--proxy-remotes` rewrites federation; `--hmr-remotes` starts reload ws |
 | [x] | `build` | runs `rspack build` per app; non-zero exit on failure |
-| [x] | `federation` | reads `moxjs.app.json`, infers exposes + shared; writes JSON; respects `--out` |
-| [x] | `routes` | scans `src/pages/**`, emits `src/moxjs.routes.ts`; `--watch` re-emits on change; `[id].tsx` → `:id`; `index.tsx` → `/` |
+| [x] | `federation` | reads `jorvel.app.json`, infers exposes + shared; writes JSON; respects `--out` |
+| [x] | `routes` | scans `src/pages/**`, emits `src/jorvel.routes.ts`; `--watch` re-emits on change; `[id].tsx` → `:id`; `index.tsx` → `/` |
 | [x] | `ssr export` / `ssr serve` | renders route list to static HTML; `--no-stream` flips to string mode |
 | [x] | `typecheck` | runs `tsc --noEmit` per package; aggregated exit code |
 | [x] | `ci` | emits `.github/workflows/*.yml`; detect affected apps from changed files |
@@ -180,12 +180,12 @@ Each CLI command gets a Vitest in `packages/cli/test/<cmd>.test.ts`. Pattern: cr
 | [x] | `deploy` | per target writes scaffold (Dockerfile, vercel.json, wrangler.toml, netlify.toml); `--dry-run`; skip-when-exists |
 | [x] | `diagnose` | exits 1 on missing root; exits 0 on minimally healthy workspace; lists discovered apps |
 | [x] | `env` | scaffolds `.env.example`; validates required keys present; exits 1 on missing |
-| [x] | `sw` | writes `public/moxjs-sw.js`; skip without `--force`; `--force` overwrites |
+| [x] | `sw` | writes `public/jorvel-sw.js`; skip without `--force`; `--force` overwrites |
 | [x] | `lint` | invokes `pnpm -r lint`; passes `--fix`; exits 1 on failure |
 | [x] | `compress` | gzip/brotli/zstd files in `dist/`, preserves originals |
 | [ ] | `test` | invokes vitest; passes `--coverage` flag through |
-| [ ] | `--cwd` global flag | `MOXJS_CWD` env propagates to all commands |
-| [ ] | `--verbose` | sets `MOXJS_DEBUG=1` |
+| [ ] | `--cwd` global flag | `JORVEL_CWD` env propagates to all commands |
+| [ ] | `--verbose` | sets `JORVEL_DEBUG=1` |
 | [ ] | error path | unknown command prints help; invalid JSON config prints typed `printCliError` |
 
 ## 5. Federation smoke test
@@ -204,28 +204,28 @@ Driven by `scripts/e2e.mjs`. Required scenarios:
 1. **Boot** — host starts on 3000, remote on 3001, no console errors.
 2. **Initial render** — `/` shows dashboard remote home.
 3. **NavLink click** — `/dashboard/settings` updates URL via History API (no full reload).
-4. **Imperative navigate** — `dispatchMoxjsNavigate({ to: '/dashboard/users/42' })` renders `[id].tsx` with `id=42`.
+4. **Imperative navigate** — `dispatchJorvelNavigate({ to: '/dashboard/users/42' })` renders `[id].tsx` with `id=42`.
 5. **Back/forward** — browser back returns to `/`, hooks re-render.
-6. **Proxy-remotes mode** — start with `moxjs dev --proxy-remotes`; assert remote chunks served from host origin.
+6. **Proxy-remotes mode** — start with `jorvel dev --proxy-remotes`; assert remote chunks served from host origin.
 7. **HMR reload** — touch a file in remote `src/`, host page auto-reloads (when started with `--hmr-remotes`).
 8. **React singleton** — `window.React === window.__REMOTE_REACT__` check via injected probe.
 9. **Error boundary** — force a remote throw, fallback UI rendered, host shell still interactive.
 10. **404 route** — unknown path renders the configured not-found component.
 
-CI gate: `MOXJS_E2E=1 pnpm e2e` must pass before publish. Playwright HTML report archived from `playwright-report/`.
+CI gate: `JORVEL_E2E=1 pnpm e2e` must pass before publish. Playwright HTML report archived from `playwright-report/`.
 
 ## 7. SSR example coverage (`examples/ecommerce`, `examples/saas`)
 
 - `vitest.config.ts` already present. Add:
   - Snapshot of `renderRouteToString('/')` (deterministic — mock Date / Math.random).
   - Streaming render: collect chunks, assert shell flush before suspense boundary.
-  - Static export: `moxjs ssr export` produces expected file list.
+  - Static export: `jorvel ssr export` produces expected file list.
 
 ## 8. Regression / contract tests
 
 - **React-singleton guard** — unit test that fails if `host` rspack config drops `eager: true` on `react` / `react-dom` shared (parses `examples/basic/apps/shell/rspack.config.mjs`).
 - **`lazyCompilation` placement** — assert it is at top level, not under `experiments`, in every generated config.
-- **Generated `moxjs.routes.ts`** — golden-file diff against `examples/basic/apps/dashboard/src/moxjs.routes.ts`.
+- **Generated `jorvel.routes.ts`** — golden-file diff against `examples/basic/apps/dashboard/src/jorvel.routes.ts`.
 
 ## 9. Cross-cutting
 
@@ -250,7 +250,7 @@ pnpm coverage
 pnpm typecheck
 
 # e2e (opt-in locally)
-MOXJS_E2E=1 pnpm e2e
+JORVEL_E2E=1 pnpm e2e
 
 # e2e (CI)
 pnpm e2e:ci

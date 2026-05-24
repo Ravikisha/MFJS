@@ -1,0 +1,13 @@
+# jorvel
+
+## 0.2.0
+
+### Minor Changes
+
+- 188b675: Initial public release — 0.1.0. Establishes semver baseline for JORVEL packages.
+
+### Patch Changes
+
+- Updated dependencies [188b675]
+  - @jorvel/ssr@0.2.0
+  - @jorvel/types@0.2.0

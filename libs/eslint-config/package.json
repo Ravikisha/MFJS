@@ -1,7 +1,7 @@
 {
-  "name": "@moxjs/eslint-config",
+  "name": "@jorvel/eslint-config",
   "version": "0.1.0",
-  "description": "Shared ESLint 9 flat config for MOXJS apps and libraries.",
+  "description": "Shared ESLint 9 flat config for JORVEL apps and libraries.",
   "type": "module",
   "main": "./index.js",
   "publishConfig": { "access": "public" },

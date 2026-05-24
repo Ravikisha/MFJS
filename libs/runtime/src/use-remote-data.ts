@@ -39,7 +39,7 @@ class LRU<V> {
   clear(): void { this.map.clear(); }
 }
 
-const CACHE_KEY = '__MOXJS_REMOTE_DATA_CACHE__';
+const CACHE_KEY = '__JORVEL_REMOTE_DATA_CACHE__';
 type GlobalWithCache = typeof globalThis & {
   [CACHE_KEY]?: LRU<CacheEntry<unknown>>;
 };

@@ -20,11 +20,11 @@ $files = Get-ChildItem -Path $root -Recurse -File -ErrorAction SilentlyContinue 
 foreach ($f in $files) {
   try {
     $content = [System.IO.File]::ReadAllText($f.FullName)
-    if ($content -cmatch 'moxjs' -or $content -cmatch 'MOXJS' -or $content -cmatch 'Moxjs') {
+    if ($content -cmatch 'jorvel' -or $content -cmatch 'JORVEL' -or $content -cmatch 'Jorvel') {
       $new = $content
-      $new = $new -creplace 'MOXJS', 'MOXJS'
-      $new = $new -creplace 'Moxjs', 'Moxjs'
-      $new = $new -creplace 'moxjs', 'moxjs'
+      $new = $new -creplace 'JORVEL', 'JORVEL'
+      $new = $new -creplace 'Jorvel', 'Jorvel'
+      $new = $new -creplace 'jorvel', 'jorvel'
       if ($new -ne $content) {
         [System.IO.File]::WriteAllText($f.FullName, $new)
         $changedCount++
@@ -36,13 +36,13 @@ foreach ($f in $files) {
 }
 Write-Host "Text replacements done. Files changed: $changedCount"
 
-# Rename files containing 'moxjs' in name (process deepest first)
+# Rename files containing 'jorvel' in name (process deepest first)
 $toRename = Get-ChildItem -Path $root -Recurse -File -ErrorAction SilentlyContinue | Where-Object {
-  -not (ShouldSkipPath $_.FullName) -and $_.Name -match 'moxjs'
+  -not (ShouldSkipPath $_.FullName) -and $_.Name -match 'jorvel'
 } | Sort-Object { $_.FullName.Length } -Descending
 
 foreach ($f in $toRename) {
-  $newName = $f.Name -replace 'moxjs', 'moxjs'
+  $newName = $f.Name -replace 'jorvel', 'jorvel'
   $newPath = Join-Path $f.DirectoryName $newName
   if ($f.FullName -ne $newPath) {
     Move-Item -LiteralPath $f.FullName -Destination $newPath -Force
@@ -50,13 +50,13 @@ foreach ($f in $toRename) {
   }
 }
 
-# Rename directories containing 'moxjs' (deepest first)
+# Rename directories containing 'jorvel' (deepest first)
 $dirsToRename = Get-ChildItem -Path $root -Recurse -Directory -ErrorAction SilentlyContinue | Where-Object {
-  -not (ShouldSkipPath $_.FullName) -and $_.Name -match 'moxjs'
+  -not (ShouldSkipPath $_.FullName) -and $_.Name -match 'jorvel'
 } | Sort-Object { $_.FullName.Length } -Descending
 
 foreach ($d in $dirsToRename) {
-  $newName = $d.Name -replace 'moxjs', 'moxjs'
+  $newName = $d.Name -replace 'jorvel', 'jorvel'
   $newPath = Join-Path $d.Parent.FullName $newName
   if ($d.FullName -ne $newPath) {
     Move-Item -LiteralPath $d.FullName -Destination $newPath -Force

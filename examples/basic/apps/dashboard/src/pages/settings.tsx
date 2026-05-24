@@ -1,5 +1,5 @@
 import React from 'react';
-import { dispatchMoxjsNavigate } from '@moxjs/runtime';
+import { dispatchJorvelNavigate } from '@jorvel/runtime';
 
 export default function SettingsPage() {
   return (
@@ -8,7 +8,7 @@ export default function SettingsPage() {
       <p>Manage your application settings here.</p>
       <button
         data-testid="back-home"
-        onClick={() => dispatchMoxjsNavigate({ to: '/' })}
+        onClick={() => dispatchJorvelNavigate({ to: '/' })}
         style={{ padding: '8px 16px', borderRadius: 6, background: '#e5e7eb', color: '#111', border: 'none', cursor: 'pointer' }}
       >
         ← Back to Home

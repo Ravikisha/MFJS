@@ -74,7 +74,7 @@ export function ToastProvider({
 }
 
 const VARIANT_COLOR: Record<ToastVariant, string> = {
-  info: 'var(--moxjs-color-primary, #4f46e5)',
+  info: 'var(--jorvel-color-primary, #4f46e5)',
   success: '#16a34a',
   warn: '#f59e0b',
   error: '#ef4444',
@@ -105,7 +105,7 @@ function ToastViewport() {
             background: VARIANT_COLOR[t.variant ?? 'info'],
             color: '#fff',
             padding: '8px 12px',
-            borderRadius: 'var(--moxjs-radius-md, 6px)',
+            borderRadius: 'var(--jorvel-radius-md, 6px)',
             boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
             minWidth: 240,
           }}
@@ -119,6 +119,6 @@ function ToastViewport() {
 
 export function useToast(): ToastContextValue {
   const ctx = React.useContext(ToastCtx);
-  if (!ctx) throw new Error('[moxjs/ui] useToast must be used inside <ToastProvider>');
+  if (!ctx) throw new Error('[jorvel/ui] useToast must be used inside <ToastProvider>');
   return ctx;
 }

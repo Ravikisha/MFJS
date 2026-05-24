@@ -1,5 +1,5 @@
 /**
- * @moxjs/ssr/node — Node-only surface (streams, static export, dynamic imports).
+ * @jorvel/ssr/node — Node-only surface (streams, static export, dynamic imports).
  */
 
 export * from './edge.js';

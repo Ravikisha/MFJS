@@ -83,7 +83,7 @@ describe('createSandboxBridge', () => {
       onReject: reject,
     });
     // B sends to A — its origin is the attacker, not what A expects
-    p.aTarget.postMessage({ __moxjs: 'moxjs.sandbox.v1', dir: 'event', method: 'pwn' }, '*');
+    p.aTarget.postMessage({ __jorvel: 'jorvel.sandbox.v1', dir: 'event', method: 'pwn' }, '*');
     expect(reject).toHaveBeenCalledOnce();
     expect(reject.mock.calls[0]![0]).toMatch(/origin mismatch/);
     a.dispose();
@@ -98,13 +98,13 @@ describe('createSandboxBridge', () => {
       expectedSource: { __id: 'OTHER' }, // not bWindow
       onReject: reject,
     });
-    p.aTarget.postMessage({ __moxjs: 'moxjs.sandbox.v1', dir: 'event', method: 'x' }, '*');
+    p.aTarget.postMessage({ __jorvel: 'jorvel.sandbox.v1', dir: 'event', method: 'x' }, '*');
     expect(reject).toHaveBeenCalledOnce();
     expect(reject.mock.calls[0]![0]).toBe('source mismatch');
     a.dispose();
   });
 
-  it('ignores foreign postMessage traffic (no __moxjs envelope)', () => {
+  it('ignores foreign postMessage traffic (no __jorvel envelope)', () => {
     const p = pair();
     const reject = vi.fn();
     const a = createSandboxBridge({

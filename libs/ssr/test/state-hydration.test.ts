@@ -14,10 +14,10 @@ afterEach(() => {
 });
 
 describe('serializeState', () => {
-  it('emits <script> with default key MOXJS_STATE', () => {
+  it('emits <script> with default key JORVEL_STATE', () => {
     const s = serializeState({ a: 1 });
     expect(s).toContain('<script>');
-    expect(s).toContain('window.__MOXJS_STATE__=');
+    expect(s).toContain('window.__JORVEL_STATE__=');
   });
 
   it('emits with custom key', () => {
@@ -52,8 +52,8 @@ describe('hydrateState / consumeHydratedState / clearHydratedState', () => {
     expect(hydrateState()).toBeUndefined();
   });
 
-  it('reads value from window.__MOXJS_STATE__', () => {
-    (window as any).__MOXJS_STATE__ = { x: 1 };
+  it('reads value from window.__JORVEL_STATE__', () => {
+    (window as any).__JORVEL_STATE__ = { x: 1 };
     expect(hydrateState()).toEqual({ x: 1 });
   });
 
@@ -63,7 +63,7 @@ describe('hydrateState / consumeHydratedState / clearHydratedState', () => {
   });
 
   it('consumeHydratedState reads then clears', () => {
-    (window as any).__MOXJS_STATE__ = { x: 1 };
+    (window as any).__JORVEL_STATE__ = { x: 1 };
     expect(consumeHydratedState()).toEqual({ x: 1 });
     expect(hydrateState()).toBeUndefined();
   });

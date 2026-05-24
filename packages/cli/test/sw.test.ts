@@ -27,20 +27,20 @@ async function run(argv: string[], cwd: string): Promise<number> {
 
 afterEach(() => vi.restoreAllMocks());
 
-describe('moxjs sw generate', () => {
+describe('jorvel sw generate', () => {
   it('errors when target app missing', async () => {
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-sw-'))) as string;
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-sw-'))) as string;
     vi.spyOn(console, 'error').mockImplementation(() => {});
     const code = await run(['generate', '--app', 'shell', '--cwd', tmp], tmp);
     expect(code).toBe(1);
   });
 
-  it('writes moxjs-sw.js into apps/<app>/public/', async () => {
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-sw-'))) as string;
+  it('writes jorvel-sw.js into apps/<app>/public/', async () => {
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-sw-'))) as string;
     await fs.ensureDir(path.join(tmp, 'apps', 'shell'));
     vi.spyOn(console, 'log').mockImplementation(() => {});
     await run(['generate', '--app', 'shell', '--cwd', tmp], tmp);
-    const out = path.join(tmp, 'apps', 'shell', 'public', 'moxjs-sw.js');
+    const out = path.join(tmp, 'apps', 'shell', 'public', 'jorvel-sw.js');
     expect(await fs.pathExists(out)).toBe(true);
     const txt = await fs.readFile(out, 'utf8');
     expect(txt).toContain("addEventListener('install'");
@@ -48,9 +48,9 @@ describe('moxjs sw generate', () => {
   });
 
   it('skips overwrite without --force', async () => {
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-sw-'))) as string;
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-sw-'))) as string;
     await fs.ensureDir(path.join(tmp, 'apps', 'shell', 'public'));
-    const out = path.join(tmp, 'apps', 'shell', 'public', 'moxjs-sw.js');
+    const out = path.join(tmp, 'apps', 'shell', 'public', 'jorvel-sw.js');
     await fs.writeFile(out, '/* user version */');
     vi.spyOn(console, 'log').mockImplementation(() => {});
     await run(['generate', '--app', 'shell', '--cwd', tmp], tmp);
@@ -58,14 +58,14 @@ describe('moxjs sw generate', () => {
   });
 
   it('--force overwrites existing file', async () => {
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-sw-'))) as string;
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-sw-'))) as string;
     await fs.ensureDir(path.join(tmp, 'apps', 'shell', 'public'));
-    const out = path.join(tmp, 'apps', 'shell', 'public', 'moxjs-sw.js');
+    const out = path.join(tmp, 'apps', 'shell', 'public', 'jorvel-sw.js');
     await fs.writeFile(out, '/* user version */');
     vi.spyOn(console, 'log').mockImplementation(() => {});
     await run(['generate', '--app', 'shell', '--cwd', tmp, '--force'], tmp);
     const txt = await fs.readFile(out, 'utf8');
     expect(txt).not.toBe('/* user version */');
-    expect(txt).toContain('moxjs-v1');
+    expect(txt).toContain('jorvel-v1');
   });
 });

@@ -2,7 +2,7 @@ import { rspack } from '@rspack/core';
 import path from 'node:path';
 import fs from 'node:fs';
 
-const federationFile = process.env.MOXJS_FEDERATION_FILE || 'moxjs.federation.json';
+const federationFile = process.env.JORVEL_FEDERATION_FILE || 'jorvel.federation.json';
 const federationPath = path.join(process.cwd(), federationFile);
 const federation = fs.existsSync(federationPath)
   ? JSON.parse(fs.readFileSync(federationPath, 'utf8'))
@@ -25,27 +25,27 @@ const sharedWithReactEager = federation?.shared
       strictVersion: true,
       requiredVersion: '^18.3.1',
     },
-    '@moxjs/event-bus': {
-      ...(federation.shared['@moxjs/event-bus'] || {}),
+    '@jorvel/event-bus': {
+      ...(federation.shared['@jorvel/event-bus'] || {}),
       eager: true,
       singleton: true,
     },
-    '@moxjs/runtime': {
-      ...(federation.shared['@moxjs/runtime'] || {}),
+    '@jorvel/runtime': {
+      ...(federation.shared['@jorvel/runtime'] || {}),
       eager: true,
       singleton: true,
     },
-    '@moxjs/state': {
-      ...(federation.shared['@moxjs/state'] || {}),
+    '@jorvel/state': {
+      ...(federation.shared['@jorvel/state'] || {}),
       eager: true,
       singleton: true,
     },
   }
   : undefined;
 
-// Proxy rules must be derived from the *original* federation file (moxjs.federation.json),
-// not from moxjs.federation.proxy.json (which points back to the host).
-const baseFederationPath = path.join(process.cwd(), 'moxjs.federation.json');
+// Proxy rules must be derived from the *original* federation file (jorvel.federation.json),
+// not from jorvel.federation.proxy.json (which points back to the host).
+const baseFederationPath = path.join(process.cwd(), 'jorvel.federation.json');
 const baseFederation = fs.existsSync(baseFederationPath)
   ? JSON.parse(fs.readFileSync(baseFederationPath, 'utf8'))
   : null;
@@ -56,7 +56,7 @@ const proxy = baseFederation?.remotes
       const entryUrl = at >= 0 ? String(spec).slice(at + 1) : String(spec);
       const target = entryUrl.replace(/\/remoteEntry\.js$/, '');
 
-      const ctx = `/moxjs/remotes/${remoteName}/remoteEntry.js`;
+      const ctx = `/jorvel/remotes/${remoteName}/remoteEntry.js`;
       return {
         context: [ctx],
         target,
@@ -82,13 +82,13 @@ export default {
   // Expose selected env vars to the client via import.meta.env
   builtins: {
     define: {
-      'import.meta.env.MOXJS_FEDERATION_FILE': JSON.stringify(process.env.MOXJS_FEDERATION_FILE || ''),
+      'import.meta.env.JORVEL_FEDERATION_FILE': JSON.stringify(process.env.JORVEL_FEDERATION_FILE || ''),
     },
   },
   devServer: {
     port: 3000,
     static: [
-      // Serve /public/* (default) plus also allow fetching flat files like /moxjs.federation.json
+      // Serve /public/* (default) plus also allow fetching flat files like /jorvel.federation.json
       // from the app root during dev.
       { directory: path.join(process.cwd(), 'public') },
       { directory: process.cwd() },

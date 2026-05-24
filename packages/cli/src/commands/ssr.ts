@@ -1,9 +1,9 @@
 /**
- * `moxjs ssr` — Server-Side Rendering & Static Export CLI command.
+ * `jorvel ssr` — Server-Side Rendering & Static Export CLI command.
  *
  * Subcommands:
- *   moxjs ssr export    — Pre-render a list of routes to static HTML files.
- *   moxjs ssr serve     — Start a Node.js SSR server for the host app.
+ *   jorvel ssr export    — Pre-render a list of routes to static HTML files.
+ *   jorvel ssr serve     — Start a Node.js SSR server for the host app.
  */
 
 import { Command } from 'commander';
@@ -19,7 +19,7 @@ import { printCliError } from '../errors.js';
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 async function loadSsrConfig(workspaceDir: string): Promise<SsrConfig | null> {
-  const configPath = path.join(workspaceDir, 'moxjs.ssr.json');
+  const configPath = path.join(workspaceDir, 'jorvel.ssr.json');
   if (!(await fs.pathExists(configPath))) return null;
   return fs.readJson(configPath) as Promise<SsrConfig>;
 }
@@ -36,7 +36,7 @@ type SsrConfig = {
   }>;
   /** Output directory for static export (relative to workspace). */
   outDir?: string;
-  /** Dev server port for `moxjs ssr serve`. */
+  /** Dev server port for `jorvel ssr serve`. */
   port?: number;
 };
 
@@ -46,7 +46,7 @@ async function loadUserAppModule(appModulePath: string) {
   // - CJS modules (Node will provide a synthetic default export)
   //
   // It does NOT transpile TypeScript. For TS sources, users should build first
-  // or point moxjs.ssr.json at a built JS entry.
+  // or point jorvel.ssr.json at a built JS entry.
   const url = pathToFileURL(appModulePath).href;
   return import(url);
 }
@@ -54,7 +54,7 @@ async function loadUserAppModule(appModulePath: string) {
 function withWorkspaceNodePath<T>(workspaceDir: string, fn: () => Promise<T>): Promise<T> {
   const prev = process.env['NODE_PATH'];
   // Ensure Node can resolve dependencies for dynamically-imported app modules.
-  // This matters when a user runs `moxjs ssr` from outside the workspace root.
+  // This matters when a user runs `jorvel ssr` from outside the workspace root.
   process.env['NODE_PATH'] = [path.join(workspaceDir, 'node_modules'), prev]
     .filter(Boolean)
     .join(path.delimiter);
@@ -68,24 +68,24 @@ function withWorkspaceNodePath<T>(workspaceDir: string, fn: () => Promise<T>): P
   });
 }
 
-// ── `moxjs ssr export` ─────────────────────────────────────────────────────────
+// ── `jorvel ssr export` ─────────────────────────────────────────────────────────
 
 const exportCommand = new Command('export')
   .description('Pre-render routes to static HTML files')
   .option('-d, --dir <path>', 'Workspace root directory', process.cwd())
-  .option('-o, --out <path>', 'Output directory (overrides moxjs.ssr.json)')
-  .option('-c, --config <path>', 'Path to moxjs.ssr.json (defaults to <dir>/moxjs.ssr.json)')
+  .option('-o, --out <path>', 'Output directory (overrides jorvel.ssr.json)')
+  .option('-c, --config <path>', 'Path to jorvel.ssr.json (defaults to <dir>/jorvel.ssr.json)')
   .action(async (opts: { dir: string; out?: string; config?: string }) => {
     const workspaceDir = path.resolve(opts.dir);
 
     const configPath = opts.config
       ? path.resolve(opts.config)
-      : path.join(workspaceDir, 'moxjs.ssr.json');
+      : path.join(workspaceDir, 'jorvel.ssr.json');
 
     if (!(await fs.pathExists(configPath))) {
       printCliError(new Error(`No SSR config found at ${configPath}`), {
         command: 'ssr export',
-        hint: 'Create a moxjs.ssr.json with { app, template, routes, outDir }.',
+        hint: 'Create a jorvel.ssr.json with { app, template, routes, outDir }.',
       });
       return;
     }
@@ -105,7 +105,7 @@ const exportCommand = new Command('export')
 
     const template = await fs.readFile(templatePath, 'utf8');
 
-    // Dynamically import the App module and @moxjs/ssr.
+    // Dynamically import the App module and @jorvel/ssr.
     const appModulePath = path.resolve(workspaceDir, config.app);
 
     console.log(kleur.cyan(`Pre-rendering ${config.routes.length} route(s) → ${outDir}`));
@@ -128,13 +128,13 @@ const exportCommand = new Command('export')
     let staticExport: (opts: any) => Promise<any>;
     let injectIntoTemplate: ((template: string, html: string) => string) | null = null;
     try {
-      const ssrMod = await import('@moxjs/ssr');
+      const ssrMod = await import('@jorvel/ssr');
       staticExport = ssrMod.staticExport;
       injectIntoTemplate = typeof ssrMod.injectIntoTemplate === 'function' ? ssrMod.injectIntoTemplate : null;
     } catch (e) {
-      printCliError(new Error('@moxjs/ssr not found.'), {
+      printCliError(new Error('@jorvel/ssr not found.'), {
         command: 'ssr export',
-        hint: 'Install it: pnpm add -D @moxjs/ssr',
+        hint: 'Install it: pnpm add -D @jorvel/ssr',
       });
       return;
     }
@@ -146,7 +146,7 @@ const exportCommand = new Command('export')
           await Promise.all(
             config.routes.map(async (route: { path: string; params?: Record<string, string> }) => {
               // Pattern routes (`:id`, `*`) cannot become static files —
-              // skip silently, keeping behavior consistent with @moxjs/ssr.
+              // skip silently, keeping behavior consistent with @jorvel/ssr.
               if (/[:*]/.test(route.path)) return null;
               const html = await Promise.resolve(App({ path: route.path, params: route.params ?? {} }));
               const content = (injectIntoTemplate ?? ((t: string, h: string) => t.replace('<!--ssr-outlet-->', h)))(
@@ -172,27 +172,27 @@ const exportCommand = new Command('export')
     console.log(kleur.green(`\nStatic export complete → ${outDir}`));
   });
 
-// ── `moxjs ssr serve` ─────────────────────────────────────────────────────────
+// ── `jorvel ssr serve` ─────────────────────────────────────────────────────────
 
 const serveCommand = new Command('serve')
   .description('Start a Node.js SSR server for the host app')
   .option('-d, --dir <path>', 'Workspace root directory', process.cwd())
-  .option('-p, --port <port>', 'Port to listen on (overrides moxjs.ssr.json)', '3000')
+  .option('-p, --port <port>', 'Port to listen on (overrides jorvel.ssr.json)', '3000')
   .option('--stream', 'Use React 18 streaming SSR when available (recommended)', true)
   .option('--no-stream', 'Disable streaming SSR and render to string')
-  .option('-c, --config <path>', 'Path to moxjs.ssr.json')
+  .option('-c, --config <path>', 'Path to jorvel.ssr.json')
   .action(async (opts: { dir: string; port: string; config?: string; stream?: boolean }) => {
     const workspaceDir = path.resolve(opts.dir);
     const port = Number(opts.port);
 
     const configPath = opts.config
       ? path.resolve(opts.config)
-      : path.join(workspaceDir, 'moxjs.ssr.json');
+      : path.join(workspaceDir, 'jorvel.ssr.json');
 
     if (!(await fs.pathExists(configPath))) {
       printCliError(new Error(`No SSR config found at ${configPath}`), {
         command: 'ssr serve',
-        hint: 'Create a moxjs.ssr.json with { app, template, routes, outDir }.',
+        hint: 'Create a jorvel.ssr.json with { app, template, routes, outDir }.',
       });
       return;
     }
@@ -226,13 +226,13 @@ const serveCommand = new Command('serve')
     let createEdgeAdapter: (opts: any) => (req: any) => Promise<any>;
     let renderRouteToStream: ((App: any, route: any) => any) | null = null;
     try {
-      const ssrMod = await import('@moxjs/ssr');
+      const ssrMod = await import('@jorvel/ssr');
       createEdgeAdapter = ssrMod.createEdgeAdapter;
       renderRouteToStream = typeof ssrMod.renderRouteToStream === 'function' ? ssrMod.renderRouteToStream : null;
     } catch {
-      printCliError(new Error('@moxjs/ssr not found.'), {
+      printCliError(new Error('@jorvel/ssr not found.'), {
         command: 'ssr serve',
-        hint: 'Install it: pnpm add -D @moxjs/ssr',
+        hint: 'Install it: pnpm add -D @jorvel/ssr',
       });
       return;
     }
@@ -266,7 +266,7 @@ const serveCommand = new Command('serve')
           await result.shellReady;
           res.statusCode = result.statusCode;
           res.setHeader('content-type', 'text/html; charset=utf-8');
-          res.setHeader('x-moxjs-ssr', '1');
+          res.setHeader('x-jorvel-ssr', '1');
           result.pipe(res);
           await result.allReady;
           return;
@@ -286,7 +286,7 @@ const serveCommand = new Command('serve')
     server.listen(listenPort, () => {
       console.log(
         kleur.green(
-          `\n🚀 MOXJS SSR server running at http://localhost:${listenPort} (${useStreaming ? 'streaming' : 'string'} mode)`
+          `\n🚀 JORVEL SSR server running at http://localhost:${listenPort} (${useStreaming ? 'streaming' : 'string'} mode)`
         )
       );
     });

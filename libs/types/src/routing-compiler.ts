@@ -1,5 +1,5 @@
 /**
- * @moxjs/types — File-based routing compiler (phase-0 foundation).
+ * @jorvel/types — File-based routing compiler (phase-0 foundation).
  *
  * The CLI currently implements route scanning directly.
  * This module formalizes the contract so we can:
@@ -8,25 +8,25 @@
  * - support non-React runtimes
  */
 
-export type MoxjsPageRoute = {
+export type JorvelPageRoute = {
   /** Route pathname relative to app base, e.g. "/" or "/reports/:id" */
   path: string;
   /** Source file path, relative to app root */
   file: string;
 };
 
-export type MoxjsRoutesManifest = {
+export type JorvelRoutesManifest = {
   app: string;
   basePath: string;
-  routes: MoxjsPageRoute[];
+  routes: JorvelPageRoute[];
 };
 
-export type MoxjsHostRoutesManifest = {
+export type JorvelHostRoutesManifest = {
   host: string;
   routes: Array<{ path: string; remote: string; module: string }>;
 };
 
-export type MoxjsRoutingCompiler = {
+export type JorvelRoutingCompiler = {
   /**
    * Convert a page file (relative to `src/pages/`) into a route path.
    *
@@ -38,14 +38,14 @@ export type MoxjsRoutingCompiler = {
   routeFromPageFile(relFromPages: string): string;
 
   /** Sort routes by matching priority (most specific first). */
-  sortRoutesForMatching(routes: MoxjsPageRoute[]): MoxjsPageRoute[];
+  sortRoutesForMatching(routes: JorvelPageRoute[]): JorvelPageRoute[];
 };
 
-export const defaultRoutingCompiler: MoxjsRoutingCompiler = {
+export const defaultRoutingCompiler: JorvelRoutingCompiler = {
   routeFromPageFile(relFromPages: string) {
     if (!relFromPages) {
       throw new Error(
-        '[moxjs/types] routeFromPageFile: empty input. Pass a path relative to src/pages/.',
+        '[jorvel/types] routeFromPageFile: empty input. Pass a path relative to src/pages/.',
       );
     }
     let withoutExt = relFromPages.replace(/\.(tsx|ts|jsx|js)$/, '');
@@ -99,7 +99,7 @@ export const defaultRoutingCompiler: MoxjsRoutingCompiler = {
       for (const r of sorted) {
         if (seen.has(r.path)) {
           // eslint-disable-next-line no-console
-          console.warn(`[moxjs/types] sortRoutesForMatching: duplicate route path "${r.path}" — first match wins.`);
+          console.warn(`[jorvel/types] sortRoutesForMatching: duplicate route path "${r.path}" — first match wins.`);
         }
         seen.add(r.path);
       }

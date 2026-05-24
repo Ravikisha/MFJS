@@ -70,10 +70,10 @@ describe('ShadowRemote', () => {
     );
     await waitFor(() => {
       const sh = (host.querySelector('div') as HTMLDivElement | null)?.shadowRoot;
-      return !!sh?.querySelector('style[data-moxjs-shadow-css]');
+      return !!sh?.querySelector('style[data-jorvel-shadow-css]');
     });
     const sh = (host.querySelector('div') as HTMLDivElement).shadowRoot!;
-    const style = sh.querySelector('style[data-moxjs-shadow-css]')!;
+    const style = sh.querySelector('style[data-jorvel-shadow-css]')!;
     expect(style.textContent).toBe(css);
     unmount();
   });

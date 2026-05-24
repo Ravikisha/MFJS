@@ -1,4 +1,4 @@
-import { dispatchMoxjsNavigate, type NavigateDetail } from './router.js';
+import { dispatchJorvelNavigate, type NavigateDetail } from './router.js';
 
 interface StartViewTransition {
   (cb: () => void | Promise<void>): ViewTransitionHandle;
@@ -49,8 +49,8 @@ export function withViewTransition(
 
 /**
  * Navigate inside a View Transition so the browser animates between DOM
- * snapshots. Drop-in replacement for `dispatchMoxjsNavigate`.
+ * snapshots. Drop-in replacement for `dispatchJorvelNavigate`.
  */
 export function navigateWithTransition(detail: NavigateDetail, opts?: ViewTransitionOptions): Promise<void> {
-  return withViewTransition(() => dispatchMoxjsNavigate(detail), opts);
+  return withViewTransition(() => dispatchJorvelNavigate(detail), opts);
 }

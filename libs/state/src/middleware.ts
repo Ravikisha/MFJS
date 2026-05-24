@@ -108,7 +108,7 @@ export interface LoggerOptions<A> {
 }
 
 export function loggerMiddleware<S, A>(opts: LoggerOptions<A> = {}): Middleware<S, A> {
-  const label = opts.label ?? 'moxjs/state';
+  const label = opts.label ?? 'jorvel/state';
   // eslint-disable-next-line no-console
   const out = opts.log ?? console.log.bind(console);
   const fmt = opts.format ?? ((a: A) => {

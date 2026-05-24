@@ -26,7 +26,7 @@ export function NoFlashScript() {
   const code = `
     (function() {
       try {
-        var t = localStorage.getItem('moxjs-theme') || 'system';
+        var t = localStorage.getItem('jorvel-theme') || 'system';
         var d = window.matchMedia('(prefers-color-scheme: dark)').matches;
         var resolved = t === 'system' ? (d ? 'dark' : 'light') : t;
         if (resolved === 'dark') document.documentElement.classList.add('dark');

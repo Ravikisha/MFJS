@@ -1,5 +1,5 @@
 /**
- * Feature: @moxjs/security — CSP, allowlist, sanitization.
+ * Feature: @jorvel/security — CSP, allowlist, sanitization.
  */
 import { describe, expect, it } from 'vitest';
 import {

@@ -12,7 +12,7 @@ export default function ServiceWorker() {
     <>
       <h1>Service Worker</h1>
       <p>
-        MOXJS ships a Service Worker that caches the app shell, every{' '}
+        JORVEL ships a Service Worker that caches the app shell, every{' '}
         <code>remoteEntry.js</code>, and federation chunks. Second visits (or flaky networks) load
         instantly from cache. The SW is opt-in — generate it once, register it from your shell
         bootstrap, and the runtime handles updates.
@@ -26,21 +26,21 @@ export default function ServiceWorker() {
       <h2 id="generate">Generate</h2>
       <CodeBlock
         language="bash"
-        code={`moxjs sw generate --app shell
-# writes apps/shell/public/moxjs-sw.js`}
+        code={`jorvel sw generate --app shell
+# writes apps/shell/public/jorvel-sw.js`}
       />
 
-      <p>The generated SW reads the build manifest at install time and pre-caches the shell. Re-run the command on every build, or wire it into the <code>build</code> hook of your <code>moxjs.config.ts</code>.</p>
+      <p>The generated SW reads the build manifest at install time and pre-caches the shell. Re-run the command on every build, or wire it into the <code>build</code> hook of your <code>jorvel.config.ts</code>.</p>
 
       <h2 id="register">Register</h2>
       <CodeBlock
         language="tsx"
         filename="apps/shell/src/bootstrap.tsx"
-        code={`import { registerMoxjsServiceWorker } from '@moxjs/runtime';
+        code={`import { registerJorvelServiceWorker } from '@jorvel/runtime';
 
 if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
-  registerMoxjsServiceWorker({
-    url: '/moxjs-sw.js',
+  registerJorvelServiceWorker({
+    url: '/jorvel-sw.js',
     autoActivate: true,
     onUpdateReady: () => showUpdateBanner(),
     onError: (err) => observability.reportError(err),
@@ -53,7 +53,7 @@ if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
         <thead><tr><th>Asset class</th><th>Strategy</th><th>Rationale</th></tr></thead>
         <tbody>
           <tr>
-            <td><code>remoteEntry.js</code> + <code>/moxjs/remotes/**</code></td>
+            <td><code>remoteEntry.js</code> + <code>/jorvel/remotes/**</code></td>
             <td>stale-while-revalidate</td>
             <td>Cache-first for instant load; revalidate in background so the next visit gets new code</td>
           </tr>
@@ -77,7 +77,7 @@ if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
 
       <h2 id="update-flow">Update flow</h2>
       <ol>
-        <li>User visits — the browser fetches <code>/moxjs-sw.js</code> in the background.</li>
+        <li>User visits — the browser fetches <code>/jorvel-sw.js</code> in the background.</li>
         <li>If the bytes changed, the new SW installs in parallel and waits in <code>installed</code> state.</li>
         <li>The runtime fires <code>onUpdateReady</code>. Show a banner: <em>&quot;A new version is available. Reload?&quot;</em></li>
         <li>
@@ -104,8 +104,8 @@ if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
       <h2 id="unregister">Unregister</h2>
       <CodeBlock
         language="ts"
-        code={`import { unregisterMoxjsServiceWorker } from '@moxjs/runtime';
-await unregisterMoxjsServiceWorker();`}
+        code={`import { unregisterJorvelServiceWorker } from '@jorvel/runtime';
+await unregisterJorvelServiceWorker();`}
       />
 
       <p>Use this from a console command for stuck users, or as a kill-switch wired to a feature flag.</p>
@@ -113,7 +113,7 @@ await unregisterMoxjsServiceWorker();`}
       <Callout variant="warn" title="Scope note">
         Service Workers are restricted to the origin root by default. When serving remotes on a CDN
         subdomain, register a separate SW per origin or proxy remotes under the host origin via{' '}
-        <code>moxjs dev --proxy-remotes</code> / a production reverse proxy. The{' '}
+        <code>jorvel dev --proxy-remotes</code> / a production reverse proxy. The{' '}
         <code>Service-Worker-Allowed</code> response header is the only way to widen scope beyond
         the SW file&apos;s directory.
       </Callout>
@@ -126,11 +126,11 @@ await unregisterMoxjsServiceWorker();`}
         </li>
         <li>
           To force a refresh, click <strong>Unregister</strong> then hard-reload. Or call{' '}
-          <code>unregisterMoxjsServiceWorker()</code> from the console.
+          <code>unregisterJorvelServiceWorker()</code> from the console.
         </li>
         <li>
           Caches show up under Application → Cache Storage. Names start with{' '}
-          <code>moxjs:</code>; entries include the URL and expiry timestamp.
+          <code>jorvel:</code>; entries include the URL and expiry timestamp.
         </li>
         <li>
           To simulate offline, DevTools → Network → throttle dropdown → &quot;Offline&quot;. The SW

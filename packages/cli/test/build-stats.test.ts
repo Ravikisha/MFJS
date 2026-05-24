@@ -11,7 +11,7 @@ import {
 } from '../src/commands/build-stats.js';
 
 async function makeWorkspace(name: string): Promise<string> {
-  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), `moxjs-stats-${name}-`));
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), `jorvel-stats-${name}-`));
   return tmp;
 }
 
@@ -30,9 +30,9 @@ async function makeApp(
   await fs.ensureDir(dir);
   const meta: Record<string, unknown> = { name: spec.name, type: spec.type };
   if (spec.port !== undefined) meta.port = spec.port;
-  await fs.writeJson(path.join(dir, 'moxjs.app.json'), meta);
+  await fs.writeJson(path.join(dir, 'jorvel.app.json'), meta);
   if (spec.shared) {
-    await fs.writeJson(path.join(dir, 'moxjs.federation.json'), {
+    await fs.writeJson(path.join(dir, 'jorvel.federation.json'), {
       name: spec.name,
       shared: spec.shared,
     });
@@ -135,7 +135,7 @@ describe('writeBuildStats', () => {
   it('writes JSON to disk and returns the same document', async () => {
     const ws = await makeWorkspace('write');
     await makeApp(ws, { name: 'a', type: 'host', assets: { 'app.js': 100 } });
-    const out = path.join(ws, 'moxjs-build-stats.json');
+    const out = path.join(ws, 'jorvel-build-stats.json');
     const stats = await writeBuildStats(ws, out);
     const onDisk = await fs.readJson(out);
     expect(onDisk).toEqual(stats);

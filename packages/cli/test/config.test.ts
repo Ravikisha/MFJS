@@ -15,11 +15,11 @@ async function write(p: string, content: string) {
 }
 
 describe('loadWorkspaceConfig', () => {
-  it('loads moxjs.config.json when present', async () => {
-    const dir = await mkTmpDir('moxjs-config-json-');
+  it('loads jorvel.config.json when present', async () => {
+    const dir = await mkTmpDir('jorvel-config-json-');
 
     await write(
-      path.join(dir, 'moxjs.config.json'),
+      path.join(dir, 'jorvel.config.json'),
       JSON.stringify(
         {
           name: 'json-only',
@@ -38,11 +38,11 @@ describe('loadWorkspaceConfig', () => {
     expect(plugins).toEqual([]);
   });
 
-  it('loads moxjs.config.ts when a compiled .js sibling is present, and merges with JSON', async () => {
-    const dir = await mkTmpDir('moxjs-config-ts-');
+  it('loads jorvel.config.ts when a compiled .js sibling is present, and merges with JSON', async () => {
+    const dir = await mkTmpDir('jorvel-config-ts-');
 
     await write(
-      path.join(dir, 'moxjs.config.json'),
+      path.join(dir, 'jorvel.config.json'),
       JSON.stringify(
         {
           name: 'base',
@@ -56,9 +56,9 @@ describe('loadWorkspaceConfig', () => {
 
     // The CLI no longer imports raw .ts; ship a compiled .js sibling. The
     // marker .ts is kept to verify the loader picks the .js up.
-    await write(path.join(dir, 'moxjs.config.ts'), '// source\n');
+    await write(path.join(dir, 'jorvel.config.ts'), '// source\n');
     await write(
-      path.join(dir, 'moxjs.config.js'),
+      path.join(dir, 'jorvel.config.js'),
       [
         "const plugin = { name: 'p1', configResolved: (cfg) => ({ ...cfg, name: 'from-ts' }) };",
         'export default {',
@@ -86,22 +86,22 @@ describe('loadWorkspaceConfig', () => {
     expect(plugins.map((p) => p.name)).toEqual(['p1']);
   });
 
-  it('throws a clear MoxjsCliError when moxjs.config.ts has no compiled .js sibling', async () => {
-    const dir = await mkTmpDir('moxjs-config-badts-');
+  it('throws a clear JorvelCliError when jorvel.config.ts has no compiled .js sibling', async () => {
+    const dir = await mkTmpDir('jorvel-config-badts-');
 
     await write(
-      path.join(dir, 'moxjs.config.ts'),
+      path.join(dir, 'jorvel.config.ts'),
       'export default (this is not valid ts);\n',
     );
 
-    await expect(loadWorkspaceConfig(dir)).rejects.toThrow(/CONFIG-002|no compiled moxjs.config.js/);
+    await expect(loadWorkspaceConfig(dir)).rejects.toThrow(/CONFIG-002|no compiled jorvel.config.js/);
   });
 
-  it('loads a compiled moxjs.config.js sibling', async () => {
-    const dir = await mkTmpDir('moxjs-config-jsts-');
-    await write(path.join(dir, 'moxjs.config.ts'), '// source\n');
+  it('loads a compiled jorvel.config.js sibling', async () => {
+    const dir = await mkTmpDir('jorvel-config-jsts-');
+    await write(path.join(dir, 'jorvel.config.ts'), '// source\n');
     await write(
-      path.join(dir, 'moxjs.config.js'),
+      path.join(dir, 'jorvel.config.js'),
       "export default { name: 'from-js' };\n",
     );
     const { cfg } = await loadWorkspaceConfig(dir);

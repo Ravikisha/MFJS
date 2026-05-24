@@ -8,12 +8,12 @@ describe('buildSchemas', () => {
   it('emits the four canonical schemas with $id pinned to baseUrl', () => {
     const cat = buildSchemas('https://x.test/schemas');
     expect(Object.keys(cat).sort()).toEqual([
-      'moxjs.app', 'moxjs.config', 'moxjs.federation', 'moxjs.ssr',
+      'jorvel.app', 'jorvel.config', 'jorvel.federation', 'jorvel.ssr',
     ]);
-    expect(cat['moxjs.config']!.$id).toBe('https://x.test/schemas/moxjs.config.json');
-    expect(cat['moxjs.app']!.$id).toBe('https://x.test/schemas/moxjs.app.json');
-    expect(cat['moxjs.federation']!.$id).toBe('https://x.test/schemas/moxjs.federation.json');
-    expect(cat['moxjs.ssr']!.$id).toBe('https://x.test/schemas/moxjs.ssr.json');
+    expect(cat['jorvel.config']!.$id).toBe('https://x.test/schemas/jorvel.config.json');
+    expect(cat['jorvel.app']!.$id).toBe('https://x.test/schemas/jorvel.app.json');
+    expect(cat['jorvel.federation']!.$id).toBe('https://x.test/schemas/jorvel.federation.json');
+    expect(cat['jorvel.ssr']!.$id).toBe('https://x.test/schemas/jorvel.ssr.json');
   });
 
   it('uses Draft 2020-12 for every schema', () => {
@@ -25,36 +25,36 @@ describe('buildSchemas', () => {
 
   it('app schema requires name + kind, rejects unknown fields', () => {
     const cat = buildSchemas();
-    expect(cat['moxjs.app']!.required).toEqual(['name', 'kind']);
-    expect(cat['moxjs.app']!.additionalProperties).toBe(false);
+    expect(cat['jorvel.app']!.required).toEqual(['name', 'kind']);
+    expect(cat['jorvel.app']!.additionalProperties).toBe(false);
   });
 
   it('federation schema enforces an sri-shaped integrity pattern', () => {
     const cat = buildSchemas();
-    const remoteItem = (cat['moxjs.federation']!.properties.remotes as { items: { properties: Record<string, { pattern?: string }> } }).items.properties;
+    const remoteItem = (cat['jorvel.federation']!.properties.remotes as { items: { properties: Record<string, { pattern?: string }> } }).items.properties;
     expect(remoteItem.integrity!.pattern).toMatch(/^\^sha\(256/);
   });
 });
 
 describe('writeSchemas', () => {
   it('writes pretty-printed schemas to disk with trailing newline', () => {
-    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'moxjs-schemas-'));
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'jorvel-schemas-'));
     try {
       const { files } = writeSchemas({ outDir: tmp });
       expect(files).toHaveLength(4);
-      const content = fs.readFileSync(path.join(tmp, 'moxjs.config.json'), 'utf8');
+      const content = fs.readFileSync(path.join(tmp, 'jorvel.config.json'), 'utf8');
       expect(content.endsWith('\n')).toBe(true);
-      expect(content).toContain('  "title": "MOXJS workspace config"');
+      expect(content).toContain('  "title": "JORVEL workspace config"');
     } finally {
       fs.rmSync(tmp, { recursive: true, force: true });
     }
   });
 
   it('honors pretty=false (no indent, no trailing whitespace)', () => {
-    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'moxjs-schemas-'));
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'jorvel-schemas-'));
     try {
       writeSchemas({ outDir: tmp, pretty: false });
-      const raw = fs.readFileSync(path.join(tmp, 'moxjs.app.json'), 'utf8');
+      const raw = fs.readFileSync(path.join(tmp, 'jorvel.app.json'), 'utf8');
       expect(raw).not.toMatch(/\n  "/);
     } finally {
       fs.rmSync(tmp, { recursive: true, force: true });
@@ -62,18 +62,18 @@ describe('writeSchemas', () => {
   });
 
   it('creates the output directory if missing', () => {
-    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'moxjs-schemas-'));
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'jorvel-schemas-'));
     try {
       const nested = path.join(tmp, 'nested', 'dir');
       writeSchemas({ outDir: nested });
-      expect(fs.existsSync(path.join(nested, 'moxjs.ssr.json'))).toBe(true);
+      expect(fs.existsSync(path.join(nested, 'jorvel.ssr.json'))).toBe(true);
     } finally {
       fs.rmSync(tmp, { recursive: true, force: true });
     }
   });
 
   it('accepts a custom catalog override (testing)', () => {
-    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'moxjs-schemas-'));
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'jorvel-schemas-'));
     try {
       const result = writeSchemas({
         outDir: tmp,
@@ -95,45 +95,45 @@ describe('writeSchemas', () => {
 describe('validateAgainst', () => {
   const cat = buildSchemas();
 
-  it('passes a well-formed moxjs.app doc', () => {
-    const r = validateAgainst(cat['moxjs.app']!, { name: 'shop', kind: 'host' });
+  it('passes a well-formed jorvel.app doc', () => {
+    const r = validateAgainst(cat['jorvel.app']!, { name: 'shop', kind: 'host' });
     expect(r.ok).toBe(true);
     expect(r.errors).toEqual([]);
   });
 
   it('flags missing required keys', () => {
-    const r = validateAgainst(cat['moxjs.app']!, { name: 'shop' });
+    const r = validateAgainst(cat['jorvel.app']!, { name: 'shop' });
     expect(r.ok).toBe(false);
     expect(r.errors.some((e) => /kind/.test(e.message))).toBe(true);
   });
 
   it('flags unknown properties when additionalProperties=false', () => {
-    const r = validateAgainst(cat['moxjs.app']!, { name: 'shop', kind: 'host', typo: true });
+    const r = validateAgainst(cat['jorvel.app']!, { name: 'shop', kind: 'host', typo: true });
     expect(r.ok).toBe(false);
     expect(r.errors.some((e) => /typo/.test(e.message))).toBe(true);
   });
 
   it('flags wrong type for a property', () => {
-    const r = validateAgainst(cat['moxjs.app']!, { name: 'shop', kind: 'host', port: 'eighty' });
+    const r = validateAgainst(cat['jorvel.app']!, { name: 'shop', kind: 'host', port: 'eighty' });
     expect(r.ok).toBe(false);
     expect(r.errors.some((e) => e.pointer === '/port')).toBe(true);
   });
 
   it('flags out-of-enum values', () => {
-    const r = validateAgainst(cat['moxjs.app']!, { name: 'shop', kind: 'something-else' });
+    const r = validateAgainst(cat['jorvel.app']!, { name: 'shop', kind: 'something-else' });
     expect(r.ok).toBe(false);
     expect(r.errors.some((e) => /enum/.test(e.message))).toBe(true);
   });
 
   it('rejects non-object docs', () => {
-    expect(validateAgainst(cat['moxjs.app']!, null).ok).toBe(false);
-    expect(validateAgainst(cat['moxjs.app']!, ['array']).ok).toBe(false);
-    expect(validateAgainst(cat['moxjs.app']!, 42 as unknown).ok).toBe(false);
+    expect(validateAgainst(cat['jorvel.app']!, null).ok).toBe(false);
+    expect(validateAgainst(cat['jorvel.app']!, ['array']).ok).toBe(false);
+    expect(validateAgainst(cat['jorvel.app']!, 42 as unknown).ok).toBe(false);
   });
 
   it('allows $schema even with additionalProperties=false', () => {
-    const r = validateAgainst(cat['moxjs.app']!, {
-      $schema: 'https://moxjs.vercel.app/schemas/moxjs.app.json',
+    const r = validateAgainst(cat['jorvel.app']!, {
+      $schema: 'https://jorveljs.vercel.app/schemas/jorvel.app.json',
       name: 'shop',
       kind: 'host',
     });

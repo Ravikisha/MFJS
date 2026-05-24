@@ -55,12 +55,12 @@ export const DOC_NAV: DocSection[] = [
   {
     title: 'API reference',
     links: [
-      { href: '/docs/api/runtime', label: '@moxjs/runtime' },
-      { href: '/docs/api/ssr', label: '@moxjs/ssr' },
-      { href: '/docs/api/security', label: '@moxjs/security' },
-      { href: '/docs/api/observability', label: '@moxjs/observability' },
-      { href: '/docs/api/state', label: '@moxjs/state' },
-      { href: '/docs/api/event-bus', label: '@moxjs/event-bus' },
+      { href: '/docs/api/runtime', label: '@jorvel/runtime' },
+      { href: '/docs/api/ssr', label: '@jorvel/ssr' },
+      { href: '/docs/api/security', label: '@jorvel/security' },
+      { href: '/docs/api/observability', label: '@jorvel/observability' },
+      { href: '/docs/api/state', label: '@jorvel/state' },
+      { href: '/docs/api/event-bus', label: '@jorvel/event-bus' },
     ],
   },
 ];

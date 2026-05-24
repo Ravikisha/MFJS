@@ -27,9 +27,9 @@ export function Logo({ className, withWordmark = true }: { className?: string; w
       </span>
       {withWordmark && (
         <span className="flex items-baseline gap-1.5 text-sm">
-          <span className="font-semibold tracking-tight">MOXJS</span>
+          <span className="font-semibold tracking-tight">JORVEL</span>
           <span className="hidden sm:inline rounded border border-border bg-secondary px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
-            v0.1.0
+            v0.2.0
           </span>
         </span>
       )}

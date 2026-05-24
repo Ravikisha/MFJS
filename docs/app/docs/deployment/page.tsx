@@ -7,7 +7,7 @@ import { RocketIcon } from '@/components/icons';
 export const metadata = {
   title: 'Deployment',
   description:
-    'Deploy MOXJS to Vercel Edge, Cloudflare Workers/Pages, Node.js, or Docker. moxjs deploy resolves the right adapter package automatically.',
+    'Deploy JORVEL to Vercel Edge, Cloudflare Workers/Pages, Node.js, or Docker. jorvel deploy resolves the right adapter package automatically.',
 };
 
 export default function DeploymentPage() {
@@ -18,10 +18,10 @@ export default function DeploymentPage() {
       </Badge>
       <h1>Deployment</h1>
       <p>
-        <code>moxjs deploy</code> dynamically loads the right adapter package — Vercel Edge,
+        <code>jorvel deploy</code> dynamically loads the right adapter package — Vercel Edge,
         Cloudflare, or Node — and scaffolds a working platform config. Adapters are loose deps;
         install only what you actually ship. Every adapter wraps the same edge-runtime-safe core
-        from <code>@moxjs/ssr/edge</code>, so the behavior is consistent across platforms — the
+        from <code>@jorvel/ssr/edge</code>, so the behavior is consistent across platforms — the
         adapter only handles request/response translation and platform-specific bootstrapping.
       </p>
 
@@ -75,8 +75,8 @@ export default function DeploymentPage() {
           <h2 id="vercel">Vercel Edge</h2>
           <CodeBlock
             language="bash"
-            code={`pnpm add -D @moxjs/adapter-vercel
-moxjs deploy --target vercel
+            code={`pnpm add -D @jorvel/adapter-vercel
+jorvel deploy --target vercel
 vercel deploy`}
           />
           <p>
@@ -87,10 +87,10 @@ vercel deploy`}
           <CodeBlock
             language="ts"
             filename="api/[[...slug]].ts"
-            code={`import { createVercelHandler } from '@moxjs/adapter-vercel';
+            code={`import { createVercelHandler } from '@jorvel/adapter-vercel';
 import { App } from '../src/App';
 import template from '../src/template.html?raw';
-import routes from '../src/moxjs.routes';
+import routes from '../src/jorvel.routes';
 
 export const config = { runtime: 'edge' };
 
@@ -120,7 +120,7 @@ export default createVercelHandler({ App, template, routes, etag: true });`}
           <p>
             The handler returns a <code>ReadableStream</code> when the SSR call streams; Vercel
             Edge passes it through. Pair with <code>renderRouteToReadableStream</code> from{' '}
-            <code>@moxjs/ssr/edge</code> for progressive rendering.
+            <code>@jorvel/ssr/edge</code> for progressive rendering.
           </p>
         </TabsContent>
 
@@ -128,8 +128,8 @@ export default createVercelHandler({ App, template, routes, etag: true });`}
           <h2 id="cloudflare">Cloudflare Workers / Pages</h2>
           <CodeBlock
             language="bash"
-            code={`pnpm add -D @moxjs/adapter-cloudflare
-moxjs deploy --target cloudflare
+            code={`pnpm add -D @jorvel/adapter-cloudflare
+jorvel deploy --target cloudflare
 wrangler deploy
 # or, for Cloudflare Pages
 wrangler pages deploy apps/shell/dist`}
@@ -137,7 +137,7 @@ wrangler pages deploy apps/shell/dist`}
           <CodeBlock
             language="ts"
             filename="src/worker.ts"
-            code={`import { createCloudflareWorker } from '@moxjs/adapter-cloudflare';
+            code={`import { createCloudflareWorker } from '@jorvel/adapter-cloudflare';
 
 const worker = createCloudflareWorker({
   App,
@@ -174,7 +174,7 @@ export default worker;`}
           <p>
             For Pub/Sub or shared state across the federation graph, expose a Durable Object as the
             event bus and bridge with <code>connectBroadcast</code> from{' '}
-            <code>@moxjs/event-bus</code>.
+            <code>@jorvel/event-bus</code>.
           </p>
         </TabsContent>
 
@@ -182,13 +182,13 @@ export default worker;`}
           <h2 id="node">Node.js</h2>
           <CodeBlock
             language="bash"
-            code={`pnpm add -D @moxjs/adapter-node
-moxjs deploy --target node`}
+            code={`pnpm add -D @jorvel/adapter-node
+jorvel deploy --target node`}
           />
           <CodeBlock
             language="ts"
             filename="server.ts"
-            code={`import { startNodeServer } from '@moxjs/adapter-node';
+            code={`import { startNodeServer } from '@jorvel/adapter-node';
 
 startNodeServer({
   App,
@@ -219,7 +219,7 @@ startNodeServer({
           <h2 id="docker">Docker</h2>
           <CodeBlock
             language="bash"
-            code={`moxjs deploy --target docker
+            code={`jorvel deploy --target docker
 docker build -t shell .
 docker run -p 3000:3000 shell`}
           />
@@ -252,7 +252,7 @@ CMD ["node", "apps/shell/dist/server.js"]`}
 
           <h3>Kubernetes manifests</h3>
           <p>
-            <code>moxjs deploy --target docker --k8s</code> additionally emits a Deployment +
+            <code>jorvel deploy --target docker --k8s</code> additionally emits a Deployment +
             Service + HPA YAML. Edit the resource limits and pod count to taste.
           </p>
         </TabsContent>
@@ -268,7 +268,7 @@ CMD ["node", "apps/shell/dist/server.js"]`}
 
       <CodeBlock
         language="ts"
-        filename="moxjs.config.ts"
+        filename="jorvel.config.ts"
         code={`{
   federation: {
     publicPath: 'https://cdn.acme.com/dashboard/',
@@ -302,13 +302,13 @@ CMD ["node", "apps/shell/dist/server.js"]`}
       <p>
         Each adapter is just a thin bridge that turns the platform&apos;s native request type into{' '}
         <code>EdgeRequest</code>. Implement <code>scaffoldDeploy()</code> + a handler factory and{' '}
-        <code>moxjs deploy --target your-adapter</code> will pick it up.
+        <code>jorvel deploy --target your-adapter</code> will pick it up.
       </p>
 
       <CodeBlock
         language="ts"
-        filename="@your-co/moxjs-adapter-foo/src/index.ts"
-        code={`import { createEdgeAdapter } from '@moxjs/ssr';
+        filename="@your-co/jorvel-adapter-foo/src/index.ts"
+        code={`import { createEdgeAdapter } from '@jorvel/ssr';
 
 export const deployTarget = 'foo';
 
@@ -335,8 +335,8 @@ export function createFooHandler(options) {
         <tbody>
           <tr><td><code>NODE_ENV</code></td><td>All</td><td>Production-mode defaults (caching, error verbosity).</td></tr>
           <tr><td><code>PORT</code></td><td>Node, Docker</td><td>Listen port.</td></tr>
-          <tr><td><code>MOXJS_DEBUG</code></td><td>All</td><td>Verbose logs.</td></tr>
-          <tr><td><code>MOXJS_REMOTE_TIMEOUT_MS</code></td><td>All</td><td>Per-remote load timeout (default 10s).</td></tr>
+          <tr><td><code>JORVEL_DEBUG</code></td><td>All</td><td>Verbose logs.</td></tr>
+          <tr><td><code>JORVEL_REMOTE_TIMEOUT_MS</code></td><td>All</td><td>Per-remote load timeout (default 10s).</td></tr>
         </tbody>
       </table>
     </>

@@ -1,30 +1,46 @@
 {
-  "name": "@moxjs/adapter-vercel",
-  "version": "0.1.0",
-  "description": "Vercel deployment adapter for MOXJS (Edge Functions + static assets).",
+  "name": "@jorvel/adapter-vercel",
+  "version": "0.2.0",
+  "description": "Vercel deployment adapter for JORVEL (Edge Functions + static assets).",
   "license": "MIT",
-  "homepage": "https://github.com/anthropics/MOXJS#readme",
+  "homepage": "https://github.com/Ravikisha/JorvelJS#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/anthropics/MOXJS.git",
+    "url": "https://github.com/Ravikisha/JorvelJS.git",
     "directory": "libs/adapter-vercel"
   },
-  "keywords": ["moxjs", "vercel", "edge", "ssr", "module-federation"],
+  "keywords": [
+    "jorvel",
+    "vercel",
+    "edge",
+    "ssr",
+    "module-federation"
+  ],
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "publishConfig": { "access": "public" },
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
     "./package.json": "./package.json"
   },
-  "files": ["dist", "templates", "README.md", "LICENSE"],
+  "files": [
+    "dist",
+    "templates",
+    "README.md",
+    "LICENSE"
+  ],
   "sideEffects": false,
   "scripts": {
     "build": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@moxjs/ssr": "workspace:*"
+    "@jorvel/ssr": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.13.10",

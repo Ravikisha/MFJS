@@ -13,7 +13,7 @@ export default function App({ path, params }) {
     React.createElement(
       'header',
       null,
-      React.createElement('h1', { style: { margin: 0 } }, 'MOXJS E-commerce'),
+      React.createElement('h1', { style: { margin: 0 } }, 'JORVEL E-commerce'),
       React.createElement(
         'p',
         { style: { marginTop: 6, opacity: 0.8 } },

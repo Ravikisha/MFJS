@@ -27,17 +27,17 @@ async function run(argv: string[], cwd: string): Promise<number> {
 
 afterEach(() => vi.restoreAllMocks());
 
-describe('moxjs diagnose', () => {
+describe('jorvel diagnose', () => {
   it('exits non-zero when workspace root has no package.json', async () => {
     vi.spyOn(console, 'log').mockImplementation(() => {});
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-diag-'))) as string;
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-diag-'))) as string;
     const code = await run(['--cwd', tmp], tmp);
     expect(code).toBe(1);
   });
 
   it('exits 0 on a minimally healthy workspace (warns only)', async () => {
     vi.spyOn(console, 'log').mockImplementation(() => {});
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-diag-'))) as string;
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-diag-'))) as string;
     await fs.writeJson(path.join(tmp, 'package.json'), { name: 'x', private: true });
     await fs.writeFile(path.join(tmp, 'pnpm-workspace.yaml'), 'packages:\n  - apps/*');
     const code = await run(['--cwd', tmp], tmp);
@@ -49,11 +49,11 @@ describe('moxjs diagnose', () => {
     vi.spyOn(console, 'log').mockImplementation((...args: unknown[]) => {
       logs.push(args.map(String).join(' '));
     });
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-diag-'))) as string;
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-diag-'))) as string;
     await fs.writeJson(path.join(tmp, 'package.json'), { name: 'x', private: true });
     await fs.writeFile(path.join(tmp, 'pnpm-workspace.yaml'), 'packages:\n  - apps/*');
     await fs.ensureDir(path.join(tmp, 'apps', 'shell'));
-    await fs.writeJson(path.join(tmp, 'apps', 'shell', 'moxjs.app.json'), { name: 'shell', type: 'host' });
+    await fs.writeJson(path.join(tmp, 'apps', 'shell', 'jorvel.app.json'), { name: 'shell', type: 'host' });
     await run(['--cwd', tmp], tmp);
     expect(logs.some((l) => l.includes('shell'))).toBe(true);
   });

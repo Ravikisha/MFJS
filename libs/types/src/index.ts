@@ -1,10 +1,10 @@
 /**
- * @moxjs/types
+ * @jorvel/types
  *
- * Zero-runtime shared type library for the MOXJS micro-frontend framework.
+ * Zero-runtime shared type library for the JORVEL micro-frontend framework.
  *
  * Exports:
- * - App configuration types  (`MoxjsAppConfig`, `AppType`)
+ * - App configuration types  (`JorvelAppConfig`, `AppType`)
  * - Federation config types  (`FederationConfig`, `SharedDependency`, `RemoteTarget`)
  * - Federation contract types (`FederationContract`, `defineFederationContract`,
  *                              `validateFederationContract`, `InferExposed`,
@@ -12,7 +12,7 @@
  * - Routing types            (`RouteTarget`, `RouteMatch`, `NavigateDetail`, `NavigateMode`)
  */
 
-export type { AppType, MoxjsAppConfig } from './app-config.js';
+export type { AppType, JorvelAppConfig } from './app-config.js';
 
 export type {
   SharedDependency,
@@ -39,16 +39,16 @@ export type {
 } from './routing.js';
 
 export type {
-  MoxjsWorkspaceConfig,
-  MoxjsRemoteConfig,
-  MoxjsOrchestratorConfig,
-  MoxjsFederationConfig,
-  MoxjsFeaturesConfig,
-} from './moxjs-config.js';
+  JorvelWorkspaceConfig,
+  JorvelRemoteConfig,
+  JorvelOrchestratorConfig,
+  JorvelFederationConfig,
+  JorvelFeaturesConfig,
+} from './jorvel-config.js';
 
-export type { MoxjsPlugin, MoxjsDevPlan, MoxjsAppMeta } from './plugins.js';
+export type { JorvelPlugin, JorvelDevPlan, JorvelAppMeta } from './plugins.js';
 
-export type { MoxjsPageRoute, MoxjsRoutesManifest, MoxjsHostRoutesManifest, MoxjsRoutingCompiler } from './routing-compiler.js';
+export type { JorvelPageRoute, JorvelRoutesManifest, JorvelHostRoutesManifest, JorvelRoutingCompiler } from './routing-compiler.js';
 export { defaultRoutingCompiler } from './routing-compiler.js';
 
 export {

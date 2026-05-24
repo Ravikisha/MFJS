@@ -4,17 +4,17 @@
  * Verifies:
  *  1. tsconfig.base.json exists and contains all required strict flags.
  *  2. All lib/package tsconfigs extend the base.
- *  3. @moxjs/types passes tsc --noEmit (typecheck script).
- *  4. @moxjs/types compile-time type tests pass (typecheck:tests script).
- *  5. moxjs generate scaffolds apps with `extends: ../../tsconfig.base.json`.
- *  6. moxjs generate scaffolds apps with a `typecheck` script.
+ *  3. @jorvel/types passes tsc --noEmit (typecheck script).
+ *  4. @jorvel/types compile-time type tests pass (typecheck:tests script).
+ *  5. jorvel generate scaffolds apps with `extends: ../../tsconfig.base.json`.
+ *  6. jorvel generate scaffolds apps with a `typecheck` script.
  *  7. defineFederationContract preserves literal event types at runtime.
  *  8. validateFederationContract catches missing / invalid containers.
  *  9. validateFederationContract accepts a valid container.
- * 10. moxjs typecheck CLI exits cleanly on the actual monorepo.
- * 11. moxjs typecheck CLI exits gracefully when no packages are found.
+ * 10. jorvel typecheck CLI exits cleanly on the actual monorepo.
+ * 11. jorvel typecheck CLI exits gracefully when no packages are found.
  *
- * Skipped unless MOXJS_E2E=1.
+ * Skipped unless JORVEL_E2E=1.
  */
 
 import { test, expect } from '@playwright/test';
@@ -23,7 +23,7 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import { spawnSync } from 'node:child_process';
 
-const SKIP = !process.env.MOXJS_E2E;
+const SKIP = !process.env.JORVEL_E2E;
 const ROOT = path.resolve(__dirname, '../..');
 
 // ── helpers ───────────────────────────────────────────────────────────────────
@@ -34,7 +34,7 @@ async function readJson(filePath: string): Promise<Record<string, unknown>> {
 }
 
 async function makeTmp(): Promise<string> {
-  return fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-ts-e2e-')) as Promise<string>;
+  return fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-ts-e2e-')) as Promise<string>;
 }
 
 /** Run `pnpm <args>` synchronously inside `cwd`. */
@@ -53,7 +53,7 @@ function pnpm(
 // ── 1. tsconfig.base.json ─────────────────────────────────────────────────────
 
 test('tsconfig.base.json — exists at workspace root', async () => {
-  test.skip(SKIP, 'Set MOXJS_E2E=1 to run e2e tests');
+  test.skip(SKIP, 'Set JORVEL_E2E=1 to run e2e tests');
 
   const basePath = path.join(ROOT, 'tsconfig.base.json');
   const stat = await fs.stat(basePath);
@@ -61,7 +61,7 @@ test('tsconfig.base.json — exists at workspace root', async () => {
 });
 
 test('tsconfig.base.json — contains all required strict flags', async () => {
-  test.skip(SKIP, 'Set MOXJS_E2E=1 to run e2e tests');
+  test.skip(SKIP, 'Set JORVEL_E2E=1 to run e2e tests');
 
   const basePath = path.join(ROOT, 'tsconfig.base.json');
   const cfg = await readJson(basePath);
@@ -79,7 +79,7 @@ test('tsconfig.base.json — contains all required strict flags', async () => {
 // ── 2. All lib/package tsconfigs extend base ──────────────────────────────────
 
 test('libs — all tsconfig.json files extend tsconfig.base.json', async () => {
-  test.skip(SKIP, 'Set MOXJS_E2E=1 to run e2e tests');
+  test.skip(SKIP, 'Set JORVEL_E2E=1 to run e2e tests');
 
   const libsDir = path.join(ROOT, 'libs');
   const entries = await fs.readdir(libsDir);
@@ -101,7 +101,7 @@ test('libs — all tsconfig.json files extend tsconfig.base.json', async () => {
 });
 
 test('packages — all tsconfig.json files extend tsconfig.base.json', async () => {
-  test.skip(SKIP, 'Set MOXJS_E2E=1 to run e2e tests');
+  test.skip(SKIP, 'Set JORVEL_E2E=1 to run e2e tests');
 
   const pkgsDir = path.join(ROOT, 'packages');
   const entries = await fs.readdir(pkgsDir);
@@ -122,26 +122,26 @@ test('packages — all tsconfig.json files extend tsconfig.base.json', async () 
   }
 });
 
-// ── 3. @moxjs/types tsc checks ─────────────────────────────────────────────────
+// ── 3. @jorvel/types tsc checks ─────────────────────────────────────────────────
 
-test('@moxjs/types — passes tsc --noEmit (typecheck script)', () => {
-  test.skip(SKIP, 'Set MOXJS_E2E=1 to run e2e tests');
+test('@jorvel/types — passes tsc --noEmit (typecheck script)', () => {
+  test.skip(SKIP, 'Set JORVEL_E2E=1 to run e2e tests');
 
   const typesDir = path.join(ROOT, 'libs', 'types');
   const { code, stderr } = pnpm(['run', 'typecheck'], typesDir);
   expect(code, `tsc errors:\n${stderr}`).toBe(0);
 });
 
-test('@moxjs/types — compile-time type tests pass (typecheck:tests script)', () => {
-  test.skip(SKIP, 'Set MOXJS_E2E=1 to run e2e tests');
+test('@jorvel/types — compile-time type tests pass (typecheck:tests script)', () => {
+  test.skip(SKIP, 'Set JORVEL_E2E=1 to run e2e tests');
 
   const typesDir = path.join(ROOT, 'libs', 'types');
   const { code, stderr } = pnpm(['run', 'typecheck:tests'], typesDir);
   expect(code, `tsc errors:\n${stderr}`).toBe(0);
 });
 
-test('@moxjs/types — all unit tests pass', () => {
-  test.skip(SKIP, 'Set MOXJS_E2E=1 to run e2e tests');
+test('@jorvel/types — all unit tests pass', () => {
+  test.skip(SKIP, 'Set JORVEL_E2E=1 to run e2e tests');
 
   const typesDir = path.join(ROOT, 'libs', 'types');
   const { code, stdout, stderr } = pnpm(['test'], typesDir);
@@ -150,8 +150,8 @@ test('@moxjs/types — all unit tests pass', () => {
 
 // ── 4. Scaffolded app tsconfig ────────────────────────────────────────────────
 
-test('moxjs generate — scaffolds tsconfig.json extending tsconfig.base.json', async () => {
-  test.skip(SKIP, 'Set MOXJS_E2E=1 to run e2e tests');
+test('jorvel generate — scaffolds tsconfig.json extending tsconfig.base.json', async () => {
+  test.skip(SKIP, 'Set JORVEL_E2E=1 to run e2e tests');
 
   const tmp = await makeTmp();
   const cliBin = path.join(ROOT, 'packages', 'cli', 'src', 'index.ts');
@@ -170,8 +170,8 @@ test('moxjs generate — scaffolds tsconfig.json extending tsconfig.base.json', 
   await fs.rm(tmp, { recursive: true, force: true });
 });
 
-test('moxjs generate — scaffolds app with `typecheck` script', async () => {
-  test.skip(SKIP, 'Set MOXJS_E2E=1 to run e2e tests');
+test('jorvel generate — scaffolds app with `typecheck` script', async () => {
+  test.skip(SKIP, 'Set JORVEL_E2E=1 to run e2e tests');
 
   const tmp = await makeTmp();
   const cliBin = path.join(ROOT, 'packages', 'cli', 'src', 'index.ts');
@@ -193,9 +193,9 @@ test('moxjs generate — scaffolds app with `typecheck` script', async () => {
 // ── 5. defineFederationContract runtime ───────────────────────────────────────
 
 test('defineFederationContract — returns the contract object unchanged', async () => {
-  test.skip(SKIP, 'Set MOXJS_E2E=1 to run e2e tests');
+  test.skip(SKIP, 'Set JORVEL_E2E=1 to run e2e tests');
 
-  const { defineFederationContract } = await import('@moxjs/types');
+  const { defineFederationContract } = await import('@jorvel/types');
 
   const contract = defineFederationContract({
     name: 'dashboard',
@@ -213,9 +213,9 @@ test('defineFederationContract — returns the contract object unchanged', async
 });
 
 test('defineFederationContract — works without optional events field', async () => {
-  test.skip(SKIP, 'Set MOXJS_E2E=1 to run e2e tests');
+  test.skip(SKIP, 'Set JORVEL_E2E=1 to run e2e tests');
 
-  const { defineFederationContract } = await import('@moxjs/types');
+  const { defineFederationContract } = await import('@jorvel/types');
 
   const contract = defineFederationContract({
     name: 'analytics',
@@ -230,9 +230,9 @@ test('defineFederationContract — works without optional events field', async (
 // ── 6. validateFederationContract runtime ─────────────────────────────────────
 
 test('validateFederationContract — violation for null container', async () => {
-  test.skip(SKIP, 'Set MOXJS_E2E=1 to run e2e tests');
+  test.skip(SKIP, 'Set JORVEL_E2E=1 to run e2e tests');
 
-  const { defineFederationContract, validateFederationContract } = await import('@moxjs/types');
+  const { defineFederationContract, validateFederationContract } = await import('@jorvel/types');
   const contract = defineFederationContract({ name: 'dash', exposes: { './App': null as unknown } });
 
   const violations = validateFederationContract(contract, null);
@@ -241,9 +241,9 @@ test('validateFederationContract — violation for null container', async () => 
 });
 
 test('validateFederationContract — violation for container missing .get()', async () => {
-  test.skip(SKIP, 'Set MOXJS_E2E=1 to run e2e tests');
+  test.skip(SKIP, 'Set JORVEL_E2E=1 to run e2e tests');
 
-  const { defineFederationContract, validateFederationContract } = await import('@moxjs/types');
+  const { defineFederationContract, validateFederationContract } = await import('@jorvel/types');
   const contract = defineFederationContract({ name: 'dash', exposes: { './App': null as unknown } });
 
   const violations = validateFederationContract(contract, {} as never);
@@ -252,9 +252,9 @@ test('validateFederationContract — violation for container missing .get()', as
 });
 
 test('validateFederationContract — no violations for valid container and contract', async () => {
-  test.skip(SKIP, 'Set MOXJS_E2E=1 to run e2e tests');
+  test.skip(SKIP, 'Set JORVEL_E2E=1 to run e2e tests');
 
-  const { defineFederationContract, validateFederationContract } = await import('@moxjs/types');
+  const { defineFederationContract, validateFederationContract } = await import('@jorvel/types');
   const contract = defineFederationContract({ name: 'dash', exposes: { './App': null as unknown } });
   const fakeContainer = { get: async (_key: string) => () => ({ default: 'FakeComponent' }) };
 
@@ -263,9 +263,9 @@ test('validateFederationContract — no violations for valid container and contr
 });
 
 test('validateFederationContract — flags exposes keys not starting with "./"', async () => {
-  test.skip(SKIP, 'Set MOXJS_E2E=1 to run e2e tests');
+  test.skip(SKIP, 'Set JORVEL_E2E=1 to run e2e tests');
 
-  const { validateFederationContract } = await import('@moxjs/types');
+  const { validateFederationContract } = await import('@jorvel/types');
   const badContract = { name: 'bad', exposes: { 'App': null as unknown } };
   const fakeContainer = { get: async () => () => ({}) };
 
@@ -274,10 +274,10 @@ test('validateFederationContract — flags exposes keys not starting with "./"',
   expect(violations[0]?.expected).toContain('./');
 });
 
-// ── 7. moxjs typecheck CLI ─────────────────────────────────────────────────────
+// ── 7. jorvel typecheck CLI ─────────────────────────────────────────────────────
 
-test('moxjs typecheck — exits 0 on the actual monorepo', () => {
-  test.skip(SKIP, 'Set MOXJS_E2E=1 to run e2e tests');
+test('jorvel typecheck — exits 0 on the actual monorepo', () => {
+  test.skip(SKIP, 'Set JORVEL_E2E=1 to run e2e tests');
 
   const cliBin = path.join(ROOT, 'packages', 'cli', 'src', 'index.ts');
   const { code, stdout, stderr } = pnpm(
@@ -287,8 +287,8 @@ test('moxjs typecheck — exits 0 on the actual monorepo', () => {
   expect(code, `typecheck failed:\n${stdout}\n${stderr}`).toBe(0);
 });
 
-test('moxjs typecheck — exits 0 with info message when no packages found', async () => {
-  test.skip(SKIP, 'Set MOXJS_E2E=1 to run e2e tests');
+test('jorvel typecheck — exits 0 with info message when no packages found', async () => {
+  test.skip(SKIP, 'Set JORVEL_E2E=1 to run e2e tests');
 
   const tmp = await makeTmp();
   const cliBin = path.join(ROOT, 'packages', 'cli', 'src', 'index.ts');

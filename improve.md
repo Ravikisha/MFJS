@@ -1,13 +1,13 @@
 ● Improvements Backlog
 
-  Status: round-6 lands +26 new tests (deprecation/revalidate/loadtest) — all green. The workspace is still mid-rename (`@mfjs/* → @moxjs/*`) so `libs/ssr` files that import `@moxjs/security` at the top, plus `examples/basic` apps, fail to resolve until `pnpm install` runs. Round-6 modules deliberately avoid that dependency at import time. Legend below: [x] landed, [ ] open.
+  Status: round-6 lands +26 new tests (deprecation/revalidate/loadtest) — all green. The workspace is still mid-rename (`@mfjs/* → @jorvel/*`) so `libs/ssr` files that import `@jorvel/security` at the top, plus `examples/basic` apps, fail to resolve until `pnpm install` runs. Round-6 modules deliberately avoid that dependency at import time. Legend below: [x] landed, [ ] open.
 
   DX / Tooling
-                                                                                                                                                 - Design system: @moxjs/ui real components (Button/Input/Modal/Tabs/Toast/Dropdown/Table/Form). Storybook. Tailwind preset pkg.
-  - i18n: @moxjs/i18n — ICU messages, per-remote catalogs, SSR locale detect, lazy load.                                                          - Devtools panel: browser extension — remote load timings, share-scope inspector, event-bus trace, store time-travel.
-  - VS Code extension: autocomplete for moxjs.config.ts, moxjs.app.json; jump-to-remote; route preview.
-  - [x] Schema publish: https://moxjs.dev/schemas/* JSON Schemas for moxjs.config, moxjs.app, moxjs.federation, moxjs.ssr. — `packages/cli/src/commands/schema.ts` (`buildSchemas`, `writeSchemas`, `validateAgainst`, registered as `moxjs schema`), Draft 2020-12 + tiny shape validator, 15 tests.
-  - Git hooks: husky + lint-staged scaffolded by moxjs init.
+                                                                                                                                                 - Design system: @jorvel/ui real components (Button/Input/Modal/Tabs/Toast/Dropdown/Table/Form). Storybook. Tailwind preset pkg.
+  - i18n: @jorvel/i18n — ICU messages, per-remote catalogs, SSR locale detect, lazy load.                                                          - Devtools panel: browser extension — remote load timings, share-scope inspector, event-bus trace, store time-travel.
+  - VS Code extension: autocomplete for jorvel.config.ts, jorvel.app.json; jump-to-remote; route preview.
+  - [x] Schema publish: https://jorvel.dev/schemas/* JSON Schemas for jorvel.config, jorvel.app, jorvel.federation, jorvel.ssr. — `packages/cli/src/commands/schema.ts` (`buildSchemas`, `writeSchemas`, `validateAgainst`, registered as `jorvel schema`), Draft 2020-12 + tiny shape validator, 15 tests.
+  - Git hooks: husky + lint-staged scaffolded by jorvel init.
   - Templates: starter templates per stack (ecommerce, saas, admin-dashboard, marketing-site).
 
   Runtime / Core
@@ -16,7 +16,7 @@
   - [x] Route transitions: View Transitions API integration. — `libs/runtime/src/view-transitions.ts`.
   - [x] Typed params: createRoute({ path, params: z.object(...) }) — compile-time + runtime validation. — `libs/runtime/src/typed-routes.ts`.
   - [x] Prefetch on hover: <NavLink prefetch> warms remote bundle. — `libs/runtime/src/prefetch.ts` + NavLink prefetch prop.
-  - [x] Service Worker: offline shell + cached remoteEntry bytes (not just metadata). — `libs/runtime/src/service-worker.ts` + `moxjs sw generate`.
+  - [x] Service Worker: offline shell + cached remoteEntry bytes (not just metadata). — `libs/runtime/src/service-worker.ts` + `jorvel sw generate`.
   - [x] CSS isolation: shadow-DOM mount option per remote. Scoped CSS modules by default. — `libs/runtime/src/shadow-remote.ts`.
   - [x] Islands hydration: partial hydrate — mark components "use client" boundaries. — `libs/runtime/src/islands.ts`.
   - [ ] React Server Components: evaluate when Rspack MF supports.
@@ -25,12 +25,12 @@
   Federation / Build
 
   - [x] Runtime remote registry service: discovery API — remotes self-register, shell fetches manifest with version + health. — `libs/runtime/src/registry.ts` (`createRegistryHandler`, `ManifestRegistry`, polling + `withHealth()` filtering), 16 tests.
-  - [x] Health check endpoint: /moxjs/health per remote → registry marks down. — `libs/runtime/src/health.ts` (`buildHealthDocument`, `createHealthHandler`, `fetchHealth`, probe states up/degraded/down), 13 tests.
+  - [x] Health check endpoint: /jorvel/health per remote → registry marks down. — `libs/runtime/src/health.ts` (`buildHealthDocument`, `createHealthHandler`, `fetchHealth`, probe states up/degraded/down), 13 tests.
   - [x] A/B remotes: weighted routing to remote versions for canary. — `libs/runtime/src/weighted-remotes.ts` (`pickWeightedRemote`, `resolveWeightedRemotes`, sticky-by-key FNV-1a buckets), 11 tests.
-  - [x] Build stats: moxjs build --stats → JSON of shared versions, chunks, conflicts. — `packages/cli/src/commands/build-stats.ts` (`collectBuildStats`, `detectConflicts`, `writeBuildStats`); wired into `moxjs build --stats [path]`, 10 tests.
-  - [x] Bundle analyzer: wire rsdoctor / rspack-bundle-analyzer via moxjs analyze. — `packages/cli/src/commands/analyze.ts` (rsdoctor → rspack-bundle-analyzer → built-in HTML fallback), 11 tests.
+  - [x] Build stats: jorvel build --stats → JSON of shared versions, chunks, conflicts. — `packages/cli/src/commands/build-stats.ts` (`collectBuildStats`, `detectConflicts`, `writeBuildStats`); wired into `jorvel build --stats [path]`, 10 tests.
+  - [x] Bundle analyzer: wire rsdoctor / rspack-bundle-analyzer via jorvel analyze. — `packages/cli/src/commands/analyze.ts` (rsdoctor → rspack-bundle-analyzer → built-in HTML fallback), 11 tests.
   - [x] Chunk-name control: contenthash templates for long-term CDN cache. — `libs/rspack-route-assets/src/chunk-names.ts` (`buildChunkNameTemplates` for filename/chunkFilename/assetModuleFilename/css*, `formatCacheControl`, `looksHashed`, `pickCacheControl` w/ remoteEntry short-cache + must-revalidate, hashed-asset immutable, fallback no-store), 18 tests.
-  - CDN push: moxjs deploy --cdn s3://... → upload dist + invalidate.
+  - CDN push: jorvel deploy --cdn s3://... → upload dist + invalidate.
   - Dynamic imports through federation: shared UI lib exposed once, imported by N remotes.
   - MDX / virtual modules: first-class MDX support for docs/content remotes.
 
@@ -41,8 +41,8 @@
   - [x] On-demand SSR: getServerSideProps-equivalent data loader. — `libs/ssr/src/loaders.ts` (`defineLoader`, `runLoaders`, `useLoaderData`, `requireLoaderData`, `setLoaderData`), concurrent execution + per-loader cacheControl/headers, 10 tests.
   - [x] Response helpers: json(), redirect(), notFound() — throwable. — `libs/ssr/src/response.ts` + edge-adapter integration, 11 tests. `redirect()` already shipped; added `json()` + `notFound()` with cross-realm duck-type guards.
   - [x] Request context: cookies/headers piped to components. — `libs/ssr/src/request-context.ts` (`getRequestContext`, `requireRequestContext`, `runWithRequestContext`), edge-adapter brackets each render, 12 tests.
-  - [x] Stream remote fragments: Cloudflare Fragments pattern — parallel SSR per remote. — `libs/ssr/src/fragments.ts` (`renderFragmentsToString`, `renderFragmentsToReadableStream`; parallel `Promise.all`, per-fragment + parent `timeoutMs` w/ abort propagation; `<moxjs-fragment name>` placeholder replacement; out-of-order stream chunks swap into the shell via tiny inline runtime; `</script>` escape inside data template; `FragmentOutcome` telemetry stream), 13 tests.
-  - [x] Image optimization: wire sharp into moxjs image. <Image> component auto-srcset. — `libs/runtime/src/image.tsx` (`Image`, `buildSrcset`, `buildSizes`, `buildImagePreloadLink`; `{w}` token + `?w=` query fallback; density variants; AVIF/WebP `<picture><source>` w/ extension swap; LCP preload link), 16 tests. CLI `moxjs image` already produces WebP/AVIF derivatives.
+  - [x] Stream remote fragments: Cloudflare Fragments pattern — parallel SSR per remote. — `libs/ssr/src/fragments.ts` (`renderFragmentsToString`, `renderFragmentsToReadableStream`; parallel `Promise.all`, per-fragment + parent `timeoutMs` w/ abort propagation; `<jorvel-fragment name>` placeholder replacement; out-of-order stream chunks swap into the shell via tiny inline runtime; `</script>` escape inside data template; `FragmentOutcome` telemetry stream), 13 tests.
+  - [x] Image optimization: wire sharp into jorvel image. <Image> component auto-srcset. — `libs/runtime/src/image.tsx` (`Image`, `buildSrcset`, `buildSizes`, `buildImagePreloadLink`; `{w}` token + `?w=` query fallback; density variants; AVIF/WebP `<picture><source>` w/ extension swap; LCP preload link), 16 tests. CLI `jorvel image` already produces WebP/AVIF derivatives.
   - [x] Font optimization: local-first fonts, preload hints, font-display: swap. — `libs/runtime/src/fonts.ts` (`buildFontPreloadLink`, `buildFontFaceCss` w/ default `font-display: swap` + unicode-range, `googleFontsUrl` w/ wght + ital,wght axes, `googleFontsPreconnectLinks` for googleapis + gstatic), 17 tests.
 
   State / Comms
@@ -51,7 +51,7 @@
   - [x] Selectors: createSelector memoization. — `libs/state/src/selectors.ts` (`createSelector`, `createSelectorWith`, `createStructuredSelector`, `shallowEqual`), 13 tests.
   - [x] Persistence: persist() → localStorage / IndexedDB / cookie. — `libs/state/src/persist.ts`.
   - [x] Replay buffer: bounded event history for late-joining remotes. — `EventBus.replay()` + `{ replay: true }` on subscribe in `libs/event-bus/src/index.ts`.
-  - [x] Redux DevTools bridge: @moxjs/devtools package. — `libs/state/src/devtools.ts` (`connectDevtools`, panel-driven `JUMP_TO_ACTION` time travel, prefers `__MOXJS_STATE_DEVTOOLS__` over Redux extension) + index re-export, 9 tests in `libs/state/test/devtools.test.ts`.
+  - [x] Redux DevTools bridge: @jorvel/devtools package. — `libs/state/src/devtools.ts` (`connectDevtools`, panel-driven `JUMP_TO_ACTION` time travel, prefers `__JORVEL_STATE_DEVTOOLS__` over Redux extension) + index re-export, 9 tests in `libs/state/test/devtools.test.ts`.
   - [x] Event schema registry: runtime validation of event payloads via Zod. — `libs/event-bus/src/schema.ts` (`attachSchemaRegistry`, validator interface accepts Zod/Valibot/custom, modes `warn`/`throw`/`drop`), 8 tests.
   - [x] Cross-tab sync: BroadcastChannel adapter for event bus. — `libs/event-bus/src/broadcast.ts` (`connectBroadcast()`), 8 tests.
 
@@ -66,21 +66,21 @@
 
   Observability
 
-  - [x] OpenTelemetry adapter: @moxjs/observability/otel — trace context propagation host→remote. — `libs/observability/src/adapters/otel.ts` (`useOtelAdapter`, duck-typed `Tracer`/`Span`, base attributes, in-flight span cleanup on dispose), 11 tests.
+  - [x] OpenTelemetry adapter: @jorvel/observability/otel — trace context propagation host→remote. — `libs/observability/src/adapters/otel.ts` (`useOtelAdapter`, duck-typed `Tracer`/`Span`, base attributes, in-flight span cleanup on dispose), 11 tests.
   - [x] Real User Monitoring: batched beacon collector. — `libs/observability/src/rum.ts` (`startRum`, navigator.sendBeacon→fetch fallback, batchSize / flushIntervalMs / maxQueueSize / sampleRate / filter, drop counter beacon, visibilitychange flush, pluggable transport for tests/edge), 12 tests.
   - [x] Error grouping: fingerprint by remote+stack for Sentry. — `libs/observability/src/fingerprint.ts` (`computeFingerprint`, `groupBy`, message normalization for ids/uuids/hex), 9 tests.
-  - [x] Trace remote loads: correlate moxjs:remote-load with backend spans. — Covered by the OTEL adapter: each remote-load lifecycle (start/success/error/timeout) becomes one span with `moxjs.remote` / `moxjs.url` / `moxjs.duration_ms` attributes.
+  - [x] Trace remote loads: correlate jorvel:remote-load with backend spans. — Covered by the OTEL adapter: each remote-load lifecycle (start/success/error/timeout) becomes one span with `jorvel.remote` / `jorvel.url` / `jorvel.duration_ms` attributes.
   - Alert policies: starter Grafana/Datadog dashboards.
 
   Testing
 
-  - [x] Contract tests: auto-gen from defineFederationContract() — verify remote exports match host imports. — `libs/types/src/contract-test.ts` exposed via `@moxjs/types/testing` (`contractChecks`, `assertContract`, `generateContractTestSource`, runner-neutral checks), 11 tests.
+  - [x] Contract tests: auto-gen from defineFederationContract() — verify remote exports match host imports. — `libs/types/src/contract-test.ts` exposed via `@jorvel/types/testing` (`contractChecks`, `assertContract`, `generateContractTestSource`, runner-neutral checks), 11 tests.
   - Visual regression: Playwright + toHaveScreenshot() in scaffolded tests.
   - A11y: axe-playwright on e2e.
-  - [x] Mock remotes: test fixtures — stub remoteEntry.js for isolated host tests. — `libs/runtime/src/testing.ts` exposed via `@moxjs/runtime/testing` subpath (`createMockRemoteLoader`, `installMockRemote`, `installMockRemotes`), 9 tests.
+  - [x] Mock remotes: test fixtures — stub remoteEntry.js for isolated host tests. — `libs/runtime/src/testing.ts` exposed via `@jorvel/runtime/testing` subpath (`createMockRemoteLoader`, `installMockRemote`, `installMockRemotes`), 9 tests.
   - Mutation testing: Stryker config.
   - Cross-browser: Playwright matrix (Chromium/Firefox/WebKit).
-  - [x] Load testing: k6 template for moxjs ssr serve. — `packages/cli/src/commands/loadtest.ts` (`buildK6Script`, `scaffoldLoadtest`, registered as `moxjs loadtest`), default ramp-up + steady-state + ramp-down stages with p95 / failure-rate thresholds, 10 tests.
+  - [x] Load testing: k6 template for jorvel ssr serve. — `packages/cli/src/commands/loadtest.ts` (`buildK6Script`, `scaffoldLoadtest`, registered as `jorvel loadtest`), default ramp-up + steady-state + ramp-down stages with p95 / failure-rate thresholds, 10 tests.
 
   Deploy / Ops
 
@@ -90,7 +90,7 @@
   - Kubernetes manifest: Helm chart per remote.
   - [x] Blue/green deploy: registry swaps manifest atomically. — `libs/runtime/src/blue-green.ts` (`BlueGreenRegistry` w/ stage → health-gate → atomic promote; `rollback`, `subscribe`, `onTransition` telemetry; pluggable `healthCheck` + `healthTimeoutMs`; `shapeHealthCheck` rejects empty/dup/big-shrink manifests), 17 tests.
   - [x] Feature flags: LaunchDarkly / Flagsmith adapter in runtime. — `libs/runtime/src/feature-flags.ts` (`FeatureFlagAdapter`, `InMemoryFlags`, `fromVendor` duck-typed wrapper, global singleton + `isFeatureEnabled`/`featureVariation`), 16 tests.
-  - Secrets: Doppler / Vault integration in moxjs env.
+  - Secrets: Doppler / Vault integration in jorvel env.
   - Preview envs: auto-deploy per PR, URL in GitHub check.
 
   Docs / Community
@@ -105,29 +105,29 @@
 
   Monorepo / Release
 
-  - Nx integration (optional): reuse task graph caching for moxjs build.
-  - [x] Turbo integration: turbo.json scaffold. — `packages/cli/src/commands/turbo.ts` (`buildTurboJson`, `scaffoldTurbo`, registered as `moxjs turbo`; default tasks `build`/`typecheck`/`test`/`lint`/`dev` w/ correct `dependsOn` + cache + `persistent: true` for dev; `--force` to overwrite, `--global-env` for cache-key env), 12 tests.
+  - Nx integration (optional): reuse task graph caching for jorvel build.
+  - [x] Turbo integration: turbo.json scaffold. — `packages/cli/src/commands/turbo.ts` (`buildTurboJson`, `scaffoldTurbo`, registered as `jorvel turbo`; default tasks `build`/`typecheck`/`test`/`lint`/`dev` w/ correct `dependsOn` + cache + `persistent: true` for dev; `--force` to overwrite, `--global-env` for cache-key env), 12 tests.
   - Pre-release channels: next / canary tags via changesets.
   - [x] Automated deprecation warnings: CLI prints when deprecated API used. — `libs/runtime/src/deprecation.ts` (`deprecate`, `markDeprecated`, globalThis-pinned once-per-key dedupe, custom sink + since/removeIn/replacement formatting), 8 tests.
-  - Type-only preview: @types/moxjs-preview for preview APIs.
+  - Type-only preview: @types/jorvel-preview for preview APIs.
 
   Killer Features (differentiators)
 
-  1. [x] Perf dashboard in moxjs dev — live remote size, load time, budget status in terminal. — `packages/cli/src/commands/perf-dashboard.ts` (`Aggregator`, `renderTable`, `runDashboard`, registered as `moxjs perf-dashboard`), 11 tests.
-  2. [x] Visual route editor — drag remotes onto route tree, exports config. — `packages/cli/src/commands/route-editor.ts` (`manifestToTree`, `treeToManifest`, `moveRoute`, `buildEditorHtml`, `scaffoldRouteEditor`; CLI `moxjs route-editor`), 13 tests.
+  1. [x] Perf dashboard in jorvel dev — live remote size, load time, budget status in terminal. — `packages/cli/src/commands/perf-dashboard.ts` (`Aggregator`, `renderTable`, `runDashboard`, registered as `jorvel perf-dashboard`), 11 tests.
+  2. [x] Visual route editor — drag remotes onto route tree, exports config. — `packages/cli/src/commands/route-editor.ts` (`manifestToTree`, `treeToManifest`, `moveRoute`, `buildEditorHtml`, `scaffoldRouteEditor`; CLI `jorvel route-editor`), 13 tests.
   3. [x] Runtime resilience — auto-fallback to cached last-good remote on 404/timeout. — `libs/runtime/src/resilience.ts` (`ResilientRemoteCache`, `MemoryCacheStore`, `StorageCacheStore`, `loadWithFallback`), 14 tests.
-  4. [x] Framework adapters: Vue + Svelte + Solid via pluggable scaffolders (core already framework-neutral). — `packages/cli/src/commands/frameworks.ts` (`buildAdapterTemplate`, `scaffoldFrameworkRemote`; CLI `moxjs adapter add <framework>`), 8 tests.
-  5. [x] AI-assisted splitter: moxjs split — analyzes traffic logs, suggests which component → new remote. — `packages/cli/src/commands/split.ts` (`analyzeTraffic` deterministic scorer, `runSplit` NDJSON reader, registered as `moxjs split`), 9 tests.
+  4. [x] Framework adapters: Vue + Svelte + Solid via pluggable scaffolders (core already framework-neutral). — `packages/cli/src/commands/frameworks.ts` (`buildAdapterTemplate`, `scaffoldFrameworkRemote`; CLI `jorvel adapter add <framework>`), 8 tests.
+  5. [x] AI-assisted splitter: jorvel split — analyzes traffic logs, suggests which component → new remote. — `packages/cli/src/commands/split.ts` (`analyzeTraffic` deterministic scorer, `runSplit` NDJSON reader, registered as `jorvel split`), 9 tests.
   6. Zephyr Cloud / one-click MFE deploy partnership.
 
   Priority Pick (next 2 weeks) — all 8 landed
 
-  1. [x] TypeDoc API generation → docs. — `packages/cli/src/commands/typedoc.ts` (`discoverPackages`, `buildTypedocConfig`, `runTypedoc`, registered as `moxjs typedoc`), 11 tests.
-  2. [x] Real @moxjs/ui + Storybook. — `libs/ui/src/{Input,Modal,Card,Toast}.tsx` plus `libs/ui/src/storybook.ts` (`storybookFiles`, `storybookScripts`, `storybookDevDeps`), 15 tests added in `libs/ui/test/components.test.tsx`.
-  3. [x] @moxjs/i18n MVP. — new package `libs/i18n` (`formatMessage`, `createI18n`, `detectLocale`, ICU-lite plural/number, lazy catalogs, subscribe), 20 tests.
-  4. [x] Bundle analyzer wiring. — see round 1, `moxjs analyze`.
-  5. [x] Service Worker offline cache for remoteEntry.js. — existing `libs/runtime/src/service-worker.ts` + `moxjs sw generate`.
-  6. [x] Contract test generator. — see round 5, `@moxjs/types/testing`.
+  1. [x] TypeDoc API generation → docs. — `packages/cli/src/commands/typedoc.ts` (`discoverPackages`, `buildTypedocConfig`, `runTypedoc`, registered as `jorvel typedoc`), 11 tests.
+  2. [x] Real @jorvel/ui + Storybook. — `libs/ui/src/{Input,Modal,Card,Toast}.tsx` plus `libs/ui/src/storybook.ts` (`storybookFiles`, `storybookScripts`, `storybookDevDeps`), 15 tests added in `libs/ui/test/components.test.tsx`.
+  3. [x] @jorvel/i18n MVP. — new package `libs/i18n` (`formatMessage`, `createI18n`, `detectLocale`, ICU-lite plural/number, lazy catalogs, subscribe), 20 tests.
+  4. [x] Bundle analyzer wiring. — see round 1, `jorvel analyze`.
+  5. [x] Service Worker offline cache for remoteEntry.js. — existing `libs/runtime/src/service-worker.ts` + `jorvel sw generate`.
+  6. [x] Contract test generator. — see round 5, `@jorvel/types/testing`.
   7. [x] OpenTelemetry adapter. — see round 4, `libs/observability/src/adapters/otel.ts`.
   8. [x] Nested routes + View Transitions. — existing `libs/runtime/src/{nested-routes,view-transitions}.ts`.
 
@@ -148,11 +148,11 @@
      - Tests: `libs/ssr/test/response.test.ts` (11)
 
   3. Mock-remote test fixture
-     - `libs/runtime/src/testing.ts` exported via `@moxjs/runtime/testing` subpath
+     - `libs/runtime/src/testing.ts` exported via `@jorvel/runtime/testing` subpath
      - `createMockRemoteLoader(map)`, `installMockRemote(spec)`, `installMockRemotes(specs)`
      - Tests: `libs/runtime/test/testing.test.ts` (9)
 
-  4. `moxjs analyze` command
+  4. `jorvel analyze` command
      - `packages/cli/src/commands/analyze.ts` registered in CLI index
      - Auto-detect: rsdoctor → rspack-bundle-analyzer → built-in HTML report from `dist/*`
      - Flags: `--app`, `--out`, `--tool`, `--dry-run`
@@ -162,7 +162,7 @@
 
   Round 2 (4 items, +42 tests, repo now 693 passing)
 
-  5. createSelector for `@moxjs/state`
+  5. createSelector for `@jorvel/state`
      - `libs/state/src/selectors.ts` — Reselect-style memoization, 1–4 inputs overloaded
      - `createSelector`, `createSelectorWith({ equalityFn })`, `createStructuredSelector`, `shallowEqual`
      - `recomputations()` / `resetRecomputations()` / `clearCache()` for cache assertions
@@ -245,17 +245,17 @@
   15. OpenTelemetry adapter (also covers "Trace remote loads")
       - `libs/observability/src/adapters/otel.ts` — `useOtelAdapter(tracer, opts)`
       - Duck-typed `Tracer` + `Span` so callers plug in any OTEL SDK
-      - Remote-load lifecycle → single span with `moxjs.remote` / `moxjs.url` / `moxjs.duration_ms`
-      - `reportError` → stand-alone `moxjs.error` span with `moxjs.ctx.*` prefixed attributes
+      - Remote-load lifecycle → single span with `jorvel.remote` / `jorvel.url` / `jorvel.duration_ms`
+      - `reportError` → stand-alone `jorvel.error` span with `jorvel.ctx.*` prefixed attributes
       - Disposer closes in-flight spans with ERROR status to avoid telemetry leaks
       - Tests: `libs/observability/test/otel.test.ts` (11)
       - Docs: section added to `/docs/observability`
 
-  16. `moxjs build --stats`
+  16. `jorvel build --stats`
       - `packages/cli/src/commands/build-stats.ts` — `collectBuildStats`, `detectConflicts`, `writeBuildStats`
       - Per-app asset table (sorted desc), `remoteEntry.js` size, shared deps in string + object form
       - Cross-app conflict detection — multi-version output sorted for stable JSON diffs
-      - Wired into `build.ts` as `--stats [path]`, defaults to `moxjs-build-stats.json`
+      - Wired into `build.ts` as `--stats [path]`, defaults to `jorvel-build-stats.json`
       - Tests: `packages/cli/test/build-stats.test.ts` (10)
       - Docs: `/docs/cli` table row added
 
@@ -266,7 +266,7 @@
   17. Runtime remote registry
       - `libs/runtime/src/registry.ts` — `createRegistryHandler` (server) + `ManifestRegistry` (client)
       - Polling with idempotent `start()` / `destroy()`, pluggable timer + fetch
-      - `withHealth(urlFor)` disables entries whose `/moxjs/health` returns `down`
+      - `withHealth(urlFor)` disables entries whose `/jorvel/health` returns `down`
       - Subscribers receive `updated` + `fetch-error` events for telemetry
       - Tests: `libs/runtime/test/registry.test.ts` (16)
       - Docs: section added to `/docs/federation`
@@ -279,7 +279,7 @@
       - Docs: section added to `/docs/ssr`
 
   19. Contract test generator
-      - `libs/types/src/contract-test.ts` exposed via `@moxjs/types/testing`
+      - `libs/types/src/contract-test.ts` exposed via `@jorvel/types/testing`
       - `contractChecks(contract, loadContainer)` returns per-export named checks (runner-neutral)
       - `assertContract` short-circuits with a multi-line error; `generateContractTestSource` scaffolds a starter file
       - Tests: `libs/types/test/contract-test.test.ts` (11)
@@ -299,8 +299,8 @@
 
   21. Redux DevTools bridge
       - `libs/state/src/devtools.ts` — `connectDevtools(store, opts)` wires init / send / time-travel
-      - No-op when the extension is absent; prefers `__MOXJS_STATE_DEVTOOLS__` then falls back to the Redux ext
-      - Now re-exported from `@moxjs/state` index
+      - No-op when the extension is absent; prefers `__JORVEL_STATE_DEVTOOLS__` then falls back to the Redux ext
+      - Now re-exported from `@jorvel/state` index
       - Tests: `libs/state/test/devtools.test.ts` (9)
 
   22. Deprecation warnings
@@ -314,7 +314,7 @@
       - Tests: `libs/ssr/test/revalidate.test.ts` (8)
 
   24. k6 load-test scaffold
-      - `packages/cli/src/commands/loadtest.ts` — `buildK6Script` + `scaffoldLoadtest`, registered as `moxjs loadtest`
+      - `packages/cli/src/commands/loadtest.ts` — `buildK6Script` + `scaffoldLoadtest`, registered as `jorvel loadtest`
       - Default ramp-up / steady-state / ramp-down stages with p95 latency + failure-rate thresholds
       - Flags: `--name`, `--target`, `--vus`, `--duration`, `--out`, `--force`
       - Tests: `packages/cli/test/loadtest.test.ts` (10)
@@ -324,7 +324,7 @@
   Killer-features round (5 differentiators, +55 tests)
 
   25. Perf dashboard
-      - `packages/cli/src/commands/perf-dashboard.ts` — `Aggregator` + `renderTable` + `runDashboard` + `moxjs perf-dashboard` CLI
+      - `packages/cli/src/commands/perf-dashboard.ts` — `Aggregator` + `renderTable` + `runDashboard` + `jorvel perf-dashboard` CLI
       - Token-bucket-like per-remote state: loads, errors, last/p95 duration, last bytes, budget status with reason
       - NDJSON stream input (stdin or file), pluggable budgets JSON
       - Tests: `packages/cli/test/perf-dashboard.test.ts` (11)
@@ -332,7 +332,7 @@
 
   26. Visual route editor
       - `packages/cli/src/commands/route-editor.ts` — pure transform layer (`manifestToTree`, `treeToManifest`, `moveRoute`) + self-contained HTML emitter
-      - CLI `moxjs route-editor` reads the existing host manifest and writes a drop-in `route-editor.html`
+      - CLI `jorvel route-editor` reads the existing host manifest and writes a drop-in `route-editor.html`
       - Tests: `packages/cli/test/route-editor.test.ts` (13)
       - Docs: row added to `/docs/cli`
 
@@ -344,12 +344,12 @@
       - Docs: section added to `/docs/federation`
 
   28. Framework adapters (Vue / Svelte / Solid)
-      - `packages/cli/src/commands/frameworks.ts` — `buildAdapterTemplate`, `scaffoldFrameworkRemote`, `moxjs adapter add` CLI
-      - Per-framework `bootstrap.{ts,tsx,svelte}` + `rspack.config.mjs` (loader chain) + `moxjs.app.json` with `framework` field
+      - `packages/cli/src/commands/frameworks.ts` — `buildAdapterTemplate`, `scaffoldFrameworkRemote`, `jorvel adapter add` CLI
+      - Per-framework `bootstrap.{ts,tsx,svelte}` + `rspack.config.mjs` (loader chain) + `jorvel.app.json` with `framework` field
       - Tests: `packages/cli/test/frameworks.test.ts` (8)
       - Docs: row added to `/docs/cli`
 
-  29. `moxjs split` (component-split analyzer)
+  29. `jorvel split` (component-split analyzer)
       - `packages/cli/src/commands/split.ts` — deterministic `analyzeTraffic` scorer + NDJSON `runSplit` driver + CLI
       - Score = `trafficWeight × hits-share + latencyWeight × ms-share`; configurable thresholds; avg-bytes annotation
       - Output ranks components and recommends the top one for its own remote
@@ -360,20 +360,20 @@
 
   Priority-pick round (3 new items + 5 confirmed, +46 new tests)
 
-  30. TypeDoc API generation (`moxjs typedoc`)
+  30. TypeDoc API generation (`jorvel typedoc`)
       - `packages/cli/src/commands/typedoc.ts` — `discoverPackages` scans `libs/*` + `packages/*` for entry files
       - `buildTypedocConfig` emits the JSON config; `runTypedoc` shells out via injectable spawn
       - `--dry-run` writes config only; `--no-markdown` swaps the markdown plugin out
       - Tests: `packages/cli/test/typedoc.test.ts` (11)
       - Docs: row added to `/docs/cli`
 
-  31. @moxjs/ui expansion + Storybook scaffold
+  31. @jorvel/ui expansion + Storybook scaffold
       - New components: `Input`, `Modal`, `Toast` (with `ToastProvider` + `useToast`), `Card`
       - Pure-data `storybookFiles()` returns 7-file Storybook 8 setup ready for `pnpm storybook`
       - Tests: `libs/ui/test/components.test.tsx` (15)
       - Docs: new page `/docs/ui`
 
-  32. @moxjs/i18n MVP (new package)
+  32. @jorvel/i18n MVP (new package)
       - `libs/i18n/src/index.ts` — `formatMessage`, `createI18n`, `detectLocale`, ICU-lite plural + number
       - Lazy `loader(locale)` caches catalogs; `subscribe()` powers re-renders
       - `detectLocale` parses `Accept-Language` honoring q-values + exact-vs-base preference
@@ -381,9 +381,9 @@
       - Docs: new page `/docs/i18n`
 
   Already shipped (re-confirmed in this round)
-      - Bundle analyzer wiring → `moxjs analyze` (round 1, `packages/cli/src/commands/analyze.ts`).
-      - Service Worker offline cache → `libs/runtime/src/service-worker.ts` + `moxjs sw generate`.
-      - Contract test generator → `@moxjs/types/testing` (round 5, `libs/types/src/contract-test.ts`).
+      - Bundle analyzer wiring → `jorvel analyze` (round 1, `packages/cli/src/commands/analyze.ts`).
+      - Service Worker offline cache → `libs/runtime/src/service-worker.ts` + `jorvel sw generate`.
+      - Contract test generator → `@jorvel/types/testing` (round 5, `libs/types/src/contract-test.ts`).
       - OpenTelemetry adapter → `libs/observability/src/adapters/otel.ts` (round 4).
       - Nested routes + View Transitions → `libs/runtime/src/{nested-routes,view-transitions}.ts`.
 
@@ -416,7 +416,7 @@
 
   37. Edge ReadableStream SSR adapter
       - `libs/ssr/src/render-to-readable-stream.ts` — `renderRouteToReadableStream`, `renderRouteToResponse`, `collectReadableStream`
-      - Lazy `import('react-dom/server.browser')` so the file stays loadable from `@moxjs/ssr/edge` (no `node:*` imports)
+      - Lazy `import('react-dom/server.browser')` so the file stays loadable from `@jorvel/ssr/edge` (no `node:*` imports)
       - Supports `signal`, `timeoutMs`, `bootstrapScripts`, `bootstrapModules`, `nonce`, `identifierPrefix`, `waitForAllReady`, `onError`
       - Shell-render failure → 500 single-shot stream so callers can still emit a response
       - Tests: `libs/ssr/test/render-to-readable-stream.test.ts` (12)
@@ -425,11 +425,11 @@
 
   Round 8 (4 items, +65 new tests)
 
-  38. JSON Schema publisher (`moxjs schema`)
-      - `packages/cli/src/commands/schema.ts` — `buildSchemas(baseUrl)` returns the four Draft 2020-12 schemas (`moxjs.config` / `moxjs.app` / `moxjs.federation` / `moxjs.ssr`)
+  38. JSON Schema publisher (`jorvel schema`)
+      - `packages/cli/src/commands/schema.ts` — `buildSchemas(baseUrl)` returns the four Draft 2020-12 schemas (`jorvel.config` / `jorvel.app` / `jorvel.federation` / `jorvel.ssr`)
       - `writeSchemas({ outDir, pretty, catalog })` emits one file per schema; creates the dir if missing; trailing newline for diff-friendliness
-      - `validateAgainst(schema, doc)` is a tiny built-in validator — required keys + additionalProperties=false + per-prop type/enum — enough to catch typos at `moxjs init` without pulling ajv
-      - CLI: `moxjs schema --out ./schemas --base-url https://moxjs.dev/schemas [--minify]`
+      - `validateAgainst(schema, doc)` is a tiny built-in validator — required keys + additionalProperties=false + per-prop type/enum — enough to catch typos at `jorvel init` without pulling ajv
+      - CLI: `jorvel schema --out ./schemas --base-url https://jorvel.dev/schemas [--minify]`
       - Tests: `packages/cli/test/schema.test.ts` (15)
       - Docs: row added to `/docs/cli`
 
@@ -472,13 +472,13 @@
 
   43. Stream remote fragments (Cloudflare Fragments pattern)
       - `libs/ssr/src/fragments.ts` — `renderFragmentsToString` (single-shot HTML), `renderFragmentsToReadableStream` (out-of-order Web stream w/ inline-swap runtime)
-      - `<moxjs-fragment name="...">` placeholder syntax; per-fragment + parent `timeoutMs` w/ `AbortController` propagation
-      - Stream variant flushes shell + tiny runtime first, then `<script type="text/template" id="moxjs-frag-data-NAME">…</script>` + swap call as each fragment resolves
+      - `<jorvel-fragment name="...">` placeholder syntax; per-fragment + parent `timeoutMs` w/ `AbortController` propagation
+      - Stream variant flushes shell + tiny runtime first, then `<script type="text/template" id="jorvel-frag-data-NAME">…</script>` + swap call as each fragment resolves
       - `</script>` in payloads is escaped to keep the wrapper closed; bad-name characters scrubbed for DOM ids
       - `FragmentOutcome` telemetry — success / failed / timeout w/ duration + bytes
       - Tests: `libs/ssr/test/fragments.test.ts` (13)
 
-  44. Turbo scaffolder (`moxjs turbo`)
+  44. Turbo scaffolder (`jorvel turbo`)
       - `packages/cli/src/commands/turbo.ts` — `buildTurboJson` returns the canonical task graph, `scaffoldTurbo` writes it
       - Default pipeline: `build` (depends ^build, outputs dist/**) / `typecheck` (^build) / `test` (local build) / `lint` / `dev` (`cache: false, persistent: true`)
       - `--force` overwrite, `--global-env` for cache-key env vars, `extraTasks` override + merge

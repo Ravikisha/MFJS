@@ -1,14 +1,14 @@
 import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
-import { NavLink, RemoteOutlet, usePathname, getRouter, type RouteTarget } from '@moxjs/runtime';
-import { getEventBus } from '@moxjs/event-bus';
-import { getSimpleStore } from '@moxjs/state';
-import type { MfAppEvents } from '@moxjs/events';
+import { NavLink, RemoteOutlet, usePathname, getRouter, type RouteTarget } from '@jorvel/runtime';
+import { getEventBus } from '@jorvel/event-bus';
+import { getSimpleStore } from '@jorvel/state';
+import type { MfAppEvents } from '@jorvel/events';
 
 // ── Replay store: shell:ready ─────────────────────────────────────────────────
 // The shell writes its ready timestamp here. Remotes that mount after the event
 // was emitted read the current value from the store (no missed-event problem).
-// Key is shared with dashboard/src/pages/index.tsx via the @moxjs/state singleton.
+// Key is shared with dashboard/src/pages/index.tsx via the @jorvel/state singleton.
 const SHELL_READY_KEY = 'shell:ready:ts';
 
 // ── Route table ───────────────────────────────────────────────────────────────
@@ -53,7 +53,7 @@ function App() {
           gap: 8,
         }}
       >
-        <span style={{ fontWeight: 700, fontSize: 18 }}>🧩 MOXJS Shell</span>
+        <span style={{ fontWeight: 700, fontSize: 18 }}>🧩 JORVEL Shell</span>
         <nav style={{ marginLeft: 24, display: 'flex', gap: 4 }}>
           <NavLink to="/" label="Home" />
           <NavLink to="/dashboard/settings" label="Settings" />

@@ -1,8 +1,8 @@
 {
-  "name": "dashboard",
+  "name": "shell",
   "filename": "remoteEntry.js",
-  "exposes": {
-    "./App": "./src/remote.tsx"
+  "remotes": {
+    "dashboard": "dashboard@http://localhost:3001/remoteEntry.js"
   },
   "shared": {
     "react": {
@@ -13,15 +13,15 @@
       "singleton": true,
       "requiredVersion": false
     },
-    "@moxjs/event-bus": {
+    "@jorvel/event-bus": {
       "singleton": true,
       "requiredVersion": false
     },
-    "@moxjs/runtime": {
+    "@jorvel/runtime": {
       "singleton": true,
       "requiredVersion": false
     },
-    "@moxjs/state": {
+    "@jorvel/state": {
       "singleton": true,
       "requiredVersion": false
     }

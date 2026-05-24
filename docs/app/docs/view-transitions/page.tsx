@@ -21,7 +21,7 @@ export default function ViewTransitionsDoc() {
           View Transitions API
         </a>{' '}
         animates between two DOM snapshots — a before image, a callback that mutates the DOM, an
-        after image. MOXJS wraps navigation in <code>document.startViewTransition()</code> when
+        after image. JORVEL wraps navigation in <code>document.startViewTransition()</code> when
         available and falls back gracefully to a plain DOM swap on Firefox, Safari &lt; 18, and
         older Chrome.
       </p>
@@ -33,12 +33,12 @@ export default function ViewTransitionsDoc() {
       <h2 id="navigate">Navigate with a transition</h2>
       <p>
         <code>navigateWithTransition</code> is the drop-in replacement for{' '}
-        <code>dispatchMoxjsNavigate</code> + a fade. Both end up calling{' '}
+        <code>dispatchJorvelNavigate</code> + a fade. Both end up calling{' '}
         <code>history.pushState</code>; the only difference is the wrapped DOM mutation.
       </p>
       <CodeBlock
         language="tsx"
-        code={`import { navigateWithTransition } from '@moxjs/runtime';
+        code={`import { navigateWithTransition } from '@jorvel/runtime';
 
 <button onClick={() => navigateWithTransition({ to: '/dashboard/settings' })}>
   Settings
@@ -52,7 +52,7 @@ export default function ViewTransitionsDoc() {
       </p>
       <CodeBlock
         language="ts"
-        code={`import { withViewTransition } from '@moxjs/runtime';
+        code={`import { withViewTransition } from '@jorvel/runtime';
 
 await withViewTransition(() => {
   setTheme('dark');
@@ -131,7 +131,7 @@ await withViewTransition(() => {
       <h2 id="detect">Feature detection</h2>
       <CodeBlock
         language="ts"
-        code={`import { supportsViewTransitions, prefersReducedMotion } from '@moxjs/runtime';
+        code={`import { supportsViewTransitions, prefersReducedMotion } from '@jorvel/runtime';
 
 if (supportsViewTransitions() && !prefersReducedMotion()) {
   // safe to schedule a transition
@@ -194,7 +194,7 @@ if (supportsViewTransitions() && !prefersReducedMotion()) {
       <h3>Theme swap with view transition</h3>
       <CodeBlock
         language="ts"
-        code={`import { withViewTransition } from '@moxjs/runtime';
+        code={`import { withViewTransition } from '@jorvel/runtime';
 
 const toggleTheme = () => withViewTransition(() => {
   document.documentElement.dataset.theme =
@@ -203,7 +203,7 @@ const toggleTheme = () => withViewTransition(() => {
       />
 
       <Callout variant="warn" title="Don't animate things users didn't ask for">
-        Reduced-motion users perceive arbitrary animation as motion-sickness or just noise. MOXJS
+        Reduced-motion users perceive arbitrary animation as motion-sickness or just noise. JORVEL
         respects the OS setting by default; only override it for transitions that carry
         information (e.g. order morph between list ↔ detail).
       </Callout>

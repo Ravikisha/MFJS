@@ -14,14 +14,14 @@ export default function FontsDocs() {
       <p>
         Fonts are one of the biggest first-paint costs. Loaded badly they cause FOIT (flash of
         invisible text), CLS (layout shift from fallback metrics), and an extra DNS hop. The
-        helpers in <code>@moxjs/runtime</code> emit the correct <code>&lt;link&gt;</code> tags and{' '}
+        helpers in <code>@jorvel/runtime</code> emit the correct <code>&lt;link&gt;</code> tags and{' '}
         <code>@font-face</code> blocks so the browser can preload, swap, and avoid the double-fetch
         trap.
       </p>
 
       <Callout variant="info" title="Pure-data helpers">
         These functions return plain JSON / strings. They have no DOM dependency, throw nothing on
-        the server, and ship in the edge bundle of <code>@moxjs/ssr</code>. You can paste their
+        the server, and ship in the edge bundle of <code>@jorvel/ssr</code>. You can paste their
         output straight into an SSR template head.
       </Callout>
 
@@ -33,7 +33,7 @@ export default function FontsDocs() {
       </p>
       <CodeBlock
         language="tsx"
-        code={`import { buildFontPreloadLink, buildFontFaceCss } from '@moxjs/runtime';
+        code={`import { buildFontPreloadLink, buildFontFaceCss } from '@jorvel/runtime';
 
 const preload = buildFontPreloadLink('/fonts/inter.woff2');
 // { rel: 'preload', as: 'font', href: '/fonts/inter.woff2', type: 'font/woff2', crossorigin: 'anonymous' }
@@ -63,7 +63,7 @@ const css = buildFontFaceCss([
       <CodeBlock
         language="tsx"
         filename="apps/shell/src/template.tsx"
-        code={`import { buildFontPreloadLink, buildFontFaceCss } from '@moxjs/runtime';
+        code={`import { buildFontPreloadLink, buildFontFaceCss } from '@jorvel/runtime';
 
 const PRELOADS = [
   buildFontPreloadLink('/fonts/inter-400.woff2'),
@@ -95,7 +95,7 @@ export function Head() {
       </p>
       <CodeBlock
         language="ts"
-        code={`import { googleFontsUrl, googleFontsPreconnectLinks } from '@moxjs/runtime';
+        code={`import { googleFontsUrl, googleFontsPreconnectLinks } from '@jorvel/runtime';
 
 googleFontsUrl({
   families: [
@@ -156,7 +156,7 @@ googleFontsPreconnectLinks();
         Self-hosted fonts need <code>font-src 'self'</code>. Google Fonts needs{' '}
         <code>font-src https://fonts.gstatic.com</code> and{' '}
         <code>style-src https://fonts.googleapis.com</code>. The <code>buildCsp</code> helper in{' '}
-        <code>@moxjs/security</code> can take a list of allowed font origins; otherwise the
+        <code>@jorvel/security</code> can take a list of allowed font origins; otherwise the
         browser blocks the request with no console error.
       </p>
     </>

@@ -66,7 +66,7 @@ describe('edge adapter ETag-before-render', () => {
     expect(renderSpy).toHaveBeenCalledTimes(1);
     const second = await handler(makeRequest('https://example.test/'));
     expect(renderSpy).toHaveBeenCalledTimes(1);
-    expect(second.headers['x-moxjs-ssr-cache']).toBe('hit');
+    expect(second.headers['x-jorvel-ssr-cache']).toBe('hit');
   });
 
   it('returns 304 when If-None-Match matches the cached ETag', async () => {

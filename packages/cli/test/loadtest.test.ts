@@ -32,7 +32,7 @@ describe('buildK6Script', () => {
 
 describe('scaffoldLoadtest', () => {
   it('writes loadtest/<name>.js with defaults', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-loadtest-'));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-loadtest-'));
     const r = await scaffoldLoadtest({ cwd: tmp });
     expect(r.written).toBe(true);
     expect(r.path).toBe(path.join(tmp, 'loadtest', 'shell.js'));
@@ -40,7 +40,7 @@ describe('scaffoldLoadtest', () => {
   });
 
   it('skips existing file without --force', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-loadtest-'));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-loadtest-'));
     await fs.outputFile(path.join(tmp, 'loadtest', 'shell.js'), '// user');
     const r = await scaffoldLoadtest({ cwd: tmp });
     expect(r.written).toBe(false);
@@ -48,7 +48,7 @@ describe('scaffoldLoadtest', () => {
   });
 
   it('--force overwrites existing file', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-loadtest-'));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-loadtest-'));
     await fs.outputFile(path.join(tmp, 'loadtest', 'shell.js'), '// user');
     const r = await scaffoldLoadtest({ cwd: tmp, force: true });
     expect(r.written).toBe(true);
@@ -56,7 +56,7 @@ describe('scaffoldLoadtest', () => {
   });
 
   it('respects custom --target, --vus, --duration, --name', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-loadtest-'));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-loadtest-'));
     const r = await scaffoldLoadtest({
       cwd: tmp,
       name: 'api',
@@ -72,13 +72,13 @@ describe('scaffoldLoadtest', () => {
   });
 
   it('--out overrides the directory', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-loadtest-'));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-loadtest-'));
     const r = await scaffoldLoadtest({ cwd: tmp, out: 'perf' });
     expect(r.path).toBe(path.join(tmp, 'perf', 'shell.js'));
   });
 
   it('sanitizes unsafe characters out of the name', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-loadtest-'));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-loadtest-'));
     const r = await scaffoldLoadtest({ cwd: tmp, name: 'bad/../name' });
     expect(r.path).toContain(path.join('loadtest', 'bad----name.js'));
   });
@@ -86,7 +86,7 @@ describe('scaffoldLoadtest', () => {
 
 describe('loadtestCommand (CLI)', () => {
   it('runs via parseAsync and writes the script', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-loadtest-'));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-loadtest-'));
     loadtestCommand.exitOverride();
     vi.spyOn(console, 'log').mockImplementation(() => {});
     await loadtestCommand.parseAsync(['--cwd', tmp, '--name', 'demo'], { from: 'user' });

@@ -2,7 +2,7 @@ import { CodeBlock } from '@/components/site/code-block';
 import { Callout } from '@/components/docs/callout';
 
 export const metadata = {
-  title: '@moxjs/observability API',
+  title: '@jorvel/observability API',
   description:
     'Hook registry for error/metric/remote-load events, structured logger, Web Vitals collection, console + Sentry + OTel adapters, fingerprint helper, RUM beacon.',
 };
@@ -10,7 +10,7 @@ export const metadata = {
 export default function ObsApi() {
   return (
     <>
-      <h1>@moxjs/observability</h1>
+      <h1>@jorvel/observability</h1>
       <p>
         Three hooks bridge runtime telemetry to your collector of choice. Adapters wire the hooks
         to a specific backend; the library never sends anything by itself. This shape keeps the
@@ -62,7 +62,7 @@ clearHandlers(): void;            // tests`}
       <h3>Subscribing</h3>
       <CodeBlock
         language="ts"
-        code={`import { onError, onMetric, onRemoteLoad } from '@moxjs/observability';
+        code={`import { onError, onMetric, onRemoteLoad } from '@jorvel/observability';
 
 onError((e) => Sentry.captureException(e.error, { extra: e.context }));
 onMetric((m) => fetch('/beacon', { method: 'POST', body: JSON.stringify(m), keepalive: true }));
@@ -74,7 +74,7 @@ onRemoteLoad((e) => {
       <h3>Reporting</h3>
       <CodeBlock
         language="ts"
-        code={`import { reportError, reportMetric, reportRemoteLoad } from '@moxjs/observability';
+        code={`import { reportError, reportMetric, reportRemoteLoad } from '@jorvel/observability';
 
 try {
   await save();
@@ -118,7 +118,7 @@ interface LogRecord {
 
       <CodeBlock
         language="ts"
-        code={`import { createLogger } from '@moxjs/observability';
+        code={`import { createLogger } from '@jorvel/observability';
 
 export const log = createLogger({
   name: 'shell',
@@ -147,7 +147,7 @@ log.info('boot complete', { durationMs: 240 });
       <CodeBlock
         language="ts"
         filename="apps/shell/src/bootstrap.tsx"
-        code={`import { collectWebVitals } from '@moxjs/observability';
+        code={`import { collectWebVitals } from '@jorvel/observability';
 
 if (typeof window !== 'undefined') {
   collectWebVitals({ metrics: ['LCP', 'CLS', 'INP'] });
@@ -177,7 +177,7 @@ if (typeof window !== 'undefined') {
       <CodeBlock
         language="ts"
         code={`import * as Sentry from '@sentry/browser';
-import { useSentryAdapter } from '@moxjs/observability';
+import { useSentryAdapter } from '@jorvel/observability';
 
 Sentry.init({ dsn: '...', tracesSampleRate: 0.1 });
 const dispose = useSentryAdapter(Sentry, {
@@ -246,7 +246,7 @@ import {
   createLogger,
   useSentryAdapter,
   useConsoleAdapter,
-} from '@moxjs/observability';
+} from '@jorvel/observability';
 
 Sentry.init({ dsn: process.env.SENTRY_DSN });
 

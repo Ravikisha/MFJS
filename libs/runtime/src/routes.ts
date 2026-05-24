@@ -3,7 +3,7 @@ import { matchPath } from './route-matcher.js';
 export type RouteTarget = {
   /** Route pattern like /dashboard/* */
   path: string;
-  /** Remote name as in moxjs.federation.json remotes map */
+  /** Remote name as in jorvel.federation.json remotes map */
   remote: string;
   /** Exposed module name, default: ./App */
   module?: string;

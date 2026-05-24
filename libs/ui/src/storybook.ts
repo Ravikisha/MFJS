@@ -1,5 +1,5 @@
 /**
- * Storybook scaffold — pure file emitter. The CLI command `moxjs ui storybook`
+ * Storybook scaffold — pure file emitter. The CLI command `jorvel ui storybook`
  * (and any equivalent build script) uses this to drop a working Storybook
  * configuration into a workspace without us taking a dependency on Storybook
  * at install time.
@@ -26,7 +26,7 @@ export default config;
 
 const PREVIEW = `// .storybook/preview.ts
 import React from 'react';
-import { ThemeProvider } from '@moxjs/ui';
+import { ThemeProvider } from '@jorvel/ui';
 
 export const decorators = [
   (Story: () => React.ReactNode) => React.createElement(ThemeProvider, null, Story()),

@@ -14,7 +14,7 @@ const App = (() => null) as unknown as ComponentType<{ path: string; params?: Re
 const cleanups: string[] = [];
 
 async function makeOutDir(): Promise<string> {
-  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-revalidate-'));
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-revalidate-'));
   cleanups.push(dir);
   return dir;
 }

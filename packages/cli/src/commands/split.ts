@@ -1,5 +1,5 @@
 /**
- * `moxjs split` — suggest which components belong in a new remote.
+ * `jorvel split` — suggest which components belong in a new remote.
  *
  * The analyzer reads an NDJSON traffic log where each line carries:
  *
@@ -150,7 +150,7 @@ export async function runSplit(opts: RunSplitOptions = {}): Promise<SplitCandida
   const top = ranked.slice(0, opts.top ?? 5);
   const write = opts.write ?? ((s: string) => process.stdout.write(s));
   if (!opts.silent) {
-    write(`moxjs split — analyzed ${records.length} record(s)\n`);
+    write(`jorvel split — analyzed ${records.length} record(s)\n`);
     if (top.length === 0) {
       write('  no candidates above the minHits threshold.\n');
     } else {

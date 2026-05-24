@@ -2,8 +2,8 @@
 
 import { describe, expect, it, vi } from 'vitest';
 import {
-  MOXJS_ERROR_EVENT,
-  MOXJS_REMOTE_LOAD_EVENT,
+  JORVEL_ERROR_EVENT,
+  JORVEL_REMOTE_LOAD_EVENT,
   emitError,
   emitRemoteLoad,
   onRemoteLoad,
@@ -15,7 +15,7 @@ describe('telemetry', () => {
     const seen = vi.fn();
     const handler = (e: Event) =>
       seen((e as CustomEvent).detail);
-    window.addEventListener(MOXJS_REMOTE_LOAD_EVENT, handler);
+    window.addEventListener(JORVEL_REMOTE_LOAD_EVENT, handler);
 
     emitRemoteLoad({ remote: 'dashboard', url: 'http://x/remoteEntry.js', phase: 'start' });
 
@@ -24,7 +24,7 @@ describe('telemetry', () => {
       url: 'http://x/remoteEntry.js',
       phase: 'start',
     });
-    window.removeEventListener(MOXJS_REMOTE_LOAD_EVENT, handler);
+    window.removeEventListener(JORVEL_REMOTE_LOAD_EVENT, handler);
   });
 
   it('onRemoteLoad returns unsubscribe fn', () => {
@@ -71,8 +71,8 @@ describe('telemetry', () => {
     offB();
   });
 
-  it('MOXJS_ERROR_EVENT constant is stable', () => {
-    expect(MOXJS_ERROR_EVENT).toBe('moxjs:error');
-    expect(MOXJS_REMOTE_LOAD_EVENT).toBe('moxjs:remote-load');
+  it('JORVEL_ERROR_EVENT constant is stable', () => {
+    expect(JORVEL_ERROR_EVENT).toBe('jorvel:error');
+    expect(JORVEL_REMOTE_LOAD_EVENT).toBe('jorvel:remote-load');
   });
 });

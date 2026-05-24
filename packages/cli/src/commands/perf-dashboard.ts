@@ -1,7 +1,7 @@
 /**
- * `moxjs perf dashboard` — live terminal view of remote size, load time, and
+ * `jorvel perf dashboard` — live terminal view of remote size, load time, and
  * budget status. Consumes a stream of `RemoteLoadEvent`-shaped records (the
- * same ones `@moxjs/observability` emits) and renders a sortable table to
+ * same ones `@jorvel/observability` emits) and renders a sortable table to
  * stdout, refreshing on every event.
  *
  * Module is split into:
@@ -107,7 +107,11 @@ export class Aggregator {
     if (!rule) {
       // Errors always degrade status.
       snap.status = snap.errors > 0 ? 'error' : 'ok';
-      snap.reason = snap.errors > 0 ? `${snap.errors} error(s)` : undefined;
+      if (snap.errors > 0) {
+        snap.reason = `${snap.errors} error(s)`;
+      } else {
+        delete snap.reason;
+      }
       return;
     }
     let status: Status = snap.errors > 0 ? 'error' : 'ok';
@@ -128,7 +132,11 @@ export class Aggregator {
       reasons.push(`p95>${rule.warnLoadMs}ms`);
     }
     snap.status = status;
-    snap.reason = reasons.length ? reasons.join(', ') : undefined;
+    if (reasons.length) {
+      snap.reason = reasons.join(', ');
+    } else {
+      delete snap.reason;
+    }
   }
 }
 

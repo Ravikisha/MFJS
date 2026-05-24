@@ -1,8 +1,8 @@
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
-import { createEdgeAdapter } from '@moxjs/ssr';
-import type { EdgeAdapterOptions, EdgeAdapterExtraOptions, EdgeRequest } from '@moxjs/ssr';
+import { createEdgeAdapter } from '@jorvel/ssr';
+import type { EdgeAdapterOptions, EdgeAdapterExtraOptions, EdgeRequest } from '@jorvel/ssr';
 
 export interface VercelAdapterOptions extends EdgeAdapterOptions, EdgeAdapterExtraOptions {
   /** Vercel runtime: 'edge' or 'nodejs'. Default: 'edge'. */
@@ -34,7 +34,7 @@ function bodyToBodyInit(body: string | Uint8Array | ReadableStream<Uint8Array>):
   return body;
 }
 
-/** Build a Vercel Edge/Node function handler from MOXJS SSR config. */
+/** Build a Vercel Edge/Node function handler from JORVEL SSR config. */
 export function createVercelHandler(options: VercelAdapterOptions) {
   const handler = createEdgeAdapter(options);
 
@@ -49,7 +49,7 @@ export const vercelConfig = {
   node: { runtime: 'nodejs22.x' as const },
 };
 
-// ── Deploy scaffold (used by `moxjs deploy --target vercel`) ──────────────────
+// ── Deploy scaffold (used by `jorvel deploy --target vercel`) ──────────────────
 
 export interface ScaffoldDeployOptions {
   cwd: string;

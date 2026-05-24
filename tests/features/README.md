@@ -1,6 +1,6 @@
 # `tests/features` — framework-feature smoke
 
-End-to-end smoke tests covering every documented MOXJS feature surface. Each
+End-to-end smoke tests covering every documented JORVEL feature surface. Each
 file maps onto a docs page and verifies the contract advertised there.
 
 | File | Feature(s) covered | Docs page |
@@ -19,7 +19,7 @@ file maps onto a docs page and verifies the contract advertised there.
 
 ```bash
 # Build the libs first — this suite imports their dist/ output.
-pnpm -r --filter '@moxjs/*' build
+pnpm -r --filter '@jorvel/*' build
 
 # Then run the feature tests.
 pnpm -C tests/features test

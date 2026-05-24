@@ -2,18 +2,18 @@ import { CodeBlock } from '@/components/site/code-block';
 import { Callout } from '@/components/docs/callout';
 
 export const metadata = {
-  title: '@moxjs/runtime API',
+  title: '@jorvel/runtime API',
   description:
-    'Full surface area of @moxjs/runtime — router, remote loader, hooks, guards, telemetry, View Transitions, islands, Service Worker, Shadow DOM.',
+    'Full surface area of @jorvel/runtime — router, remote loader, hooks, guards, telemetry, View Transitions, islands, Service Worker, Shadow DOM.',
 };
 
 export default function RuntimeApi() {
   return (
     <>
-      <h1>@moxjs/runtime</h1>
+      <h1>@jorvel/runtime</h1>
       <p>
         Singleton-safe router, remote loader, hooks, guards, telemetry. Every export below is
-        importable from <code>@moxjs/runtime</code>; the package is configured as a Module
+        importable from <code>@jorvel/runtime</code>; the package is configured as a Module
         Federation singleton so host and remote observe the same router instance.
       </p>
 
@@ -30,8 +30,8 @@ export default function RuntimeApi() {
           <tr><td><code>createRouter</code></td><td><code>(opts?: RouterOptions) =&gt; Router</code> — fresh instance, for tests</td></tr>
           <tr><td><code>useRouter</code></td><td><code>() =&gt; Router</code> — hook</td></tr>
           <tr><td><code>usePathname</code></td><td><code>() =&gt; string</code> — pathname + search + hash</td></tr>
-          <tr><td><code>dispatchMoxjsNavigate</code></td><td><code>(detail: NavigateDetail) =&gt; void</code></td></tr>
-          <tr><td><code>attachMoxjsNavigateListener</code></td><td><code>() =&gt; () =&gt; void</code> — returns disposer</td></tr>
+          <tr><td><code>dispatchJorvelNavigate</code></td><td><code>(detail: NavigateDetail) =&gt; void</code></td></tr>
+          <tr><td><code>attachJorvelNavigateListener</code></td><td><code>() =&gt; () =&gt; void</code> — returns disposer</td></tr>
         </tbody>
       </table>
       <CodeBlock
@@ -147,18 +147,18 @@ createRoleGuard({
       <h2 id="sw">Service Worker</h2>
       <CodeBlock
         language="ts"
-        code={`registerMoxjsServiceWorker(opts?: {
-  url?: string;                   // default '/moxjs-sw.js'
+        code={`registerJorvelServiceWorker(opts?: {
+  url?: string;                   // default '/jorvel-sw.js'
   scope?: string;                 // default '/'
   autoActivate?: boolean;         // post SKIP_WAITING on update
   onUpdateReady?: () => void;
   onActivated?: () => void;
 }): Promise<ServiceWorkerRegistration | null>;
 
-unregisterMoxjsServiceWorker(): Promise<boolean>;
+unregisterJorvelServiceWorker(): Promise<boolean>;
 
 // Inline source — useful for build-time injection
-declare const MOXJS_SERVICE_WORKER_SOURCE: string;`}
+declare const JORVEL_SERVICE_WORKER_SOURCE: string;`}
       />
 
       <h2 id="shadow">Shadow DOM</h2>
@@ -252,12 +252,12 @@ fetchHealth(url: string, opts?: { timeoutMs?: number }): Promise<HealthBody>;`}
         <li><code>onRemoteLoad(cb): () =&gt; void</code></li>
         <li><code>onRuntimeError(cb): () =&gt; void</code></li>
         <li><code>emitRemoteLoad(detail)</code> / <code>emitError(detail)</code></li>
-        <li>DOM events: <code>moxjs:navigate</code>, <code>moxjs:remote-load</code>, <code>moxjs:error</code></li>
+        <li>DOM events: <code>jorvel:navigate</code>, <code>jorvel:remote-load</code>, <code>jorvel:error</code></li>
       </ul>
 
       <h2 id="dev-reload">Dev reload</h2>
       <ul>
-        <li><code>connectMoxjsDevReload(url?: string): () =&gt; void</code> — opens a WS to the host&apos;s reload server; auto-injected when <code>MOXJS_DEV_RELOAD_URL</code> is set</li>
+        <li><code>connectJorvelDevReload(url?: string): () =&gt; void</code> — opens a WS to the host&apos;s reload server; auto-injected when <code>JORVEL_DEV_RELOAD_URL</code> is set</li>
       </ul>
 
       <h2 id="use-remote-data">useRemoteData</h2>

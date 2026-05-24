@@ -13,10 +13,10 @@
       "../node_modules/@types"
     ],
     "paths": {
-      "@moxjs/types": ["../libs/types/src/index.ts"],
-      "@moxjs/runtime": ["../libs/runtime/src/index.ts"],
-      "@moxjs/event-bus": ["../libs/event-bus/src/index.ts"],
-      "@moxjs/ssr": ["../libs/ssr/src/index.ts"]
+      "@jorvel/types": ["../libs/types/src/index.ts"],
+      "@jorvel/runtime": ["../libs/runtime/src/index.ts"],
+      "@jorvel/event-bus": ["../libs/event-bus/src/index.ts"],
+      "@jorvel/ssr": ["../libs/ssr/src/index.ts"]
     }
   },
   "include": ["e2e/**/*.ts"],

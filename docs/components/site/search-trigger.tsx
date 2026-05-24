@@ -9,7 +9,7 @@ export function SearchTrigger({ className }: { className?: string }) {
     <button
       type="button"
       onClick={() => {
-        const event = new CustomEvent('moxjs:search-open');
+        const event = new CustomEvent('jorvel:search-open');
         window.dispatchEvent(event);
       }}
       className={cn(

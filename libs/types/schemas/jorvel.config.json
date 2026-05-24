@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://moxjs.vercel.app/schemas/moxjs.config.json",
-  "title": "MOXJS Workspace Config",
-  "description": "Schema for moxjs.config.json — workspace-level configuration consumed by @moxjs/cli.",
+  "$id": "https://jorveljs.vercel.app/schemas/jorvel.config.json",
+  "title": "JORVEL Workspace Config",
+  "description": "Schema for jorvel.config.json — workspace-level configuration consumed by jorvel.",
   "type": "object",
   "additionalProperties": true,
   "properties": {
@@ -101,7 +101,7 @@
     },
     "plugins": {
       "type": "array",
-      "description": "Plugin instances (typically populated from moxjs.config.ts, not JSON)."
+      "description": "Plugin instances (typically populated from jorvel.config.ts, not JSON)."
     }
   }
 }

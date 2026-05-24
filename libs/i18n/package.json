@@ -1,7 +1,7 @@
 {
-  "name": "@moxjs/i18n",
+  "name": "@jorvel/i18n",
   "version": "0.1.0",
-  "description": "Tiny i18n primitives for MOXJS micro-frontends — ICU-lite interpolation, lazy catalogs, locale detection.",
+  "description": "Tiny i18n primitives for JORVEL micro-frontends — ICU-lite interpolation, lazy catalogs, locale detection.",
   "license": "MIT",
   "type": "module",
   "main": "dist/index.js",

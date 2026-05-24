@@ -17,7 +17,7 @@ function App({ path: p }: { path: string }) {
 
 let tmp = '';
 beforeAll(async () => {
-  tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-static-'));
+  tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-static-'));
 });
 afterAll(async () => {
   await fs.rm(tmp, { recursive: true, force: true });

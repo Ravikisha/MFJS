@@ -4,7 +4,7 @@ import fs from 'fs-extra';
 import kleur from 'kleur';
 
 /**
- * `moxjs analyze` — open a bundle analyzer for an app's built output.
+ * `jorvel analyze` — open a bundle analyzer for an app's built output.
  *
  * Detection order:
  *   1. `rsdoctor` (the canonical Rspack analyzer) — invoked via `pnpm dlx`.
@@ -39,16 +39,16 @@ function resolveAppDir(cwd: string, appName?: string): { name: string; dir: stri
   }
   if (appName) {
     const dir = path.join(appsDir, appName);
-    if (!fs.existsSync(path.join(dir, 'moxjs.app.json'))) {
-      throw new Error(`analyze: app "${appName}" missing apps/${appName}/moxjs.app.json`);
+    if (!fs.existsSync(path.join(dir, 'jorvel.app.json'))) {
+      throw new Error(`analyze: app "${appName}" missing apps/${appName}/jorvel.app.json`);
     }
     return { name: appName, dir };
   }
   const candidates = fs.readdirSync(appsDir).filter((d) =>
-    fs.existsSync(path.join(appsDir, d, 'moxjs.app.json')),
+    fs.existsSync(path.join(appsDir, d, 'jorvel.app.json')),
   );
   if (candidates.length === 0) {
-    throw new Error('analyze: no apps with moxjs.app.json under apps/');
+    throw new Error('analyze: no apps with jorvel.app.json under apps/');
   }
   if (candidates.length > 1 && !appName) {
     throw new Error(
@@ -164,7 +164,7 @@ export const analyzeCommand = new Command('analyze')
       if (opts.dryRun !== undefined) runOpts.dryRun = opts.dryRun;
 
       const result = await runAnalyze(runOpts);
-      console.log(kleur.bold(`moxjs analyze -> ${result.app} (${result.tool})`));
+      console.log(kleur.bold(`jorvel analyze -> ${result.app} (${result.tool})`));
       if (result.command) {
         console.log(kleur.dim(`  next: ${result.command.bin} ${result.command.args.join(' ')}`));
       } else if (result.reportPath) {

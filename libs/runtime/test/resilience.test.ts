@@ -61,7 +61,7 @@ describe('StorageCacheStore', () => {
 
   it('returns undefined on corrupt JSON', () => {
     const { storage, backing } = fakeStorage();
-    backing.set('moxjs.lastgood.a', 'not json');
+    backing.set('jorvel.lastgood.a', 'not json');
     const store = new StorageCacheStore(storage);
     expect(store.get('a')).toBeUndefined();
   });

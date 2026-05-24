@@ -2,7 +2,7 @@ import { CodeBlock } from '@/components/site/code-block';
 import { Callout } from '@/components/docs/callout';
 
 export const metadata = {
-  title: '@moxjs/i18n',
+  title: '@jorvel/i18n',
   description:
     'Tiny ICU-lite interpolation, lazy catalogs, locale detection. Works on the server (Accept-Language) and the client.',
 };
@@ -10,7 +10,7 @@ export const metadata = {
 export default function I18nPage() {
   return (
     <>
-      <h1>@moxjs/i18n</h1>
+      <h1>@jorvel/i18n</h1>
       <p>
         A ~3 KB i18n primitive shaped after ICU MessageFormat: simple placeholders, plural arms,
         number formatting, lazy catalogs, change-listener for re-rendering on locale swap. No
@@ -20,7 +20,7 @@ export default function I18nPage() {
       <h2 id="quickstart">Quickstart</h2>
       <CodeBlock
         language="ts"
-        code={`import { createI18n } from '@moxjs/i18n';
+        code={`import { createI18n } from '@jorvel/i18n';
 
 const i18n = createI18n({
   locale: 'en',
@@ -94,7 +94,7 @@ i18n.t('greet', { name: 'Ada' });`}
       </p>
       <CodeBlock
         language="ts"
-        code={`import { detectLocale, createI18n } from '@moxjs/i18n';
+        code={`import { detectLocale, createI18n } from '@jorvel/i18n';
 
 export async function handler(req: Request): Promise<Response> {
   const accept = req.headers.get('accept-language') ?? undefined;
@@ -107,17 +107,17 @@ export async function handler(req: Request): Promise<Response> {
       <h2 id="hydration">Hydrating client from server</h2>
       <p>
         Serialize the active locale + catalog into the HTML, then re-create the i18n instance on
-        the client. <code>serializeState</code> from <code>@moxjs/ssr</code> safely escapes the
+        the client. <code>serializeState</code> from <code>@jorvel/ssr</code> safely escapes the
         JSON for inline script injection.
       </p>
       <CodeBlock
         language="ts"
         filename="server"
-        code={`import { serializeState } from '@moxjs/ssr';
+        code={`import { serializeState } from '@jorvel/ssr';
 
 const html = template
   .replace('</head>', \`
-    <script id="__MOXJS_I18N__" type="application/json">\${serializeState({
+    <script id="__JORVEL_I18N__" type="application/json">\${serializeState({
       locale: i18n.locale,
       catalogs: i18n.catalogs,
     })}</script>
@@ -126,9 +126,9 @@ const html = template
       <CodeBlock
         language="ts"
         filename="client"
-        code={`import { createI18n } from '@moxjs/i18n';
+        code={`import { createI18n } from '@jorvel/i18n';
 
-const raw = document.getElementById('__MOXJS_I18N__')?.textContent;
+const raw = document.getElementById('__JORVEL_I18N__')?.textContent;
 const hydrated = raw ? JSON.parse(raw) : undefined;
 
 export const i18n = createI18n({

@@ -1,4 +1,4 @@
-# @moxjs/tsconfig
+# @jorvel/tsconfig
 
 Reusable TypeScript presets.
 
@@ -6,16 +6,16 @@ Reusable TypeScript presets.
 
 | Preset | For |
 |---|---|
-| `@moxjs/tsconfig/base.json` | Common strictness + ES2022 |
-| `@moxjs/tsconfig/react.json` | React/JSX apps |
-| `@moxjs/tsconfig/node.json` | Node.js CLIs / servers |
-| `@moxjs/tsconfig/library.json` | Library builds (emits `.d.ts`) |
+| `@jorvel/tsconfig/base.json` | Common strictness + ES2022 |
+| `@jorvel/tsconfig/react.json` | React/JSX apps |
+| `@jorvel/tsconfig/node.json` | Node.js CLIs / servers |
+| `@jorvel/tsconfig/library.json` | Library builds (emits `.d.ts`) |
 
 ## Use
 
 ```json
 {
-  "extends": "@moxjs/tsconfig/react.json",
+  "extends": "@jorvel/tsconfig/react.json",
   "include": ["src"]
 }
 ```

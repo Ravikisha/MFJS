@@ -11,13 +11,13 @@ export type CliErrorOptions = {
   code?: string;
 };
 
-export class MoxjsCliError extends Error {
+export class JorvelCliError extends Error {
   public readonly code?: string;
   public readonly hint?: string | string[];
   public readonly exitCode: number;
   constructor(message: string, opts: { code?: string; hint?: string | string[]; exitCode?: number } = {}) {
     super(message);
-    this.name = 'MoxjsCliError';
+    this.name = 'JorvelCliError';
     if (opts.code !== undefined) this.code = opts.code;
     if (opts.hint !== undefined) this.hint = opts.hint;
     this.exitCode = opts.exitCode ?? 1;
@@ -25,7 +25,7 @@ export class MoxjsCliError extends Error {
 }
 
 export function formatCliError(err: unknown): { message: string; stack?: string; code?: string } {
-  if (err instanceof MoxjsCliError) {
+  if (err instanceof JorvelCliError) {
     const out: { message: string; stack?: string; code?: string } = { message: err.message };
     if (err.stack) out.stack = err.stack;
     if (err.code) out.code = err.code;
@@ -41,14 +41,14 @@ export function formatCliError(err: unknown): { message: string; stack?: string;
 
 export function printCliError(err: unknown, opts: CliErrorOptions = {}) {
   const { message, stack, code } = formatCliError(err);
-  const prefix = opts.command ? `moxjs ${opts.command}` : 'moxjs';
+  const prefix = opts.command ? `jorvel ${opts.command}` : 'jorvel';
   const codeStr = opts.code ?? code;
   const codePrefix = codeStr ? `[${codeStr}] ` : '';
 
   // eslint-disable-next-line no-console
   console.error(kleur.red(`${prefix} failed: ${codePrefix}${message}`));
 
-  const hintFromErr = err instanceof MoxjsCliError ? err.hint : undefined;
+  const hintFromErr = err instanceof JorvelCliError ? err.hint : undefined;
   const hints = (opts.hint ?? hintFromErr)
     ? Array.isArray(opts.hint ?? hintFromErr)
       ? (opts.hint ?? hintFromErr) as string[]
@@ -59,13 +59,13 @@ export function printCliError(err: unknown, opts: CliErrorOptions = {}) {
     console.error(kleur.yellow(line));
   }
 
-  const debug = process.env['MOXJS_DEBUG'] === '1' || process.env['MOXJS_DEBUG'] === 'true';
+  const debug = process.env['JORVEL_DEBUG'] === '1' || process.env['JORVEL_DEBUG'] === 'true';
   if (debug && stack) {
     // eslint-disable-next-line no-console
     console.error(kleur.gray(stack));
   }
 
-  const exit = opts.exitCode ?? (err instanceof MoxjsCliError ? err.exitCode : 1);
+  const exit = opts.exitCode ?? (err instanceof JorvelCliError ? err.exitCode : 1);
   process.exitCode = exit;
 }
 

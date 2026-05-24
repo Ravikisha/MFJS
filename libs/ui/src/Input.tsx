@@ -23,10 +23,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   const isInvalid = Boolean(errorText) || rest['aria-invalid'] === true;
   const field: CSSProperties = {
     width: '100%',
-    borderRadius: 'var(--moxjs-radius-md, 6px)',
-    border: `1px solid ${isInvalid ? 'var(--moxjs-color-error, #ef4444)' : 'var(--moxjs-color-border, #d1d5db)'}`,
-    background: 'var(--moxjs-color-surface, #fff)',
-    color: 'var(--moxjs-color-on-surface, #111)',
+    borderRadius: 'var(--jorvel-radius-md, 6px)',
+    border: `1px solid ${isInvalid ? 'var(--jorvel-color-error, #ef4444)' : 'var(--jorvel-color-border, #d1d5db)'}`,
+    background: 'var(--jorvel-color-surface, #fff)',
+    color: 'var(--jorvel-color-on-surface, #111)',
     outline: 'none',
     ...sizes[size],
     ...style,
@@ -45,7 +45,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       {label ? <span style={{ fontSize: '0.875rem' }}>{label}</span> : null}
       {input}
       {errorText ? (
-        <span role="alert" style={{ color: 'var(--moxjs-color-error, #ef4444)', fontSize: '0.8rem' }}>
+        <span role="alert" style={{ color: 'var(--jorvel-color-error, #ef4444)', fontSize: '0.8rem' }}>
           {errorText}
         </span>
       ) : null}

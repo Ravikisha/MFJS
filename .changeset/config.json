@@ -4,12 +4,12 @@
   "commit": false,
   "fixed": [],
   "linked": [
-    ["@moxjs/runtime", "@moxjs/ssr", "@moxjs/security"],
-    ["@moxjs/state", "@moxjs/event-bus", "@moxjs/events"],
-    ["@moxjs/adapter-node", "@moxjs/adapter-vercel", "@moxjs/adapter-cloudflare"]
+    ["@jorvel/runtime", "@jorvel/ssr", "@jorvel/security"],
+    ["@jorvel/state", "@jorvel/event-bus", "@jorvel/events"],
+    ["@jorvel/adapter-node", "@jorvel/adapter-vercel", "@jorvel/adapter-cloudflare"]
   ],
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["docs", "@app/*", "moxjs-example-*"]
+  "ignore": ["docs", "@app/*", "jorvel-example-*"]
 }

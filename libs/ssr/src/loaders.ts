@@ -1,5 +1,5 @@
 /**
- * Per-route data loaders — getServerSideProps-style data fetching for MOXJS SSR.
+ * Per-route data loaders — getServerSideProps-style data fetching for JORVEL SSR.
  *
  * Each route can register a `defineLoader` that runs before render. The loader
  * receives a `LoaderContext` (URL, params, request, request-context) and may
@@ -51,7 +51,7 @@ interface LoaderSlot {
   headers: Record<string, string>;
 }
 
-const SLOT_KEY = '__MOXJS_LOADER_SLOT__';
+const SLOT_KEY = '__JORVEL_LOADER_SLOT__';
 
 function slot(): LoaderSlot | undefined {
   return (globalThis as Record<string, unknown>)[SLOT_KEY] as LoaderSlot | undefined;
@@ -77,7 +77,7 @@ export function useLoaderData<T>(key: string): T | undefined {
 export function requireLoaderData<T>(key: string): T {
   const v = slot()?.data[key];
   if (v === undefined) {
-    throw new Error(`[moxjs/ssr] No loader data for key "${key}". Did the route register one?`);
+    throw new Error(`[jorvel/ssr] No loader data for key "${key}". Did the route register one?`);
   }
   return v as T;
 }

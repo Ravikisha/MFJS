@@ -1,4 +1,4 @@
-import { escapeHtml } from '@moxjs/security';
+import { escapeHtml } from '@jorvel/security';
 
 export interface PreloadLink {
   href: string;

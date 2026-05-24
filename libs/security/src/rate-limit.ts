@@ -88,7 +88,7 @@ export class RateLimiter {
 
   /** Consume `n` tokens at once (e.g. weighted ops). */
   consumeN(key: string, n: number): RateLimitResult {
-    if (n <= 0) throw new Error('[moxjs/security] consumeN requires n >= 1');
+    if (n <= 0) throw new Error('[jorvel/security] consumeN requires n >= 1');
     const now = this.now();
     const prev = this.store.get(key);
     let tokens = prev ? prev.tokens : this.capacity;

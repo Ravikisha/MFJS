@@ -29,14 +29,14 @@ export default function ConcurrentPreload() {
       <h2 id="basic">Preload all remotes after first paint</h2>
       <CodeBlock
         language="ts"
-        code={`import { preloadRemotes } from '@moxjs/runtime';
+        code={`import { preloadRemotes } from '@jorvel/runtime';
 
 window.addEventListener('load', () => {
   preloadRemotes(
     [
-      { name: 'dashboard', entryUrl: '/moxjs/remotes/dashboard/remoteEntry.js' },
-      { name: 'profile',   entryUrl: '/moxjs/remotes/profile/remoteEntry.js' },
-      { name: 'billing',   entryUrl: '/moxjs/remotes/billing/remoteEntry.js' },
+      { name: 'dashboard', entryUrl: '/jorvel/remotes/dashboard/remoteEntry.js' },
+      { name: 'profile',   entryUrl: '/jorvel/remotes/profile/remoteEntry.js' },
+      { name: 'billing',   entryUrl: '/jorvel/remotes/billing/remoteEntry.js' },
     ],
     { concurrency: 2, idle: true },
   );
@@ -83,7 +83,7 @@ if (failed.length) observability.reportError(new Error('preload failures'), { fa
       <h2 id="sw">Combine with Service Worker</h2>
       <p>
         Preloaded <code>remoteEntry.js</code> responses flow through the Service Worker cache set
-        by <code>moxjs sw generate</code>. Second-load cost drops to cache-hit. The combination is
+        by <code>jorvel sw generate</code>. Second-load cost drops to cache-hit. The combination is
         what makes route changes feel native after the first session — preload puts the bytes in
         memory, the SW puts them on disk.
       </p>
@@ -95,7 +95,7 @@ if (failed.length) observability.reportError(new Error('preload failures'), { fa
       </p>
       <CodeBlock
         language="ts"
-        code={`import { preloadRemotes } from '@moxjs/runtime';
+        code={`import { preloadRemotes } from '@jorvel/runtime';
 
 if (typeof window !== 'undefined') {
   const conn = (navigator as any).connection;
@@ -109,7 +109,7 @@ if (typeof window !== 'undefined') {
         idle: true,
         idleBudgetMs: 16,            // wait for a full frame of headroom
         onResult: (r) => observability.reportMetric({
-          name: 'moxjs.preload',
+          name: 'jorvel.preload',
           value: r.durationMs,
           tags: { remote: r.remote, ok: String(r.ok) },
         }),

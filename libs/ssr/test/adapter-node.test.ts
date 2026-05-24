@@ -48,7 +48,7 @@ describe('createNodeServer', () => {
   });
 
   it('serves a static file from staticDir', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-staticnode-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-staticnode-'));
     await fs.writeFile(path.join(dir, 'hello.txt'), 'world');
     const server = createNodeServer({
       App,
@@ -70,7 +70,7 @@ describe('createNodeServer', () => {
   });
 
   it('rejects path traversal in static request', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-staticnode-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-staticnode-'));
     await fs.writeFile(path.join(dir, 'ok.txt'), 'ok');
     const server = createNodeServer({
       App,
@@ -97,7 +97,7 @@ describe('createNodeServer', () => {
       App,
       template: TEMPLATE,
       routes: ROUTES,
-      staticDir: path.join(os.tmpdir(), 'moxjs-empty-' + Date.now()),
+      staticDir: path.join(os.tmpdir(), 'jorvel-empty-' + Date.now()),
       logger: { info: () => {}, error: () => {} },
     });
     const base = await listen(server);
@@ -131,21 +131,21 @@ describe('scaffoldDeploy (node)', () => {
   });
 
   it('writes Dockerfile', async () => {
-    dir = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-nodea-'));
+    dir = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-nodea-'));
     const r = await scaffoldDeploy({ cwd: dir });
     expect(r.files[0].written).toBe(true);
     expect((await fs.readFile(path.join(dir, 'Dockerfile'), 'utf8')).length).toBeGreaterThan(0);
   });
 
   it('skips existing Dockerfile', async () => {
-    dir = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-nodea-'));
+    dir = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-nodea-'));
     await fs.writeFile(path.join(dir, 'Dockerfile'), 'FROM scratch');
     const r = await scaffoldDeploy({ cwd: dir });
     expect(r.files[0].written).toBe(false);
   });
 
   it('nextHint mentions docker', async () => {
-    dir = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-nodea-'));
+    dir = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-nodea-'));
     const r = await scaffoldDeploy({ cwd: dir });
     expect(r.nextHint).toMatch(/docker/i);
   });

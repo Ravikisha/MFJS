@@ -31,14 +31,14 @@ export function ShadowRemote({ children, mode = 'open', css, stylesheets, classN
 
     if (!mountRef.current) {
       const mount = document.createElement('div');
-      mount.className = 'moxjs-shadow-root';
+      mount.className = 'jorvel-shadow-root';
       shadow.appendChild(mount);
       mountRef.current = mount;
     }
 
     if (css) {
       const style = document.createElement('style');
-      style.setAttribute('data-moxjs-shadow-css', '');
+      style.setAttribute('data-jorvel-shadow-css', '');
       style.textContent = css;
       shadow.appendChild(style);
     }

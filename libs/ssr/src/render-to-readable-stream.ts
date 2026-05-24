@@ -1,9 +1,9 @@
 /**
- * @moxjs/ssr — renderToReadableStream (Web Streams / edge runtimes).
+ * @jorvel/ssr — renderToReadableStream (Web Streams / edge runtimes).
  *
  * Wraps React 18's `renderToReadableStream` so it works inside Cloudflare
  * Workers / Vercel Edge / Deno Deploy. Unlike `render-to-stream.ts` this file
- * has zero `node:*` imports, so it stays loadable in `@moxjs/ssr/edge`.
+ * has zero `node:*` imports, so it stays loadable in `@jorvel/ssr/edge`.
  *
  * The streaming render is exposed as either:
  *   - a `Response` (ready-to-return from an edge handler), or
@@ -103,7 +103,7 @@ export async function renderRouteToReadableStream(
   if (opts.timeoutMs && opts.timeoutMs > 0) {
     timeoutHandle = setTimeout(() => {
       controller.abort();
-      recordError(new Error(`[moxjs/ssr] streaming render timed out after ${opts.timeoutMs}ms`));
+      recordError(new Error(`[jorvel/ssr] streaming render timed out after ${opts.timeoutMs}ms`));
     }, opts.timeoutMs);
   }
 

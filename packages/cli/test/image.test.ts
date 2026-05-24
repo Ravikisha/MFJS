@@ -6,7 +6,7 @@ import fs from 'fs-extra';
 import { planImageOptimizations, runImageOptimizations } from '../src/commands/image.js';
 
 async function tmp() {
-  return fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-image-')) as Promise<string>;
+  return fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-image-')) as Promise<string>;
 }
 
 describe('planImageOptimizations', () => {

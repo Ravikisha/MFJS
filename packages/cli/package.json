@@ -1,26 +1,37 @@
 {
-  "name": "@moxjs/cli",
-  "version": "0.1.0",
-  "description": "MOXJS command-line tool: scaffold, dev, build, federation, SSR, deploy, and diagnostics for module federation workspaces.",
+  "name": "jorvel",
+  "version": "0.2.0",
+  "description": "JORVEL command-line tool: scaffold, dev, build, federation, SSR, deploy, and diagnostics for module federation workspaces.",
   "license": "MIT",
-  "homepage": "https://github.com/anthropics/MOXJS#readme",
+  "homepage": "https://github.com/Ravikisha/JorvelJS#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/anthropics/MOXJS.git",
+    "url": "https://github.com/Ravikisha/JorvelJS.git",
     "directory": "packages/cli"
   },
-  "keywords": ["moxjs", "module-federation", "cli", "rspack", "scaffold"],
+  "keywords": [
+    "jorvel",
+    "module-federation",
+    "cli",
+    "rspack",
+    "scaffold"
+  ],
   "private": false,
   "publishConfig": {
     "access": "public"
   },
   "type": "module",
   "bin": {
-    "moxjs": "./dist/index.js"
+    "jorvel": "./dist/index.js"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist", "templates", "README.md", "LICENSE"],
+  "files": [
+    "dist",
+    "templates",
+    "README.md",
+    "LICENSE"
+  ],
   "engines": {
     "node": ">=20"
   },
@@ -39,8 +50,8 @@
     "kleur": "^4.1.5",
     "execa": "^9.5.3",
     "ws": "^8.18.3",
-    "@moxjs/ssr": "workspace:*",
-    "@moxjs/types": "workspace:*",
+    "@jorvel/ssr": "workspace:*",
+    "@jorvel/types": "workspace:*",
     "tree-kill": "^1.2.2",
     "chokidar": "^4.0.3"
   },

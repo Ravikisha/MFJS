@@ -2,7 +2,7 @@ import { CodeBlock } from '@/components/site/code-block';
 import { Callout } from '@/components/docs/callout';
 
 export const metadata = {
-  title: '@moxjs/event-bus API',
+  title: '@jorvel/event-bus API',
   description:
     'Typed pub/sub bus with wildcard listeners, replay-on-subscribe, schema validation, and cross-tab broadcast.',
 };
@@ -10,7 +10,7 @@ export const metadata = {
 export default function EventBusApi() {
   return (
     <>
-      <h1>@moxjs/event-bus</h1>
+      <h1>@jorvel/event-bus</h1>
       <p>
         Lightweight typed publish/subscribe with wildcard support, optional replay-on-subscribe,
         and a per-bus error handler so a single throwing listener cannot abort iteration. The
@@ -152,7 +152,7 @@ interface SchemaRegistryHandle {
       <CodeBlock
         language="ts"
         code={`import { z } from 'zod';
-import { attachSchemaRegistry, getEventBus } from '@moxjs/event-bus';
+import { attachSchemaRegistry, getEventBus } from '@jorvel/event-bus';
 
 const bus = getEventBus<MyEvents>();
 
@@ -174,7 +174,7 @@ bus.emit('cart:add', { sku: '', qty: -1 });   // warns + drops`}
         code={`connectBroadcast<E extends EventMap>(
   bus: EventBus<E>,
   opts?: {
-    channelName?: string;          // default 'moxjs:bus'
+    channelName?: string;          // default 'jorvel:bus'
     filter?: (event: keyof E) => boolean;
   },
 ): BroadcastConnection;
@@ -198,12 +198,12 @@ interface BroadcastConnection {
 
       <h2 id="federation">Federation contract</h2>
       <p>
-        Pair the bus with a typed federation contract from <code>@moxjs/types</code> to enforce the
+        Pair the bus with a typed federation contract from <code>@jorvel/types</code> to enforce the
         event vocabulary across host + remote builds:
       </p>
       <CodeBlock
         language="ts"
-        code={`import { defineFederationContract } from '@moxjs/types';
+        code={`import { defineFederationContract } from '@jorvel/types';
 
 export const dashboardContract = defineFederationContract({
   name: 'dashboard',
@@ -223,7 +223,7 @@ const bus = getEventBus<DashboardEvents>();`}
       <h2 id="testing">Testing</h2>
       <CodeBlock
         language="ts"
-        code={`import { _resetEventBus } from '@moxjs/event-bus';
+        code={`import { _resetEventBus } from '@jorvel/event-bus';
 
 beforeEach(() => { _resetEventBus(); });
 

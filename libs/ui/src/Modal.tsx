@@ -54,9 +54,9 @@ export function Modal(props: ModalProps): JSX.Element | null {
         aria-labelledby={props.ariaLabelledBy}
         tabIndex={-1}
         style={{
-          background: 'var(--moxjs-color-surface, #fff)',
-          color: 'var(--moxjs-color-on-surface, #111)',
-          borderRadius: 'var(--moxjs-radius-md, 6px)',
+          background: 'var(--jorvel-color-surface, #fff)',
+          color: 'var(--jorvel-color-on-surface, #111)',
+          borderRadius: 'var(--jorvel-radius-md, 6px)',
           padding: '16px',
           minWidth: 320,
           maxWidth: '90vw',

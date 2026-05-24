@@ -20,7 +20,7 @@ const collect = async (stream: ReadableStream<Uint8Array>): Promise<string> => {
 
 describe('renderFragmentsToString', () => {
   it('replaces a single placeholder with the rendered fragment', async () => {
-    const shell = '<main><moxjs-fragment name="header" /></main>';
+    const shell = '<main><jorvel-fragment name="header" /></main>';
     const { html, outcomes } = await renderFragmentsToString({
       shell,
       fragments: [{ name: 'header', render: async () => '<h1>hi</h1>' }],
@@ -35,7 +35,7 @@ describe('renderFragmentsToString', () => {
       name,
       render: async () => { await new Promise((r) => setTimeout(r, ms)); order.push(name); return `<i>${name}</i>`; },
     });
-    const shell = '<a><moxjs-fragment name="x"/></a><b><moxjs-fragment name="y"/></b>';
+    const shell = '<a><jorvel-fragment name="x"/></a><b><jorvel-fragment name="y"/></b>';
     const { html } = await renderFragmentsToString({
       shell,
       fragments: [make('x', 30), make('y', 5)],
@@ -46,7 +46,7 @@ describe('renderFragmentsToString', () => {
   });
 
   it('uses fallback when fragment render throws', async () => {
-    const shell = '<x><moxjs-fragment name="bad"/></x>';
+    const shell = '<x><jorvel-fragment name="bad"/></x>';
     const { html, outcomes } = await renderFragmentsToString({
       shell,
       fragments: [{ name: 'bad', render: async () => { throw new Error('boom'); }, fallback: '<em>oops</em>' }],
@@ -59,7 +59,7 @@ describe('renderFragmentsToString', () => {
   it('uses fallback when fragment times out', async () => {
     vi.useFakeTimers();
     try {
-      const shell = '<x><moxjs-fragment name="slow"/></x>';
+      const shell = '<x><jorvel-fragment name="slow"/></x>';
       const promise = renderFragmentsToString({
         shell,
         timeoutMs: 50,
@@ -75,7 +75,7 @@ describe('renderFragmentsToString', () => {
   });
 
   it('empty fallback yields an empty replacement', async () => {
-    const shell = '<x><moxjs-fragment name="bad"/></x>';
+    const shell = '<x><jorvel-fragment name="bad"/></x>';
     const { html } = await renderFragmentsToString({
       shell,
       fragments: [{ name: 'bad', render: async () => { throw new Error('x'); } }],
@@ -86,7 +86,7 @@ describe('renderFragmentsToString', () => {
   it('emits onFragment for every outcome', async () => {
     const events: FragmentOutcome[] = [];
     await renderFragmentsToString({
-      shell: '<moxjs-fragment name="a"/><moxjs-fragment name="b"/>',
+      shell: '<jorvel-fragment name="a"/><jorvel-fragment name="b"/>',
       onFragment: (e) => events.push(e),
       fragments: [
         { name: 'a', render: async () => '<x/>' },
@@ -99,7 +99,7 @@ describe('renderFragmentsToString', () => {
   it('passes the abort signal into the fragment', async () => {
     let captured!: AbortSignal;
     await renderFragmentsToString({
-      shell: '<moxjs-fragment name="x"/>',
+      shell: '<jorvel-fragment name="x"/>',
       fragments: [{ name: 'x', render: async (signal) => { captured = signal; return ''; } }],
     });
     expect(captured).toBeInstanceOf(AbortSignal);
@@ -109,7 +109,7 @@ describe('renderFragmentsToString', () => {
     vi.useFakeTimers();
     try {
       const promise = renderFragmentsToString({
-        shell: '<moxjs-fragment name="x"/>',
+        shell: '<jorvel-fragment name="x"/>',
         timeoutMs: 10_000,
         fragments: [{
           name: 'x',
@@ -129,7 +129,7 @@ describe('renderFragmentsToString', () => {
 
   it('leaves unmatched placeholders blank (fragment not registered)', async () => {
     const { html } = await renderFragmentsToString({
-      shell: '<a><moxjs-fragment name="missing"/></a>',
+      shell: '<a><jorvel-fragment name="missing"/></a>',
       fragments: [],
     });
     expect(html).toBe('<a></a>');
@@ -138,24 +138,24 @@ describe('renderFragmentsToString', () => {
 
 describe('renderFragmentsToReadableStream', () => {
   it('flushes the shell with placeholders + a runtime script, then each fragment chunk', async () => {
-    const shell = '<a><moxjs-fragment name="hi"/></a>';
+    const shell = '<a><jorvel-fragment name="hi"/></a>';
     const { stream, done } = renderFragmentsToReadableStream({
       shell,
       fragments: [{ name: 'hi', render: async () => '<h1>HI</h1>' }],
     });
     const out = await collect(stream);
     await done;
-    expect(out).toContain('<moxjs-fragment name="hi"></moxjs-fragment>');
-    expect(out).toContain('data-moxjs-fragments');
-    expect(out).toContain('id="moxjs-frag-data-hi"');
+    expect(out).toContain('<jorvel-fragment name="hi"></jorvel-fragment>');
+    expect(out).toContain('data-jorvel-fragments');
+    expect(out).toContain('id="jorvel-frag-data-hi"');
     expect(out).toContain('<h1>HI</h1>');
-    expect(out).toContain('window.__moxjsFragment("hi")');
+    expect(out).toContain('window.__jorvelFragment("hi")');
   });
 
   it('escapes </script> inside fragment HTML', async () => {
     const malicious = '<p>boom</p></script><script>alert(1)</script>';
     const { stream } = renderFragmentsToReadableStream({
-      shell: '<moxjs-fragment name="x"/>',
+      shell: '<jorvel-fragment name="x"/>',
       fragments: [{ name: 'x', render: async () => malicious }],
     });
     const out = await collect(stream);
@@ -167,7 +167,7 @@ describe('renderFragmentsToReadableStream', () => {
     vi.useFakeTimers();
     try {
       const { stream, done } = renderFragmentsToReadableStream({
-        shell: '<moxjs-fragment name="slow"/>',
+        shell: '<jorvel-fragment name="slow"/>',
         timeoutMs: 30,
         fragments: [{ name: 'slow', render: () => new Promise(() => {}), fallback: '<em>oops</em>' }],
       });
@@ -176,7 +176,7 @@ describe('renderFragmentsToReadableStream', () => {
       vi.useRealTimers();
       const out = await readerP;
       const { outcomes } = await done;
-      expect(out).not.toContain('id="moxjs-frag-data-slow"');
+      expect(out).not.toContain('id="jorvel-frag-data-slow"');
       expect(out).toContain('<em>oops</em>');
       expect(outcomes[0]!.phase).toBe('timeout');
     } finally {
@@ -186,7 +186,7 @@ describe('renderFragmentsToReadableStream', () => {
 
   it('done promise resolves with the full outcome list', async () => {
     const { stream, done } = renderFragmentsToReadableStream({
-      shell: '<moxjs-fragment name="a"/><moxjs-fragment name="b"/>',
+      shell: '<jorvel-fragment name="a"/><jorvel-fragment name="b"/>',
       fragments: [
         { name: 'a', render: async () => '<x/>' },
         { name: 'b', render: async () => '<y/>' },

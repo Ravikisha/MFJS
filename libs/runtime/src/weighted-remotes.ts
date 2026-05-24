@@ -62,12 +62,12 @@ export function pickWeightedRemote(
   opts: PickOptions = {},
 ): PickResult {
   if (!entry.variants.length) {
-    throw new Error(`[moxjs/runtime] WeightedRemoteEntry "${entry.name}" has no variants`);
+    throw new Error(`[jorvel/runtime] WeightedRemoteEntry "${entry.name}" has no variants`);
   }
   const total = entry.variants.reduce((acc, v) => {
     if (!(v.weight > 0)) {
       throw new Error(
-        `[moxjs/runtime] WeightedRemoteEntry "${entry.name}" has non-positive weight (${v.weight})`,
+        `[jorvel/runtime] WeightedRemoteEntry "${entry.name}" has non-positive weight (${v.weight})`,
       );
     }
     return acc + v.weight;

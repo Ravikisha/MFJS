@@ -19,7 +19,7 @@ describe('useConsoleAdapter', () => {
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const off = useConsoleAdapter();
     reportError({ error: new Error('x'), source: 'runtime' });
-    expect(spy).toHaveBeenCalledWith('[moxjs:error]', 'error', expect.any(Error), expect.any(Object));
+    expect(spy).toHaveBeenCalledWith('[jorvel:error]', 'error', expect.any(Error), expect.any(Object));
     off();
   });
 
@@ -100,7 +100,7 @@ describe('useSentryAdapter', () => {
     useSentryAdapter(s, { captureMetrics: true });
     reportMetric({ name: 'lcp', value: 2000, unit: 'ms' });
     expect(s.addBreadcrumb).toHaveBeenCalledWith({
-      category: 'moxjs.metric',
+      category: 'jorvel.metric',
       message: 'lcp',
       data: { value: 2000, unit: 'ms' },
     });

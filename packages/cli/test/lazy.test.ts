@@ -6,7 +6,7 @@ import fs from 'fs-extra';
 import { checkLazyLoading } from '../src/commands/lazy.js';
 
 async function tmp() {
-  return fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-lazy-')) as Promise<string>;
+  return fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-lazy-')) as Promise<string>;
 }
 
 describe('checkLazyLoading', () => {

@@ -112,8 +112,8 @@ describe('buildEditorHtml', () => {
 
 describe('scaffoldRouteEditor', () => {
   it('writes route-editor.html, reading manifest when present', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-routedit-'));
-    await fs.outputJson(path.join(tmp, 'apps', 'shell', 'moxjs.routes.host.json'), {
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-routedit-'));
+    await fs.outputJson(path.join(tmp, 'apps', 'shell', 'jorvel.routes.host.json'), {
       routes: [{ path: '/', remote: 'home' }],
     });
     const r = await scaffoldRouteEditor({ cwd: tmp });
@@ -124,7 +124,7 @@ describe('scaffoldRouteEditor', () => {
   });
 
   it('falls back to an empty manifest when none exists', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-routedit-'));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-routedit-'));
     const r = await scaffoldRouteEditor({ cwd: tmp });
     expect(r.manifest.routes).toEqual([]);
     expect(r.written).toBe(true);
@@ -132,7 +132,7 @@ describe('scaffoldRouteEditor', () => {
   });
 
   it('skips overwrite without --force', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-routedit-'));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-routedit-'));
     await fs.outputFile(path.join(tmp, 'route-editor.html'), '<!-- user -->');
     const r = await scaffoldRouteEditor({ cwd: tmp });
     expect(r.written).toBe(false);

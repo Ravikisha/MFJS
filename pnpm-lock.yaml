@@ -71,17 +71,17 @@ importers:
 
   examples/basic/apps/dashboard:
     dependencies:
-      '@moxjs/event-bus':
-        specifier: workspace:*
+      '@jorvel/event-bus':
+        specifier: workspace:^
         version: link:../../../../libs/event-bus
-      '@moxjs/events':
-        specifier: workspace:*
+      '@jorvel/events':
+        specifier: workspace:^
         version: link:../../../../libs/events
-      '@moxjs/runtime':
-        specifier: workspace:*
+      '@jorvel/runtime':
+        specifier: workspace:^
         version: link:../../../../libs/runtime
-      '@moxjs/state':
-        specifier: workspace:*
+      '@jorvel/state':
+        specifier: workspace:^
         version: link:../../../../libs/state
       react:
         specifier: ^18.3.1
@@ -114,17 +114,17 @@ importers:
 
   examples/basic/apps/shell:
     dependencies:
-      '@moxjs/event-bus':
-        specifier: workspace:*
+      '@jorvel/event-bus':
+        specifier: workspace:^
         version: link:../../../../libs/event-bus
-      '@moxjs/events':
-        specifier: workspace:*
+      '@jorvel/events':
+        specifier: workspace:^
         version: link:../../../../libs/events
-      '@moxjs/runtime':
-        specifier: workspace:*
+      '@jorvel/runtime':
+        specifier: workspace:^
         version: link:../../../../libs/runtime
-      '@moxjs/state':
-        specifier: workspace:*
+      '@jorvel/state':
+        specifier: workspace:^
         version: link:../../../../libs/state
       react:
         specifier: ^18.3.1
@@ -201,7 +201,7 @@ importers:
 
   libs/adapter-cloudflare:
     dependencies:
-      '@moxjs/ssr':
+      '@jorvel/ssr':
         specifier: workspace:*
         version: link:../ssr
     devDependencies:
@@ -214,7 +214,7 @@ importers:
 
   libs/adapter-node:
     dependencies:
-      '@moxjs/ssr':
+      '@jorvel/ssr':
         specifier: workspace:*
         version: link:../ssr
     devDependencies:
@@ -227,7 +227,7 @@ importers:
 
   libs/adapter-vercel:
     dependencies:
-      '@moxjs/ssr':
+      '@jorvel/ssr':
         specifier: workspace:*
         version: link:../ssr
     devDependencies:
@@ -348,10 +348,10 @@ importers:
 
   libs/ssr:
     dependencies:
-      '@moxjs/runtime':
+      '@jorvel/runtime':
         specifier: workspace:*
         version: link:../runtime
-      '@moxjs/security':
+      '@jorvel/security':
         specifier: workspace:*
         version: link:../security
     devDependencies:
@@ -429,10 +429,10 @@ importers:
       '@inquirer/prompts':
         specifier: ^6.0.1
         version: 6.0.1
-      '@moxjs/ssr':
+      '@jorvel/ssr':
         specifier: workspace:*
         version: link:../../libs/ssr
-      '@moxjs/types':
+      '@jorvel/types':
         specifier: workspace:*
         version: link:../../libs/types
       chokidar:

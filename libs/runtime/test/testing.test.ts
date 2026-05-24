@@ -77,12 +77,12 @@ describe('installMockRemote', () => {
   it('uninstall removes container + script tag', () => {
     const handle = installMockRemote({ name: 'dashboard', modules: {} });
     expect((globalThis as Record<string, unknown>)['dashboard']).toBeDefined();
-    expect(document.getElementById('moxjs-remote-dashboard')).not.toBeNull();
+    expect(document.getElementById('jorvel-remote-dashboard')).not.toBeNull();
 
     handle.uninstall();
 
     expect((globalThis as Record<string, unknown>)['dashboard']).toBeUndefined();
-    expect(document.getElementById('moxjs-remote-dashboard')).toBeNull();
+    expect(document.getElementById('jorvel-remote-dashboard')).toBeNull();
   });
 
   it('respects custom entryUrl', () => {

@@ -49,7 +49,7 @@ export type RemoteEntryCache = {
 };
 
 function getDefaultRemoteEntryCache(): RemoteEntryCache {
-  const storageKey = (k: RemoteEntryCacheKey) => `moxjs.remoteEntry:${k.name}:${k.entryUrl}`;
+  const storageKey = (k: RemoteEntryCacheKey) => `jorvel.remoteEntry:${k.name}:${k.entryUrl}`;
 
   return {
     get(key) {
@@ -102,7 +102,7 @@ function getGlobal(): Record<string, unknown> {
 }
 
 function scriptId(remoteName: string) {
-  return `moxjs-remote-${remoteName}`;
+  return `jorvel-remote-${remoteName}`;
 }
 
 function isBrowserEnv() {
@@ -137,7 +137,7 @@ function originAllowed(entryUrl: string, patterns: string[] | undefined): boolea
 // In-flight dedupe: concurrent callers see the same Promise; resolved Promises
 // stay cached so cache-hit short-circuits still emit `success` telemetry.
 const inFlight: Map<string, Promise<void>> = (() => {
-  const KEY = '__MOXJS_REMOTE_INFLIGHT__';
+  const KEY = '__JORVEL_REMOTE_INFLIGHT__';
   type GlobalWithFlights = typeof globalThis & { [KEY]?: Map<string, Promise<void>> };
   const g = globalThis as GlobalWithFlights;
   if (!g[KEY]) g[KEY] = new Map<string, Promise<void>>();
@@ -161,7 +161,7 @@ export async function loadRemoteEntry(
 
   if (!originAllowed(remote.entryUrl, options?.allowedOrigins)) {
     const err = new Error(
-      `[moxjs/runtime] loadRemoteEntry: origin not in allowedOrigins for "${remote.name}" (${remote.entryUrl})`,
+      `[jorvel/runtime] loadRemoteEntry: origin not in allowedOrigins for "${remote.name}" (${remote.entryUrl})`,
     );
     emitRemoteLoad({ remote: remote.name, url: remote.entryUrl, phase: 'error', durationMs: 0, error: err });
     throw err;
@@ -215,7 +215,7 @@ export async function loadRemoteEntry(
     const doc = globalThis.document;
     const existingScript = doc.getElementById(id) as HTMLScriptElement | null;
     if (existingScript) {
-      const loaded = existingScript.dataset['moxjsLoaded'] === '1';
+      const loaded = existingScript.dataset['jorvelLoaded'] === '1';
       if (loaded && g[remote.name]) {
         emitRemoteLoad({
           remote: remote.name,
@@ -232,7 +232,7 @@ export async function loadRemoteEntry(
         };
         const onLoad = () => {
           cleanup();
-          existingScript.dataset['moxjsLoaded'] = '1';
+          existingScript.dataset['jorvelLoaded'] = '1';
           emitRemoteLoad({
             remote: remote.name,
             url: remote.entryUrl,
@@ -294,7 +294,7 @@ export async function loadRemoteEntry(
             return;
           }
           if (cache) cache.set({ name: remote.name, entryUrl: remote.entryUrl }, { loadedAt: Date.now() });
-          script.dataset['moxjsLoaded'] = '1';
+          script.dataset['jorvelLoaded'] = '1';
           emitRemoteLoad({
             remote: remote.name,
             url: remote.entryUrl,

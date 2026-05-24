@@ -46,7 +46,7 @@ describe('loadRemoteEntry', () => {
 
     await loadRemoteEntry({ name: 'dashboard', entryUrl: 'http://localhost:3001/remoteEntry.js' });
 
-    const script = document.head.querySelector('#moxjs-remote-dashboard') as HTMLScriptElement;
+    const script = document.head.querySelector('#jorvel-remote-dashboard') as HTMLScriptElement;
     expect(script).not.toBeNull();
     expect(script.src).toBe('http://localhost:3001/remoteEntry.js');
   });
@@ -57,7 +57,7 @@ describe('loadRemoteEntry', () => {
     await loadRemoteEntry({ name: 'dashboard', entryUrl: 'http://localhost:3001/remoteEntry.js' });
     await loadRemoteEntry({ name: 'dashboard', entryUrl: 'http://localhost:3001/remoteEntry.js' });
 
-    const scripts = document.head.querySelectorAll('#moxjs-remote-dashboard');
+    const scripts = document.head.querySelectorAll('#jorvel-remote-dashboard');
     expect(scripts.length).toBe(1);
   });
 

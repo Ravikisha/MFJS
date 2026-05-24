@@ -71,10 +71,10 @@ function deepClone(policy: CspPolicy): CspPolicy {
 
 export function buildCsp(policy: CspPolicy = {}, opts: CspOptions = {}): string {
   if (opts.nonce !== undefined && !NONCE_RE.test(opts.nonce)) {
-    throw new Error(`[moxjs/security] Invalid nonce; must match /${NONCE_RE.source}/`);
+    throw new Error(`[jorvel/security] Invalid nonce; must match /${NONCE_RE.source}/`);
   }
   if (opts.reportUri !== undefined && /[\s;]/.test(opts.reportUri)) {
-    throw new Error('[moxjs/security] reportUri must not contain whitespace or `;`.');
+    throw new Error('[jorvel/security] reportUri must not contain whitespace or `;`.');
   }
 
   const merged = deepClone(BASELINE);

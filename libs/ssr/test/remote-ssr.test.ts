@@ -17,7 +17,7 @@ describe('ssrLoadRemote', () => {
   it('loads a module default export that resolves at runtime', async () => {
     // We cannot import an actual federated remote in unit tests, but we can
     // verify the null-on-failure path and the API contract.
-    const component = await ssrLoadRemote({ specifier: 'this-does-not-exist-moxjs' });
+    const component = await ssrLoadRemote({ specifier: 'this-does-not-exist-jorvel' });
     expect(component).toBeNull();
   });
 

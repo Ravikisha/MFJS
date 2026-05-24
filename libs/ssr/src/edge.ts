@@ -1,5 +1,5 @@
 /**
- * @moxjs/ssr/edge — surface safe for Cloudflare Workers, Vercel Edge,
+ * @jorvel/ssr/edge — surface safe for Cloudflare Workers, Vercel Edge,
  * Deno Deploy, and any other runtime that does not provide `node:stream`.
  *
  * Excludes: render-to-stream (Node streams), static-export (fs).

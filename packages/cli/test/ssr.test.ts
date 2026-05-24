@@ -1,8 +1,8 @@
 /**
- * Unit tests for `moxjs ssr` CLI command.
+ * Unit tests for `jorvel ssr` CLI command.
  *
  * Tests focus on config validation, file discovery, and error paths.
- * The actual rendering is tested in @moxjs/ssr unit tests.
+ * The actual rendering is tested in @jorvel/ssr unit tests.
  */
 
 import { describe, it, expect, afterEach } from 'vitest';
@@ -17,7 +17,7 @@ import { once } from 'node:events';
 const tmpDirs: string[] = [];
 
 async function makeTmp(): Promise<string> {
-  const dir = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-ssr-cli-'))) as unknown as string;
+  const dir = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-ssr-cli-'))) as unknown as string;
   tmpDirs.push(dir);
   return dir;
 }
@@ -44,7 +44,7 @@ function runNode(args: string[], opts: { cwd: string }): Promise<{ code: number;
   });
 }
 
-async function runMoxjsCli(
+async function runJorvelCli(
   tmpWorkspace: string,
   cliArgs: string[]
 ): Promise<{ code: number; stdout: string; stderr: string }> {
@@ -83,7 +83,7 @@ async function writeTinyWorkspace(tmp: string) {
 
   // SSR config.
   await fs.writeJson(
-    path.join(tmp, 'moxjs.ssr.json'),
+    path.join(tmp, 'jorvel.ssr.json'),
     {
       app: './src/App.mjs',
       template: './index.html',
@@ -116,10 +116,10 @@ async function writeTinyWorkspace(tmp: string) {
   }
 }
 
-// ── moxjs.ssr.json validation ─────────────────────────────────────────────────
+// ── jorvel.ssr.json validation ─────────────────────────────────────────────────
 
-describe('moxjs ssr — config file loading', () => {
-  it('moxjs.ssr.json with all required fields is valid JSON', async () => {
+describe('jorvel ssr — config file loading', () => {
+  it('jorvel.ssr.json with all required fields is valid JSON', async () => {
     const tmp = await makeTmp();
     const config = {
       app: './src/App.js',
@@ -129,9 +129,9 @@ describe('moxjs ssr — config file loading', () => {
       port: 4000,
     };
 
-    await fs.writeJson(path.join(tmp, 'moxjs.ssr.json'), config);
+    await fs.writeJson(path.join(tmp, 'jorvel.ssr.json'), config);
 
-    const loaded = await fs.readJson(path.join(tmp, 'moxjs.ssr.json'));
+    const loaded = await fs.readJson(path.join(tmp, 'jorvel.ssr.json'));
     expect(loaded.app).toBe('./src/App.js');
     expect(loaded.template).toBe('./index.html');
     expect(loaded.routes).toHaveLength(2);
@@ -147,8 +147,8 @@ describe('moxjs ssr — config file loading', () => {
       routes: [{ path: '/users/42', params: { id: '42' } }],
     };
 
-    await fs.writeJson(path.join(tmp, 'moxjs.ssr.json'), config);
-    const loaded = await fs.readJson(path.join(tmp, 'moxjs.ssr.json'));
+    await fs.writeJson(path.join(tmp, 'jorvel.ssr.json'), config);
+    const loaded = await fs.readJson(path.join(tmp, 'jorvel.ssr.json'));
     expect(loaded.routes[0].params.id).toBe('42');
   });
 });
@@ -186,7 +186,7 @@ describe('path-to-file mapping', () => {
 
 // ── SSR config schema shape ───────────────────────────────────────────────────
 
-describe('moxjs ssr — config shape validation', () => {
+describe('jorvel ssr — config shape validation', () => {
   it('config without routes array has no routes to export', async () => {
     const config = { app: './App.js', template: './index.html', routes: [] };
     expect(config.routes).toHaveLength(0);
@@ -207,7 +207,7 @@ describe('moxjs ssr — config shape validation', () => {
 
 // ── SSR serve — http server integration (lightweight) ────────────────────────
 
-describe('moxjs ssr serve — Node.js http server', () => {
+describe('jorvel ssr serve — Node.js http server', () => {
   it('can create an http server and respond to a request', async () => {
     // We do not actually start the full CLI server here (it would need a real
     // App module), but we verify the core Node.js http.createServer pattern
@@ -239,8 +239,8 @@ describe('moxjs ssr serve — Node.js http server', () => {
   });
 });
 
-describe('moxjs ssr — integration', () => {
-  it('`moxjs ssr export` writes pages to outDir', async () => {
+describe('jorvel ssr — integration', () => {
+  it('`jorvel ssr export` writes pages to outDir', async () => {
     const tmp = await makeTmp();
     try {
       await writeTinyWorkspace(tmp);
@@ -254,10 +254,10 @@ describe('moxjs ssr — integration', () => {
       throw err;
     }
 
-    const { code, stdout, stderr } = await runMoxjsCli(tmp, ['ssr', 'export', '--dir', tmp]);
+    const { code, stdout, stderr } = await runJorvelCli(tmp, ['ssr', 'export', '--dir', tmp]);
 
     if (code !== 0) {
-      throw new Error(`moxjs ssr export failed (code ${code}).\nSTDOUT:\n${stdout}\nSTDERR:\n${stderr}`);
+      throw new Error(`jorvel ssr export failed (code ${code}).\nSTDOUT:\n${stdout}\nSTDERR:\n${stderr}`);
     }
     expect(stdout + stderr).toMatch(/Static export complete/);
 
@@ -268,6 +268,6 @@ describe('moxjs ssr — integration', () => {
 
   // Note: we intentionally don't start a real HTTP server in unit tests because it can be
   // flaky (port binding, timing, signal handling in CI). The SSR server logic is covered
-  // by @moxjs/ssr tests for string/stream rendering, and this integration suite verifies
+  // by @jorvel/ssr tests for string/stream rendering, and this integration suite verifies
   // that the CLI can load an app module + run static export deterministically.
 });

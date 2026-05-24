@@ -1,5 +1,5 @@
 /**
- * @moxjs/state/react
+ * @jorvel/state/react
  *
  * Minimal React 18+ bindings for `Store` and `SimpleStore`. Uses
  * `useSyncExternalStore` so concurrent rendering tearing is avoided.

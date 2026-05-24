@@ -67,7 +67,7 @@ export function requireRequestContext(): RequestContext {
   const ctx = active.get();
   if (!ctx) {
     throw new Error(
-      '[moxjs/ssr] No active request context. Did you call this outside of a route render?',
+      '[jorvel/ssr] No active request context. Did you call this outside of a route render?',
     );
   }
   return ctx;

@@ -60,7 +60,7 @@ describe('buildTurboJson', () => {
 
 describe('scaffoldTurbo', () => {
   it('writes turbo.json with a trailing newline', () => {
-    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'moxjs-turbo-'));
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'jorvel-turbo-'));
     try {
       const r = scaffoldTurbo({ cwd: tmp });
       expect(r.written).toBe(true);
@@ -74,7 +74,7 @@ describe('scaffoldTurbo', () => {
   });
 
   it('refuses to overwrite an existing turbo.json by default', () => {
-    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'moxjs-turbo-'));
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'jorvel-turbo-'));
     try {
       fs.writeFileSync(path.join(tmp, 'turbo.json'), '{}\n');
       const r = scaffoldTurbo({ cwd: tmp });
@@ -87,7 +87,7 @@ describe('scaffoldTurbo', () => {
   });
 
   it('overwrites when force=true', () => {
-    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'moxjs-turbo-'));
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'jorvel-turbo-'));
     try {
       fs.writeFileSync(path.join(tmp, 'turbo.json'), '{}\n');
       const r = scaffoldTurbo({ cwd: tmp, force: true });

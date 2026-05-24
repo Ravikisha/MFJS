@@ -1,7 +1,7 @@
 {
-  "name": "@moxjs/tsconfig",
+  "name": "@jorvel/tsconfig",
   "version": "0.1.0",
-  "description": "Shared TypeScript config presets for MOXJS projects.",
+  "description": "Shared TypeScript config presets for JORVEL projects.",
   "publishConfig": { "access": "public" },
   "files": ["base.json", "react.json", "node.json", "library.json", "README.md"]
 }

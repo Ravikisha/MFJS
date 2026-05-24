@@ -10,7 +10,7 @@ import { ArrowRight, CheckIcon, RocketIcon, ShieldIcon, NetworkIcon } from '@/co
 export const metadata = {
   title: 'Getting started',
   description:
-    'Scaffold a production-ready MOXJS workspace in five commands. Host + remote, file-based routing, federation, dev server with HMR.',
+    'Scaffold a production-ready JORVEL workspace in five commands. Host + remote, file-based routing, federation, dev server with HMR.',
 };
 
 export default function GettingStarted() {
@@ -21,7 +21,7 @@ export default function GettingStarted() {
       </Badge>
       <h1>Getting started</h1>
       <p>
-        MOXJS scaffolds a complete micro-frontend workspace in five commands. By the end of this
+        JORVEL scaffolds a complete micro-frontend workspace in five commands. By the end of this
         guide you&apos;ll have a host, a remote, file-based routing, and a dev server with HMR
         running on the same origin.
       </p>
@@ -71,14 +71,14 @@ export default function GettingStarted() {
         <TabsContent value="pnpm">
           <CodeBlock
             language="bash"
-            code={`corepack enable\ncorepack prepare pnpm@9.15.5 --activate\npnpm dlx @moxjs/cli@latest init my-app`}
+            code={`corepack enable\ncorepack prepare pnpm@9.15.5 --activate\npnpm dlx jorvel@latest init my-app`}
           />
         </TabsContent>
         <TabsContent value="npm">
-          <CodeBlock language="bash" code={`npx @moxjs/cli@latest init my-app`} />
+          <CodeBlock language="bash" code={`npx jorvel@latest init my-app`} />
         </TabsContent>
         <TabsContent value="yarn">
-          <CodeBlock language="bash" code={`yarn dlx @moxjs/cli@latest init my-app`} />
+          <CodeBlock language="bash" code={`yarn dlx jorvel@latest init my-app`} />
         </TabsContent>
       </Tabs>
 
@@ -87,7 +87,7 @@ export default function GettingStarted() {
       <Steps>
         <Step title="Initialize a workspace" active>
           <p className="mt-2">
-            <code>moxjs init</code> writes <code>moxjs.config.ts</code>, a workspace{' '}
+            <code>jorvel init</code> writes <code>jorvel.config.ts</code>, a workspace{' '}
             <code>tsconfig.base.json</code>, <code>pnpm-workspace.yaml</code>, a{' '}
             <code>.gitignore</code>, GitHub Actions for CI (<code>typecheck</code> →{' '}
             <code>lint</code> → <code>test</code> → <code>perf budget</code>), and a deploy
@@ -96,7 +96,7 @@ export default function GettingStarted() {
           </p>
           <CodeBlock
             language="bash"
-            code={`pnpm dlx @moxjs/cli@latest init my-app\ncd my-app\n\n# Inspect the new workspace\nls\n# .github/  .vscode/  apps/  libs/  moxjs.config.ts  package.json  pnpm-workspace.yaml  tsconfig.base.json`}
+            code={`pnpm dlx jorvel@latest init my-app\ncd my-app\n\n# Inspect the new workspace\nls\n# .github/  .vscode/  apps/  libs/  jorvel.config.ts  package.json  pnpm-workspace.yaml  tsconfig.base.json`}
           />
         </Step>
         <Step title="Generate a host and a remote">
@@ -106,13 +106,13 @@ export default function GettingStarted() {
           </p>
           <CodeBlock
             language="bash"
-            code={`# Wizard (recommended on first run)\nmoxjs scaffold app\n\n# Non-interactive\nmoxjs generate host shell --port 3000\nmoxjs generate remote dashboard --port 3001\nmoxjs federation`}
+            code={`# Wizard (recommended on first run)\njorvel scaffold app\n\n# Non-interactive\njorvel generate host shell --port 3000\njorvel generate remote dashboard --port 3001\njorvel federation`}
           />
         </Step>
         <Step title="Run the dev server">
           <CodeBlock
             language="bash"
-            code={`moxjs dev --proxy-remotes --hmr-remotes`}
+            code={`jorvel dev --proxy-remotes --hmr-remotes`}
           />
           <p className="mt-2">
             <code>--proxy-remotes</code> serves every remote on the host&apos;s origin so CSP, cookies,
@@ -122,7 +122,7 @@ export default function GettingStarted() {
         </Step>
         <Step title="Add a route">
           <p className="mt-2">
-            Drop a file in <code>apps/dashboard/src/pages/</code>. MOXJS uses Next.js-style file
+            Drop a file in <code>apps/dashboard/src/pages/</code>. JORVEL uses Next.js-style file
             conventions: <code>index.tsx</code>, <code>[id].tsx</code>, <code>(group)/</code>.
           </p>
           <CodeBlock
@@ -131,14 +131,14 @@ export default function GettingStarted() {
             code={`export default function Settings() {\n  return (\n    <main>\n      <h2>Settings</h2>\n      <p>Configure your account.</p>\n    </main>\n  );\n}`}
           />
           <p>
-            Re-scan with <code>moxjs routes --watch</code>. The host now matches{' '}
+            Re-scan with <code>jorvel routes --watch</code>. The host now matches{' '}
             <code>/dashboard/settings</code>.
           </p>
         </Step>
         <Step title="Build for production">
           <CodeBlock
             language="bash"
-            code={`moxjs build              # all apps\nmoxjs build --app shell  # one app`}
+            code={`jorvel build              # all apps\njorvel build --app shell  # one app`}
           />
           <p className="mt-2">
             Output lands under <code>apps/&lt;name&gt;/dist/</code>. Asset filenames carry content
@@ -154,18 +154,18 @@ export default function GettingStarted() {
               <TabsTrigger value="node">Node / Docker</TabsTrigger>
             </TabsList>
             <TabsContent value="vercel">
-              <CodeBlock language="bash" code={`moxjs deploy --target vercel\nvercel deploy`} />
+              <CodeBlock language="bash" code={`jorvel deploy --target vercel\nvercel deploy`} />
             </TabsContent>
             <TabsContent value="cloudflare">
               <CodeBlock
                 language="bash"
-                code={`moxjs deploy --target cloudflare\nwrangler pages deploy apps/shell/dist`}
+                code={`jorvel deploy --target cloudflare\nwrangler pages deploy apps/shell/dist`}
               />
             </TabsContent>
             <TabsContent value="node">
               <CodeBlock
                 language="bash"
-                code={`moxjs deploy --target node\ndocker build -t shell .\ndocker run -p 3000:3000 shell`}
+                code={`jorvel deploy --target node\ndocker build -t shell .\ndocker run -p 3000:3000 shell`}
               />
             </TabsContent>
           </Tabs>
@@ -192,16 +192,16 @@ export default function GettingStarted() {
 │   │   │   ├── App.tsx         # Root React component (used by both CSR + SSR)
 │   │   │   ├── bootstrap.tsx   # Client entry — calls getRouter()
 │   │   │   ├── index.ts        # async import of bootstrap (federation boundary)
-│   │   │   └── moxjs.routes.ts  # Auto-generated by 'moxjs routes'
-│   │   ├── moxjs.app.json       # App manifest: name, type, port, exposes
-│   │   ├── moxjs.federation.json# Generated by 'moxjs federation'
+│   │   │   └── jorvel.routes.ts  # Auto-generated by 'jorvel routes'
+│   │   ├── jorvel.app.json       # App manifest: name, type, port, exposes
+│   │   ├── jorvel.federation.json# Generated by 'jorvel federation'
 │   │   └── rspack.config.mjs   # Rspack + ModuleFederationPlugin
 │   └── dashboard/              # Remote — owns "/dashboard/*"
 │       └── src/
 │           ├── remote.tsx      # Exposed entry point (./App)
-│           └── pages/          # File-based routes scanned by 'moxjs routes'
+│           └── pages/          # File-based routes scanned by 'jorvel routes'
 ├── libs/                       # Shared libraries (contracts, ui-kit, etc.)
-├── moxjs.config.ts              # Workspace config: federation, security, deploy
+├── jorvel.config.ts              # Workspace config: federation, security, deploy
 ├── pnpm-workspace.yaml         # pnpm workspace declaration
 ├── tsconfig.base.json          # Strict TS settings shared by every app
 └── .github/workflows/          # CI: typecheck / lint / test / build`}
@@ -237,7 +237,7 @@ export default function GettingStarted() {
         <Step title="4. Federation loads the remote">
           <p className="mt-2">
             Rspack&apos;s <code>ModuleFederationPlugin</code> fetches{' '}
-            <code>/moxjs/remotes/dashboard/remoteEntry.js</code> (proxied to{' '}
+            <code>/jorvel/remotes/dashboard/remoteEntry.js</code> (proxied to{' '}
             <code>http://localhost:3001</code> by <code>--proxy-remotes</code>), bridges the React
             share scope, and resolves <code>./App</code>.
           </p>
@@ -245,7 +245,7 @@ export default function GettingStarted() {
         <Step title="5. Remote renders its sub-route">
           <p className="mt-2">
             <code>&lt;RemoteApp subpath=&quot;/settings&quot; pages={'{pages}'} /&gt;</code> matches{' '}
-            <code>settings.tsx</code> from the generated <code>moxjs.routes.ts</code>, lazy-imports
+            <code>settings.tsx</code> from the generated <code>jorvel.routes.ts</code>, lazy-imports
             the chunk, and renders the page.
           </p>
         </Step>
@@ -256,30 +256,30 @@ export default function GettingStarted() {
       <CodeBlock
         language="bash"
         code={`# Develop
-moxjs dev --proxy-remotes --hmr-remotes          # most common
-moxjs routes --watch                              # in a second terminal, per remote
+jorvel dev --proxy-remotes --hmr-remotes          # most common
+jorvel routes --watch                              # in a second terminal, per remote
 
 # Verify before pushing
-moxjs typecheck                                   # tsc --noEmit per package
-moxjs lint                                        # ESLint workspace-wide
-moxjs test                                        # Vitest, parallel
-moxjs perf                                        # bundle-size budgets
-moxjs diagnose                                    # env, ports, configs
+jorvel typecheck                                   # tsc --noEmit per package
+jorvel lint                                        # ESLint workspace-wide
+jorvel test                                        # Vitest, parallel
+jorvel perf                                        # bundle-size budgets
+jorvel diagnose                                    # env, ports, configs
 
 # Ship
-moxjs build                                       # all apps, host first
-moxjs build --app dashboard --compress            # one app + gz/br
-moxjs deploy --target vercel                      # writes vercel.json`}
+jorvel build                                       # all apps, host first
+jorvel build --app dashboard --compress            # one app + gz/br
+jorvel deploy --target vercel                      # writes vercel.json`}
       />
 
       <h2 id="first-issue">If something breaks</h2>
       <ol>
         <li>
-          Run <code>moxjs diagnose</code>. It checks Node, pnpm, Rspack versions, ports in use,
+          Run <code>jorvel diagnose</code>. It checks Node, pnpm, Rspack versions, ports in use,
           generated federation configs, and React duplication risks.
         </li>
         <li>
-          Set <code>MOXJS_DEBUG=1</code> in your shell to surface full stack traces from CLI errors.
+          Set <code>JORVEL_DEBUG=1</code> in your shell to surface full stack traces from CLI errors.
         </li>
         <li>
           See <Link href="/docs/troubleshooting">Troubleshooting</Link> for the most-hit issues
@@ -315,7 +315,7 @@ moxjs deploy --target vercel                      # writes vercel.json`}
       <p className="text-sm text-muted-foreground">
         <CheckIcon className="mr-1 inline h-4 w-4 text-emerald-500" /> Made it through the
         quickstart? Star the repo on{' '}
-        <a href="https://github.com/Ravikisha/MFJS" target="_blank" rel="noopener noreferrer">
+        <a href="https://github.com/Ravikisha/JorvelJS" target="_blank" rel="noopener noreferrer">
           GitHub
         </a>
         .

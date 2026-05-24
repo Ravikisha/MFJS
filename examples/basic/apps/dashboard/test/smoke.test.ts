@@ -3,7 +3,7 @@ import {
   loadRemoteModule,
   resolveRemotePage,
   type RemotePageRoute,
-} from '@moxjs/runtime';
+} from '@jorvel/runtime';
 
 const mockPages: RemotePageRoute[] = [
   { path: '/users/:id', load: async () => ({ default: () => null }) },
@@ -12,11 +12,11 @@ const mockPages: RemotePageRoute[] = [
 ];
 
 describe('dashboard example app — routing', () => {
-  it('loadRemoteModule is exported from @moxjs/runtime', () => {
+  it('loadRemoteModule is exported from @jorvel/runtime', () => {
     expect(typeof loadRemoteModule).toBe('function');
   });
 
-  it('resolveRemotePage is exported from @moxjs/runtime', () => {
+  it('resolveRemotePage is exported from @jorvel/runtime', () => {
     expect(typeof resolveRemotePage).toBe('function');
   });
 

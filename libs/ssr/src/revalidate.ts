@@ -77,7 +77,7 @@ export async function revalidateStaticPages(
   const now = opts.now ?? Date.now;
   const manifestPath = opts.manifestPath ?? opts.manifestFile;
   if (!manifestPath) {
-    throw new Error('[moxjs/ssr] revalidateStaticPages: `manifestPath` (or `manifestFile`) is required');
+    throw new Error('[jorvel/ssr] revalidateStaticPages: `manifestPath` (or `manifestFile`) is required');
   }
   const resolved = resolveManifestPath(opts.outDir, manifestPath);
 

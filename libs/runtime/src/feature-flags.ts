@@ -111,7 +111,7 @@ export class InMemoryFlags implements FeatureFlagAdapter {
 
 /**
  * Wrap a vendor SDK client into `FeatureFlagAdapter`. We use a *duck-typed*
- * `client` so MOXJS doesn't take a hard dependency on any vendor package.
+ * `client` so JORVEL doesn't take a hard dependency on any vendor package.
  *
  * Expected duck:
  *   - `variation(flag, ctx?, defaultValue?)` returning any
@@ -125,7 +125,7 @@ export interface VendorClientLike {
 }
 
 export interface FromVendorOptions {
-  /** Convert MOXJS context to whatever the SDK expects (e.g. `{ kind: 'user', key }`). */
+  /** Convert JORVEL context to whatever the SDK expects (e.g. `{ kind: 'user', key }`). */
   toClientContext?: (ctx: FlagContext | undefined) => unknown;
 }
 
@@ -149,7 +149,7 @@ export function fromVendor(
 
 // ── globalThis-pinned singleton (matches the rest of the runtime) ─────────
 
-const KEY = '__MOXJS_FEATURE_FLAGS__';
+const KEY = '__JORVEL_FEATURE_FLAGS__';
 type GlobalWithFlags = typeof globalThis & { [KEY]?: FeatureFlagAdapter };
 
 export function setFeatureFlags(adapter: FeatureFlagAdapter): void {

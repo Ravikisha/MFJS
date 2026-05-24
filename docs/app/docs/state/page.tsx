@@ -13,7 +13,7 @@ export default function StateDoc() {
       <h1>State &amp; event bus</h1>
       <p>
         Two primitives cover almost every cross-remote communication pattern: a typed event bus
-        (<code>@moxjs/event-bus</code>) and a singleton store registry (<code>@moxjs/state</code>).
+        (<code>@jorvel/event-bus</code>) and a singleton store registry (<code>@jorvel/state</code>).
         Both are pinned to <code>globalThis</code> so duplicate bundles still observe the same
         instance — the federation share-scope is the fast path, <code>globalThis</code> is the
         safety net.
@@ -42,7 +42,7 @@ export default function StateDoc() {
       <h2 id="event-bus">Event bus</h2>
       <CodeBlock
         language="ts"
-        code={`import { getEventBus } from '@moxjs/event-bus';
+        code={`import { getEventBus } from '@jorvel/event-bus';
 
 interface Events {
   'user:login':    { userId: string };
@@ -75,7 +75,7 @@ bus.clear();                   // wipe everything (tests)`}
       />
 
       <p>
-        <code>bus</code> is a singleton — any remote that imports <code>@moxjs/event-bus</code>{' '}
+        <code>bus</code> is a singleton — any remote that imports <code>@jorvel/event-bus</code>{' '}
         shares the same instance because the package is declared as a singleton in federation
         config. A handler that throws is caught (<code>errorHandler</code>) so a single bad
         subscriber cannot abort delivery to the rest.
@@ -84,7 +84,7 @@ bus.clear();                   // wipe everything (tests)`}
       <h2>Simple store</h2>
       <CodeBlock
         language="ts"
-        code={`import { getSimpleStore } from '@moxjs/state';
+        code={`import { getSimpleStore } from '@jorvel/state';
 
 const auth = getSimpleStore<{ user: User | null }>('auth', { user: null });
 auth.subscribe((s) => render(s));
@@ -94,7 +94,7 @@ auth.set({ user: { id: '1', email: 'x@y.z' } });`}
       <h2>Redux-style store</h2>
       <CodeBlock
         language="ts"
-        code={`import { getStore } from '@moxjs/state';
+        code={`import { getStore } from '@jorvel/state';
 
 type State = { count: number };
 type Action = { type: 'inc' } | { type: 'set'; value: number };
@@ -118,7 +118,7 @@ store.dispatch({ type: 'inc' });`}
       </p>
       <CodeBlock
         language="ts"
-        code={`import { createSelector, createStructuredSelector, shallowEqual, createSelectorWith } from '@moxjs/state';
+        code={`import { createSelector, createStructuredSelector, shallowEqual, createSelectorWith } from '@jorvel/state';
 
 const selectUser = (s: AppState) => s.user;
 const selectCart = (s: AppState) => s.cart;
@@ -158,7 +158,7 @@ const selectHeader = createStructuredSelector({
   thunkMiddleware,
   loggerMiddleware,
   persistenceMiddleware,
-} from '@moxjs/state';
+} from '@jorvel/state';
 
 const store = createStoreWithMiddleware(
   { user: null, count: 0 },
@@ -188,7 +188,7 @@ store.dispatch(({ dispatch }) => {
       </p>
       <CodeBlock
         language="ts"
-        code={`import { getEventBus, attachSchemaRegistry } from '@moxjs/event-bus';
+        code={`import { getEventBus, attachSchemaRegistry } from '@jorvel/event-bus';
 import { z } from 'zod';
 
 interface Events {
@@ -219,7 +219,7 @@ bus.emit('cart:add', { qty: 1 } as never);        // throws — sku missing`}
   isFeatureEnabled,
   featureVariation,
   fromVendor,
-} from '@moxjs/runtime';
+} from '@jorvel/runtime';
 
 // Local / tests
 setFeatureFlags(new InMemoryFlags({
@@ -244,10 +244,10 @@ const theme = featureVariation('theme', 'light', { userId: user.id });`}
       </p>
       <CodeBlock
         language="ts"
-        code={`import { connectBroadcast } from '@moxjs/event-bus';
+        code={`import { connectBroadcast } from '@jorvel/event-bus';
 
 const conn = connectBroadcast(bus, {
-  channelName: 'moxjs:cart',
+  channelName: 'jorvel:cart',
   filter: (event) => event !== 'cart:internal',   // keep some events tab-local
 });
 
@@ -264,8 +264,8 @@ conn.disconnect();`}
       <CodeBlock
         language="ts"
         code={`// server.ts
-import { serializeState } from '@moxjs/ssr';
-import { buildCsp, generateNonce } from '@moxjs/security';
+import { serializeState } from '@jorvel/ssr';
+import { buildCsp, generateNonce } from '@jorvel/security';
 
 const nonce = generateNonce();
 const initial = await loadInitialState(request);
@@ -275,7 +275,7 @@ response.setHeader('Content-Security-Policy', buildCsp({ nonce }));
 const html = baseHtml.replace('</head>', head + '</head>');
 
 // bootstrap.tsx
-import { hydrateState, clearHydratedState } from '@moxjs/ssr';
+import { hydrateState, clearHydratedState } from '@jorvel/ssr';
 
 const state = hydrateState<InitialState>('app');
 if (state) primeStore(state);
@@ -288,8 +288,8 @@ clearHydratedState('app');   // free the <script> tag once consumed`}
       <CodeBlock
         language="ts"
         filename="libs/auth-store/src/index.ts"
-        code={`import { getSimpleStore } from '@moxjs/state';
-import { getEventBus } from '@moxjs/event-bus';
+        code={`import { getSimpleStore } from '@jorvel/state';
+import { getEventBus } from '@jorvel/event-bus';
 
 export interface Session { userId: string; roles: string[] }
 
@@ -303,7 +303,7 @@ sessionStore.subscribe((s) => bus.emit('auth:session', s));`}
       <h3>Time-travel debugging in dev</h3>
       <CodeBlock
         language="ts"
-        code={`import { getStore } from '@moxjs/state';
+        code={`import { getStore } from '@jorvel/state';
 
 const counter = getStore('counter', { count: 0 }, reducer);
 
@@ -317,8 +317,8 @@ if (process.env.NODE_ENV !== 'production') {
       <h3>Resetting between tests</h3>
       <CodeBlock
         language="ts"
-        code={`import { _resetStore, _resetSimpleStore } from '@moxjs/state';
-import { _resetEventBus } from '@moxjs/event-bus';
+        code={`import { _resetStore, _resetSimpleStore } from '@jorvel/state';
+import { _resetEventBus } from '@jorvel/event-bus';
 
 afterEach(() => {
   _resetStore();

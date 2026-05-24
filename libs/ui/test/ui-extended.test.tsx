@@ -5,12 +5,12 @@ import { Button, ThemeProvider, defaultTheme, useTheme } from '../src/index.js';
 describe('Button — variants and sizes', () => {
   it('primary variant emits primary background var', () => {
     const html = renderToStaticMarkup(<Button variant="primary">x</Button>);
-    expect(html).toContain('--moxjs-color-primary');
+    expect(html).toContain('--jorvel-color-primary');
   });
 
   it('secondary variant emits border', () => {
     const html = renderToStaticMarkup(<Button variant="secondary">x</Button>);
-    expect(html).toContain('--moxjs-color-border');
+    expect(html).toContain('--jorvel-color-border');
   });
 
   it('ghost variant has transparent background', () => {

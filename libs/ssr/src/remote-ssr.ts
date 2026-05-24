@@ -1,5 +1,5 @@
 /**
- * @moxjs/ssr — remote SSR compatibility helpers
+ * @jorvel/ssr — remote SSR compatibility helpers
  *
  * Federated remotes are typically loaded at runtime via dynamic import
  * (`import('dashboard/App')`). During SSR, that import will succeed only if
@@ -11,7 +11,7 @@
 
 import { createElement } from 'react';
 import { renderToString as reactRenderToString, renderToStaticMarkup } from 'react-dom/server';
-import { escapeHtml, isSafePathname } from '@moxjs/security';
+import { escapeHtml, isSafePathname } from '@jorvel/security';
 import type { ComponentType } from 'react';
 import type { SsrRenderResult } from './types.js';
 

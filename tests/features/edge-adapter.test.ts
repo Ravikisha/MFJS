@@ -24,12 +24,12 @@ function makeRequest(url: string, method = 'GET', headers: Record<string, string
 }
 
 describe('createEdgeAdapter', () => {
-  it('returns 200 + content-type + x-moxjs-ssr', async () => {
+  it('returns 200 + content-type + x-jorvel-ssr', async () => {
     const handler = createEdgeAdapter({ App, template: TEMPLATE, routes: [{ path: '/' }] });
     const res = await handler(makeRequest('https://example.test/'));
     expect(res.status).toBe(200);
     expect(res.headers['content-type']).toMatch(/text\/html/);
-    expect(res.headers['x-moxjs-ssr']).toBe('1');
+    expect(res.headers['x-jorvel-ssr']).toBe('1');
   });
 
   it('responds to OPTIONS with allow header', async () => {

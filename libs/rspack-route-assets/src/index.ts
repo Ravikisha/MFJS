@@ -3,11 +3,11 @@ import { mkdir, writeFile } from 'node:fs/promises';
 
 export type RouteAssetsMap = Record<string, string[]>;
 
-export type MoxjsRouteAssetsPluginOptions = {
+export type JorvelRouteAssetsPluginOptions = {
   /** Route -> entry name (as used in bundler "entry" field). */
   routeEntries: Record<string, string>;
 
-  /** Where to write a minimal JSON file containing `{ moxjs: { routeAssets } }`. */
+  /** Where to write a minimal JSON file containing `{ jorvel: { routeAssets } }`. */
   outFile?: string;
 
   /** The stats filename (relative to output.path) to write assets to. Default: "stats.json". */
@@ -44,19 +44,19 @@ export function createRouteAssetsFromEntrypoints(args: {
   return out;
 }
 
-export function moxjsRspackRouteAssetsPlugin(options: MoxjsRouteAssetsPluginOptions) {
+export function jorvelRspackRouteAssetsPlugin(options: JorvelRouteAssetsPluginOptions) {
   const outPath = options.outFile;
   const statsFile = options.statsFile ?? 'stats.json';
   const emitAsset = options.emitAsset ?? true;
 
   return {
-    name: 'moxjs-rspack-route-assets',
+    name: 'jorvel-rspack-route-assets',
 
     apply(compiler: any) {
-      compiler.hooks?.thisCompilation?.tap('moxjs-rspack-route-assets', (compilation: any) => {
+      compiler.hooks?.thisCompilation?.tap('jorvel-rspack-route-assets', (compilation: any) => {
         compilation.hooks?.processAssets?.tapPromise(
           {
-            name: 'moxjs-rspack-route-assets',
+            name: 'jorvel-rspack-route-assets',
             // Use string stage to avoid importing rspack/webpack types.
             stage: (compiler.webpack?.Compilation?.PROCESS_ASSETS_STAGE_SUMMARIZE ?? 1000) as any,
           },
@@ -76,7 +76,7 @@ export function moxjsRspackRouteAssetsPlugin(options: MoxjsRouteAssetsPluginOpti
               routeEntries: options.routeEntries,
             });
 
-            const payload = JSON.stringify({ moxjs: { routeAssets } }, null, 2);
+            const payload = JSON.stringify({ jorvel: { routeAssets } }, null, 2);
 
             if (emitAsset && compilation.emitAsset) {
               const RawSource = compiler.webpack?.sources?.RawSource;

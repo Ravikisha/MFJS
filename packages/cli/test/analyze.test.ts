@@ -8,7 +8,7 @@ import { analyzeCommand, runAnalyze } from '../src/commands/analyze.js';
 async function makeApp(tmp: string, appName: string, files: Record<string, string | number> = {}): Promise<string> {
   const dir = path.join(tmp, 'apps', appName);
   await fs.ensureDir(dir);
-  await fs.writeJson(path.join(dir, 'moxjs.app.json'), { name: appName });
+  await fs.writeJson(path.join(dir, 'jorvel.app.json'), { name: appName });
   // Optional dist files
   const distDir = path.join(dir, 'dist');
   await fs.ensureDir(distDir);
@@ -23,32 +23,32 @@ afterEach(() => vi.restoreAllMocks());
 
 describe('runAnalyze (programmatic)', () => {
   it('throws when apps/ missing', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-analyze-'));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-analyze-'));
     await expect(runAnalyze({ cwd: tmp })).rejects.toThrow(/apps\/ directory missing/);
   });
 
   it('throws when target --app missing', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-analyze-'));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-analyze-'));
     await fs.ensureDir(path.join(tmp, 'apps'));
     await expect(runAnalyze({ cwd: tmp, app: 'shell' })).rejects.toThrow(/missing apps\/shell/);
   });
 
   it('requires --app when multiple apps detected', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-analyze-'));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-analyze-'));
     await makeApp(tmp, 'shell');
     await makeApp(tmp, 'dashboard');
     await expect(runAnalyze({ cwd: tmp })).rejects.toThrow(/multiple apps detected/);
   });
 
   it('auto-selects the only app', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-analyze-'));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-analyze-'));
     await makeApp(tmp, 'shell');
     const r = await runAnalyze({ cwd: tmp });
     expect(r.app).toBe('shell');
   });
 
   it('writes fallback analyze.html with sorted asset table', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-analyze-'));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-analyze-'));
     const appDir = await makeApp(tmp, 'shell', {
       'small.js': 100,
       'big.js': 5000,
@@ -69,7 +69,7 @@ describe('runAnalyze (programmatic)', () => {
   });
 
   it('--dry-run skips report write but returns path', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-analyze-'));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-analyze-'));
     const appDir = await makeApp(tmp, 'shell');
     const r = await runAnalyze({ cwd: tmp, dryRun: true });
     expect(r.reportPath).toBe(path.join(appDir, 'analyze', 'analyze.html'));
@@ -77,7 +77,7 @@ describe('runAnalyze (programmatic)', () => {
   });
 
   it('--tool rsdoctor returns the rsdoctor pnpm dlx command', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-analyze-'));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-analyze-'));
     await makeApp(tmp, 'shell');
     const r = await runAnalyze({ cwd: tmp, tool: 'rsdoctor' });
     expect(r.tool).toBe('rsdoctor');
@@ -86,7 +86,7 @@ describe('runAnalyze (programmatic)', () => {
   });
 
   it('--tool analyzer returns rspack-bundle-analyzer command', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-analyze-'));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-analyze-'));
     await makeApp(tmp, 'shell');
     const r = await runAnalyze({ cwd: tmp, tool: 'analyzer' });
     expect(r.tool).toBe('analyzer');
@@ -94,7 +94,7 @@ describe('runAnalyze (programmatic)', () => {
   });
 
   it('--out overrides the report directory', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-analyze-'));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-analyze-'));
     await makeApp(tmp, 'shell');
     const customOut = path.join(tmp, 'reports', 'shell');
     const r = await runAnalyze({ cwd: tmp, out: customOut });
@@ -105,7 +105,7 @@ describe('runAnalyze (programmatic)', () => {
 
 describe('analyzeCommand (CLI surface)', () => {
   it('runs via parseAsync against a single-app workspace', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-analyze-'));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-analyze-'));
     await makeApp(tmp, 'shell', { 'app.js': 1024 });
     analyzeCommand.exitOverride();
     vi.spyOn(console, 'log').mockImplementation(() => {});
@@ -114,7 +114,7 @@ describe('analyzeCommand (CLI surface)', () => {
   });
 
   it('exits 1 on missing apps directory', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-analyze-'));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-analyze-'));
     analyzeCommand.exitOverride();
     const exitSpy = vi.spyOn(process, 'exit').mockImplementation((code) => {
       throw new Error(`__exit__:${code ?? 0}`);

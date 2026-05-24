@@ -2,7 +2,7 @@ import { CodeBlock } from '@/components/site/code-block';
 import { Callout } from '@/components/docs/callout';
 
 export const metadata = {
-  title: '@moxjs/ssr API',
+  title: '@jorvel/ssr API',
   description:
     'Render to string/stream, static export, edge adapter, request context, redirects, state hydration, preload links, cache headers, loaders, fragments.',
 };
@@ -10,17 +10,17 @@ export const metadata = {
 export default function SsrApi() {
   return (
     <>
-      <h1>@moxjs/ssr</h1>
+      <h1>@jorvel/ssr</h1>
       <p>
-        Server-rendering toolkit for MOXJS. Framework-agnostic — you pass your React App, your
+        Server-rendering toolkit for JORVEL. Framework-agnostic — you pass your React App, your
         routes table, and an HTML template; the package handles streaming, caching, and the
         Suspense → HTTP-status bridge.
       </p>
 
       <Callout variant="info" title="Entry points">
-        Node deployments import from <code>@moxjs/ssr</code> (re-exports{' '}
-        <code>@moxjs/ssr/node</code>). Cloudflare Workers, Vercel Edge, and Deno Deploy import from{' '}
-        <code>@moxjs/ssr/edge</code> — that bundle excludes <code>node:stream</code> and{' '}
+        Node deployments import from <code>@jorvel/ssr</code> (re-exports{' '}
+        <code>@jorvel/ssr/node</code>). Cloudflare Workers, Vercel Edge, and Deno Deploy import from{' '}
+        <code>@jorvel/ssr/edge</code> — that bundle excludes <code>node:stream</code> and{' '}
         <code>node:fs/promises</code> so it loads cleanly under non-Node runtimes.
       </Callout>
 
@@ -173,7 +173,7 @@ requireLoaderData<T>(): T;`}
       <CodeBlock
         language="tsx"
         filename="apps/dashboard/src/pages/users/[id].tsx"
-        code={`import { defineLoader, useLoaderData } from '@moxjs/ssr';
+        code={`import { defineLoader, useLoaderData } from '@jorvel/ssr';
 
 export const loader = defineLoader(async ({ params }) => {
   const user = await db.user.findUnique({ where: { id: params.id } });

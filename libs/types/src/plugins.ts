@@ -1,35 +1,35 @@
 /**
- * @moxjs/types — Plugin system (phase-0 foundation).
+ * @jorvel/types — Plugin system (phase-0 foundation).
  *
  * The goal is to formalize extension points without committing to a complex
  * plugin runtime yet.
  */
 
 import type { FederationConfig } from './federation-config.js';
-import type { MoxjsWorkspaceConfig } from './moxjs-config.js';
+import type { JorvelWorkspaceConfig } from './jorvel-config.js';
 
-export type MoxjsAppMeta = {
+export type JorvelAppMeta = {
   name: string;
   type: 'host' | 'remote';
   port: number;
   dir: string;
 };
 
-export type MoxjsDevPlan = {
+export type JorvelDevPlan = {
   workspaceDir: string;
-  apps: MoxjsAppMeta[];
-  host?: MoxjsAppMeta;
-  remotes: MoxjsAppMeta[];
+  apps: JorvelAppMeta[];
+  host?: JorvelAppMeta;
+  remotes: JorvelAppMeta[];
   mode: 'parallel' | 'on-demand';
   proxyRemotes: boolean;
   hmrRemotes: boolean;
 };
 
-export type MoxjsPlugin = {
+export type JorvelPlugin = {
   name: string;
 
   /** Inspect/modify resolved workspace config before commands run. */
-  configResolved?: (cfg: MoxjsWorkspaceConfig) => MoxjsWorkspaceConfig | void | Promise<MoxjsWorkspaceConfig | void>;
+  configResolved?: (cfg: JorvelWorkspaceConfig) => JorvelWorkspaceConfig | void | Promise<JorvelWorkspaceConfig | void>;
 
   /**
    * Inspect/modify the federation config right before it is written.
@@ -38,17 +38,17 @@ export type MoxjsPlugin = {
    */
   federationConfig?: (args: {
     workspaceDir: string;
-    app: MoxjsAppMeta;
+    app: JorvelAppMeta;
     config: FederationConfig;
   }) => FederationConfig | void | Promise<FederationConfig | void>;
 
   /** Inspect/modify the computed dev plan. */
-  devPlan?: (plan: MoxjsDevPlan) => MoxjsDevPlan | void | Promise<MoxjsDevPlan | void>;
+  devPlan?: (plan: JorvelDevPlan) => JorvelDevPlan | void | Promise<JorvelDevPlan | void>;
 };
 
 type PluginHookValue = {
-  configResolved: MoxjsWorkspaceConfig;
-  devPlan: MoxjsDevPlan;
+  configResolved: JorvelWorkspaceConfig;
+  devPlan: JorvelDevPlan;
 };
 
 /**
@@ -58,7 +58,7 @@ type PluginHookValue = {
  */
 export async function applyPlugins<H extends 'configResolved' | 'devPlan'>(
   value: PluginHookValue[H],
-  plugins: MoxjsPlugin[],
+  plugins: JorvelPlugin[],
   hook: H,
 ): Promise<PluginHookValue[H]> {
   let out = value;
@@ -75,8 +75,8 @@ export async function applyPlugins<H extends 'configResolved' | 'devPlan'>(
  * Apply the federation hook for a specific app.
  */
 export async function applyFederationConfigPlugins(
-  args: { workspaceDir: string; app: MoxjsAppMeta; config: FederationConfig },
-  plugins: MoxjsPlugin[],
+  args: { workspaceDir: string; app: JorvelAppMeta; config: FederationConfig },
+  plugins: JorvelPlugin[],
 ): Promise<FederationConfig> {
   let cfg = args.config;
   for (const p of plugins) {

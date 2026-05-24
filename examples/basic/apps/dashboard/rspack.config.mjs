@@ -2,7 +2,7 @@ import { rspack } from '@rspack/core';
 import path from 'node:path';
 import fs from 'node:fs';
 
-const federationPath = path.join(process.cwd(), 'moxjs.federation.json');
+const federationPath = path.join(process.cwd(), 'jorvel.federation.json');
 const federation = fs.existsSync(federationPath)
   ? JSON.parse(fs.readFileSync(federationPath, 'utf8'))
   : null;
@@ -18,16 +18,16 @@ const sharedWithReactEager = federation?.shared
       ...(federation.shared['react-dom'] || {}),
       singleton: true,
     },
-    '@moxjs/event-bus': {
-      ...(federation.shared['@moxjs/event-bus'] || {}),
+    '@jorvel/event-bus': {
+      ...(federation.shared['@jorvel/event-bus'] || {}),
       singleton: true,
     },
-    '@moxjs/runtime': {
-      ...(federation.shared['@moxjs/runtime'] || {}),
+    '@jorvel/runtime': {
+      ...(federation.shared['@jorvel/runtime'] || {}),
       singleton: true,
     },
-    '@moxjs/state': {
-      ...(federation.shared['@moxjs/state'] || {}),
+    '@jorvel/state': {
+      ...(federation.shared['@jorvel/state'] || {}),
       singleton: true,
     },
   }

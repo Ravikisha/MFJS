@@ -31,10 +31,10 @@ export default function Prefetch() {
       </p>
       <CodeBlock
         language="tsx"
-        code={`import { NavLink, NavLinkPrefetchProvider } from '@moxjs/runtime';
+        code={`import { NavLink, NavLinkPrefetchProvider } from '@jorvel/runtime';
 
 const REMOTES = {
-  dashboard: { name: 'dashboard', entryUrl: '/moxjs/remotes/dashboard/remoteEntry.js' },
+  dashboard: { name: 'dashboard', entryUrl: '/jorvel/remotes/dashboard/remoteEntry.js' },
 };
 
 const HOST_ROUTES = [
@@ -68,7 +68,7 @@ const HOST_ROUTES = [
       </p>
       <CodeBlock
         language="ts"
-        code={`import { prefetchRoute } from '@moxjs/runtime';
+        code={`import { prefetchRoute } from '@jorvel/runtime';
 
 await prefetchRoute('/dashboard/reports', { routes: HOST_ROUTES, remotes: REMOTES });`}
       />
@@ -87,7 +87,7 @@ await prefetchRoute('/dashboard/reports', { routes: HOST_ROUTES, remotes: REMOTE
           the eventual real load, so the navigation pays only the React-render cost.
         </li>
         <li>
-          Emits <code>moxjs:remote-load</code> telemetry with <code>{`{ source: 'prefetch' }`}</code>{' '}
+          Emits <code>jorvel:remote-load</code> telemetry with <code>{`{ source: 'prefetch' }`}</code>{' '}
           so observability dashboards can separate proactive loads from on-demand.
         </li>
         <li>
@@ -130,7 +130,7 @@ await prefetchRoute('/dashboard/reports', { routes: HOST_ROUTES, remotes: REMOTE
       </p>
       <CodeBlock
         language="ts"
-        code={`import { resetPrefetchCache } from '@moxjs/runtime';
+        code={`import { resetPrefetchCache } from '@jorvel/runtime';
 
 bus.on('auth:logout', resetPrefetchCache);   // force re-fetch with new auth headers`}
       />
@@ -175,7 +175,7 @@ bus.on('auth:logout', resetPrefetchCache);   // force re-fetch with new auth hea
       <h3>Prefetch after auth completes</h3>
       <CodeBlock
         language="ts"
-        code={`import { prefetchRoute } from '@moxjs/runtime';
+        code={`import { prefetchRoute } from '@jorvel/runtime';
 import { bus } from './bus';
 
 bus.on('auth:ready', () => {

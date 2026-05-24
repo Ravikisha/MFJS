@@ -16,7 +16,7 @@ describe('deprecate', () => {
     deprecate('oldThing', { sink });
     deprecate('oldThing', { sink });
     expect(sink).toHaveBeenCalledTimes(1);
-    expect(sink).toHaveBeenCalledWith('[moxjs] DEPRECATION: oldThing');
+    expect(sink).toHaveBeenCalledWith('[jorvel] DEPRECATION: oldThing');
   });
 
   it('different keys log independently', () => {
@@ -51,7 +51,7 @@ describe('deprecate', () => {
   it('uses console.warn by default', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     deprecate('default-sink');
-    expect(warn).toHaveBeenCalledWith('[moxjs] DEPRECATION: default-sink');
+    expect(warn).toHaveBeenCalledWith('[jorvel] DEPRECATION: default-sink');
   });
 });
 

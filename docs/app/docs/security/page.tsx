@@ -17,7 +17,7 @@ export default function SecurityPage() {
       </Badge>
       <h1>Security</h1>
       <p>
-        <code>@moxjs/security</code> packages the primitives federated apps actually need: a CSP
+        <code>@jorvel/security</code> packages the primitives federated apps actually need: a CSP
         builder with <code>strict-dynamic</code>, SRI hashing for <code>remoteEntry.js</code>, an
         origin allowlist with wildcard support, base64url-validated nonces, and helpers for safe
         hydration. Every primitive is edge-runtime safe (Web Crypto, no <code>Buffer</code>, no{' '}
@@ -32,7 +32,7 @@ export default function SecurityPage() {
 
       <CodeBlock
         language="ts"
-        code={`import { buildCsp } from '@moxjs/security';
+        code={`import { buildCsp } from '@jorvel/security';
 
 const policy = buildCsp({
   nonce: cryptoRandomNonce(),       // base64url
@@ -59,7 +59,7 @@ const policy = buildCsp({
       </p>
       <CodeBlock
         language="ts"
-        code={`import { cspMiddleware } from '@moxjs/security';
+        code={`import { cspMiddleware } from '@jorvel/security';
 
 app.use(cspMiddleware({
   remotes: ['https://cdn.example.com'],
@@ -84,7 +84,7 @@ app.get('/', (_req, res) => {
       </p>
       <CodeBlock
         language="ts"
-        code={`import { createRateLimitGuard } from '@moxjs/security';
+        code={`import { createRateLimitGuard } from '@jorvel/security';
 
 const guard = createRateLimitGuard({
   capacity: 60,             // burst
@@ -116,7 +116,7 @@ export default async function fetch(req) {
       </p>
       <CodeBlock
         language="ts"
-        code={`import { AuditLogger, bufferSink } from '@moxjs/security';
+        code={`import { AuditLogger, bufferSink } from '@jorvel/security';
 
 const buf = bufferSink();
 const audit = new AuditLogger({ sinks: [buf.sink], redactKeys: ['ssn'] });
@@ -146,7 +146,7 @@ await audit.denied({
 
       <CodeBlock
         language="ts"
-        code={`import { sriHashFromUrl } from '@moxjs/security';
+        code={`import { sriHashFromUrl } from '@jorvel/security';
 
 const integrity = await sriHashFromUrl(
   'https://cdn.acme.com/dashboard/remoteEntry.js',
@@ -167,7 +167,7 @@ const integrity = await sriHashFromUrl(
 
       <CodeBlock
         language="ts"
-        code={`import { computeSriForManifest, injectSriIntoHtml } from '@moxjs/security';
+        code={`import { computeSriForManifest, injectSriIntoHtml } from '@jorvel/security';
 
 const { entries, failures } = await computeSriForManifest(
   manifest.map((m) => ({ name: m.name, entryUrl: m.entryUrl })),
@@ -190,7 +190,7 @@ const html = injectSriIntoHtml(template, entries, { match: 'basename' });`}
 
       <CodeBlock
         language="ts"
-        code={`import { buildSandboxIframeAttrs, createSandboxBridge } from '@moxjs/security';
+        code={`import { buildSandboxIframeAttrs, createSandboxBridge } from '@jorvel/security';
 
 const attrs = buildSandboxIframeAttrs({
   src: 'https://untrusted.example.com/remote.html',
@@ -222,7 +222,7 @@ const result = await bridge.request('search', { q: 'react' }, 2_000);`}
   generatePkceChallenge, buildAuthorizeUrl,
   parseAuthorizationResponse, exchangeCodeForTokens,
   refreshTokens, TokenStore, tokenSetFromResponse,
-} from '@moxjs/security';
+} from '@jorvel/security';
 
 // 1. login start
 const pkce = await generatePkceChallenge();
@@ -263,7 +263,7 @@ fetch('/api/me', { headers: { authorization: \`Bearer \${await store.getAccessTo
       <h2 id="allowlist">Origin allowlist</h2>
       <CodeBlock
         language="ts"
-        code={`import { RemoteAllowlist } from '@moxjs/security';
+        code={`import { RemoteAllowlist } from '@jorvel/security';
 
 const list = new RemoteAllowlist([
   'https://*.acme.com',
@@ -302,10 +302,10 @@ list.allows('https://acme.com/x.js');             // false (single-label needs s
       <h2 id="safe-json">Safe state hydration</h2>
       <CodeBlock
         language="ts"
-        code={`import { safeJsonForScript, escapeHtml, pruneProtoKeys } from '@moxjs/security';
+        code={`import { safeJsonForScript, escapeHtml, pruneProtoKeys } from '@jorvel/security';
 
 const head = \`
-  <script id="__moxjs_state" type="application/json" nonce="\${nonce}">
+  <script id="__jorvel_state" type="application/json" nonce="\${nonce}">
     \${safeJsonForScript({ user, flags })}
   </script>
 \`;
@@ -326,7 +326,7 @@ const safe = pruneProtoKeys(JSON.parse(rawConfig));`}
 
       <h2 id="threat-model">Threat model</h2>
       <p>
-        Federation surfaces three threat classes. Each MOXJS primitive maps to one of them.
+        Federation surfaces three threat classes. Each JORVEL primitive maps to one of them.
       </p>
       <table>
         <thead>
@@ -375,8 +375,8 @@ const safe = pruneProtoKeys(JSON.parse(rawConfig));`}
       <CodeBlock
         language="ts"
         filename="edge/handler.ts"
-        code={`import { buildCsp, generateNonce, RemoteAllowlist } from '@moxjs/security';
-import { createEdgeAdapter, LruHtmlCache } from '@moxjs/ssr/edge';
+        code={`import { buildCsp, generateNonce, RemoteAllowlist } from '@jorvel/security';
+import { createEdgeAdapter, LruHtmlCache } from '@jorvel/ssr/edge';
 
 const allow = new RemoteAllowlist(['https://*.cdn.acme.com']);
 

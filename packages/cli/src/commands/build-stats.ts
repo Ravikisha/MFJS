@@ -1,5 +1,5 @@
 /**
- * `moxjs build --stats` — JSON summary of the workspace post-build.
+ * `jorvel build --stats` — JSON summary of the workspace post-build.
  *
  * Combines per-app metadata + asset sizes + federation share scope into a
  * single document. The host-wide section flags shared-dep version conflicts
@@ -19,7 +19,7 @@ export interface AppStats {
   assets: Array<{ file: string; bytes: number }>;
   /** `remoteEntry.js` size if present (only for remotes). */
   remoteEntryBytes?: number;
-  /** Shared deps + versions parsed from `moxjs.federation.json`. */
+  /** Shared deps + versions parsed from `jorvel.federation.json`. */
   shared: Record<string, string>;
 }
 
@@ -91,10 +91,10 @@ export async function collectBuildStats(workspaceDir: string): Promise<BuildStat
     const folders = await fs.readdir(appsDir);
     for (const folder of folders) {
       const appDir = path.join(appsDir, folder);
-      const metaPath = path.join(appDir, 'moxjs.app.json');
+      const metaPath = path.join(appDir, 'jorvel.app.json');
       if (!(await fs.pathExists(metaPath))) continue;
       const meta = (await fs.readJson(metaPath)) as AppMeta;
-      const fedPath = path.join(appDir, 'moxjs.federation.json');
+      const fedPath = path.join(appDir, 'jorvel.federation.json');
       const fed = (await fs.pathExists(fedPath)) ? await fs.readJson(fedPath) : {};
       const shared = parseShared(fed);
       const distDir = path.join(appDir, 'dist');

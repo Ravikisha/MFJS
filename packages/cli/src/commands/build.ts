@@ -24,7 +24,7 @@ async function runBuild(cwd: string, signal: AbortSignal): Promise<void> {
 }
 
 export const buildCommand = new Command('build')
-  .description('Build all apps under apps/* (those that have moxjs.app.json)')
+  .description('Build all apps under apps/* (those that have jorvel.app.json)')
   .option('-d, --dir <path>', 'Workspace root directory', process.cwd())
   .option(
     '--compress',
@@ -48,7 +48,7 @@ export const buildCommand = new Command('build')
   .option('--allow-empty', 'Exit 0 even when no apps are present.', false)
   .option(
     '--stats [path]',
-    'Write a JSON build-stats summary (default path: moxjs-build-stats.json under the workspace root).',
+    'Write a JSON build-stats summary (default path: jorvel-build-stats.json under the workspace root).',
   )
   .action(
     async (opts: {
@@ -74,7 +74,7 @@ export const buildCommand = new Command('build')
       const appMetas: Array<{ dir: string; meta: AppMeta }> = [];
 
       for (const folder of appFolders) {
-        const metaPath = path.join(appsDir, folder, 'moxjs.app.json');
+        const metaPath = path.join(appsDir, folder, 'jorvel.app.json');
         if (!(await fs.pathExists(metaPath))) continue;
         const meta = (await fs.readJson(metaPath)) as AppMeta;
         appMetas.push({ dir: path.join(appsDir, folder), meta });
@@ -85,7 +85,7 @@ export const buildCommand = new Command('build')
           console.log(kleur.yellow('No apps found — exiting cleanly (--allow-empty).'));
           return;
         }
-        console.error(kleur.yellow('No apps found (missing moxjs.app.json).'));
+        console.error(kleur.yellow('No apps found (missing jorvel.app.json).'));
         process.exitCode = 2;
         return;
       }
@@ -142,7 +142,7 @@ export const buildCommand = new Command('build')
       if (opts.stats) {
         const outPath = path.resolve(
           workspaceDir,
-          typeof opts.stats === 'string' ? opts.stats : 'moxjs-build-stats.json',
+          typeof opts.stats === 'string' ? opts.stats : 'jorvel-build-stats.json',
         );
         const stats = await writeBuildStats(workspaceDir, outPath);
         console.log(

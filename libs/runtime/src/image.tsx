@@ -1,7 +1,7 @@
 /**
- * @moxjs/runtime — Image optimization helpers.
+ * @jorvel/runtime — Image optimization helpers.
  *
- * Pairs with the `moxjs image` CLI that produces resized WebP/AVIF assets.
+ * Pairs with the `jorvel image` CLI that produces resized WebP/AVIF assets.
  * The runtime side handles:
  *   - `buildSrcset(src, { widths })` — formats the `<img srcset>` string
  *   - `buildSizes(breakpoints)` — formats the `<img sizes>` string

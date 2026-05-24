@@ -84,7 +84,7 @@ describe('analyzeTraffic', () => {
 
 describe('runSplit — NDJSON input', () => {
   it('reads each line and writes top candidates', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-split-'));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-split-'));
     const nd: string[] = [];
     for (let i = 0; i < 30; i++) nd.push(JSON.stringify({ path: '/x', component: 'Hot', ms: 50 }));
     for (let i = 0; i < 30; i++) nd.push(JSON.stringify({ path: '/y', component: 'Mid', ms: 20 }));
@@ -104,7 +104,7 @@ describe('runSplit — NDJSON input', () => {
   });
 
   it('reports "no candidates" when minHits filters everything', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-split-'));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-split-'));
     const file = path.join(tmp, 'traffic.ndjson');
     await fs.writeFile(file, JSON.stringify({ path: '/', component: 'A', ms: 5 }) + '\n');
     const out: string[] = [];

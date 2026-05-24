@@ -64,9 +64,9 @@ describe('useOtelAdapter — remote-load lifecycle', () => {
     reportRemoteLoad({ remote: 'dashboard', url: 'https://x/r.js', phase: 'start' });
     reportRemoteLoad({ remote: 'dashboard', url: 'https://x/r.js', phase: 'success', durationMs: 87 });
     expect(spans).toHaveLength(1);
-    expect(spans[0]!.name).toBe('moxjs.remote-load');
-    expect(spans[0]!.attributes['moxjs.remote']).toBe('dashboard');
-    expect(spans[0]!.attributes['moxjs.duration_ms']).toBe(87);
+    expect(spans[0]!.name).toBe('jorvel.remote-load');
+    expect(spans[0]!.attributes['jorvel.remote']).toBe('dashboard');
+    expect(spans[0]!.attributes['jorvel.duration_ms']).toBe(87);
     expect(spans[0]!.status?.code).toBe(1);
     expect(spans[0]!.ended).toBe(true);
     off();
@@ -103,9 +103,9 @@ describe('useOtelAdapter — remote-load lifecycle', () => {
     reportRemoteLoad({ remote: 'a', url: 'ua', phase: 'success', durationMs: 1 });
     reportRemoteLoad({ remote: 'b', url: 'ub', phase: 'error', durationMs: 2 });
     expect(spans).toHaveLength(2);
-    expect(spans[0]!.attributes['moxjs.remote']).toBe('a');
+    expect(spans[0]!.attributes['jorvel.remote']).toBe('a');
     expect(spans[0]!.status?.code).toBe(1);
-    expect(spans[1]!.attributes['moxjs.remote']).toBe('b');
+    expect(spans[1]!.attributes['jorvel.remote']).toBe('b');
     expect(spans[1]!.status?.code).toBe(2);
     off();
   });
@@ -120,16 +120,16 @@ describe('useOtelAdapter — remote-load lifecycle', () => {
 });
 
 describe('useOtelAdapter — errors', () => {
-  it('emits an moxjs.error span per reportError, with prefixed context attrs', () => {
+  it('emits an jorvel.error span per reportError, with prefixed context attrs', () => {
     const { tracer, spans } = makeTracer();
     const off = useOtelAdapter(tracer);
     const err = new Error('boom');
     reportError({ error: err, source: 'remote', context: { remote: 'dashboard', userId: 'u1' } });
     expect(spans).toHaveLength(1);
-    expect(spans[0]!.name).toBe('moxjs.error');
-    expect(spans[0]!.attributes['moxjs.source']).toBe('remote');
-    expect(spans[0]!.attributes['moxjs.ctx.remote']).toBe('dashboard');
-    expect(spans[0]!.attributes['moxjs.ctx.userId']).toBe('u1');
+    expect(spans[0]!.name).toBe('jorvel.error');
+    expect(spans[0]!.attributes['jorvel.source']).toBe('remote');
+    expect(spans[0]!.attributes['jorvel.ctx.remote']).toBe('dashboard');
+    expect(spans[0]!.attributes['jorvel.ctx.userId']).toBe('u1');
     expect(spans[0]!.exceptions).toEqual([err]);
     expect(spans[0]!.status?.code).toBe(2);
     off();

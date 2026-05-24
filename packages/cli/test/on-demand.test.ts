@@ -5,8 +5,8 @@ import fs from 'fs-extra';
 import { _devEnvForApp } from '../src/commands/dev';
 
 describe('on-demand remotes (env wiring)', () => {
-  it('sets MOXJS_ON_DEMAND_MIDDLEWARE for host when --on-demand is enabled', async () => {
-  const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-on-demand-'))) as string;
+  it('sets JORVEL_ON_DEMAND_MIDDLEWARE for host when --on-demand is enabled', async () => {
+  const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-on-demand-'))) as string;
 
   // Minimal workspace structure.
     const apps = [
@@ -17,25 +17,25 @@ describe('on-demand remotes (env wiring)', () => {
     for (const a of apps) {
       const dir = path.join(tmp, 'apps', a.name);
       await fs.ensureDir(dir);
-      await fs.writeJson(path.join(dir, 'moxjs.app.json'), { name: a.name, type: a.type, port: a.port });
+      await fs.writeJson(path.join(dir, 'jorvel.app.json'), { name: a.name, type: a.type, port: a.port });
       // federation file so dev doesn't try to generate (keep test fast)
-      await fs.writeJson(path.join(dir, 'moxjs.federation.json'), { name: a.name, filename: 'remoteEntry.js' });
+      await fs.writeJson(path.join(dir, 'jorvel.federation.json'), { name: a.name, filename: 'remoteEntry.js' });
     }
 
     const hostEnv = _devEnvForApp({
       appType: 'host',
       proxyRemotes: true,
-      hostFederationFile: 'moxjs.federation.proxy.json',
+      hostFederationFile: 'jorvel.federation.proxy.json',
       starterUrl: 'http://127.0.0.1:1234',
     });
     const remoteEnv = _devEnvForApp({
       appType: 'remote',
       proxyRemotes: true,
-      hostFederationFile: 'moxjs.federation.proxy.json',
+      hostFederationFile: 'jorvel.federation.proxy.json',
       starterUrl: 'http://127.0.0.1:1234',
     });
 
-    expect(hostEnv.MOXJS_ON_DEMAND_MIDDLEWARE).toBe('1');
-    expect(remoteEnv.MOXJS_ON_DEMAND_MIDDLEWARE).toBeUndefined();
+    expect(hostEnv.JORVEL_ON_DEMAND_MIDDLEWARE).toBe('1');
+    expect(remoteEnv.JORVEL_ON_DEMAND_MIDDLEWARE).toBeUndefined();
   });
 });

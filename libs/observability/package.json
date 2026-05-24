@@ -1,24 +1,40 @@
 {
-  "name": "@moxjs/observability",
-  "version": "0.1.0",
-  "description": "Telemetry hooks for MOXJS: error reporting, metrics, remote-load tracing, structured logger, Web Vitals.",
+  "name": "@jorvel/observability",
+  "version": "0.2.0",
+  "description": "Telemetry hooks for JORVEL: error reporting, metrics, remote-load tracing, structured logger, Web Vitals.",
   "license": "MIT",
-  "homepage": "https://github.com/anthropics/MOXJS#readme",
+  "homepage": "https://github.com/Ravikisha/JorvelJS#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/anthropics/MOXJS.git",
+    "url": "https://github.com/Ravikisha/JorvelJS.git",
     "directory": "libs/observability"
   },
-  "keywords": ["moxjs", "module-federation", "observability", "telemetry", "logging", "metrics"],
+  "keywords": [
+    "jorvel",
+    "module-federation",
+    "observability",
+    "telemetry",
+    "logging",
+    "metrics"
+  ],
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "publishConfig": { "access": "public" },
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
     "./package.json": "./package.json"
   },
-  "files": ["dist", "README.md", "LICENSE"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "sideEffects": false,
   "scripts": {
     "build": "tsc -p tsconfig.json",

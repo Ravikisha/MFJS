@@ -23,15 +23,15 @@ interface DeployAdapterModule {
 }
 
 const ADAPTER_PACKAGES: Record<Target, string | null> = {
-  vercel: '@moxjs/adapter-vercel',
-  cloudflare: '@moxjs/adapter-cloudflare',
-  node: '@moxjs/adapter-node',
-  docker: '@moxjs/adapter-node',
+  vercel: '@jorvel/adapter-vercel',
+  cloudflare: '@jorvel/adapter-cloudflare',
+  node: '@jorvel/adapter-node',
+  docker: '@jorvel/adapter-node',
   netlify: null, // No adapter-netlify yet — use inline scaffold.
 };
 
 export const deployCommand = new Command('deploy')
-  .description('Package the workspace for a deploy target (delegates to @moxjs/adapter-* packages).')
+  .description('Package the workspace for a deploy target (delegates to @jorvel/adapter-* packages).')
   .option('--target <target>', 'vercel | cloudflare | netlify | node | docker')
   .option('--cwd <dir>', 'Workspace root', process.cwd())
   .option('--dry-run', 'Print actions but do not write files')
@@ -41,11 +41,11 @@ export const deployCommand = new Command('deploy')
     const target = opts.target ?? cfg?.deploy?.target;
 
     if (!target) {
-      console.error(kleur.red('deploy: no target. Pass --target or set deploy.target in moxjs.config.'));
+      console.error(kleur.red('deploy: no target. Pass --target or set deploy.target in jorvel.config.'));
       process.exit(1);
     }
 
-    console.log(kleur.bold(`moxjs deploy -> ${target}`));
+    console.log(kleur.bold(`jorvel deploy -> ${target}`));
 
     const log = (msg: string) => console.log(kleur.green(msg));
     const adapterPkg = ADAPTER_PACKAGES[target];
@@ -115,7 +115,7 @@ async function scaffoldVercel(cwd: string, dryRun?: boolean): Promise<void> {
         buildCommand: 'pnpm build',
         outputDirectory: 'apps/shell/dist',
         framework: null,
-        rewrites: [{ source: '/moxjs/remotes/:name/:path*', destination: '/:path*' }],
+        rewrites: [{ source: '/jorvel/remotes/:name/:path*', destination: '/:path*' }],
         headers: [
           {
             source: '/assets/(.*)',
@@ -134,7 +134,7 @@ async function scaffoldVercel(cwd: string, dryRun?: boolean): Promise<void> {
 async function scaffoldCloudflare(cwd: string, dryRun?: boolean): Promise<void> {
   await writeIfMissing(
     path.join(cwd, 'wrangler.toml'),
-    `name = "moxjs-shell"
+    `name = "jorvel-shell"
 main = "apps/shell/dist/worker.js"
 compatibility_date = "2025-01-01"
 

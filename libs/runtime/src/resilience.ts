@@ -48,7 +48,7 @@ interface StorageLike {
 
 /** Backed by `Storage` (localStorage/sessionStorage). Falls back gracefully. */
 export class StorageCacheStore implements CacheStore {
-  constructor(private readonly storage: StorageLike, private readonly prefix = 'moxjs.lastgood.') {}
+  constructor(private readonly storage: StorageLike, private readonly prefix = 'jorvel.lastgood.') {}
   get(name: string): CacheRecord | undefined {
     try {
       const raw = this.storage.getItem(this.prefix + name);

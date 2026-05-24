@@ -13,7 +13,7 @@
  * or post-swap — never a half-blended manifest.
  *
  * Health gating is pluggable so callers can run shape-validation,
- * /moxjs/health probes, smoke tests, etc.
+ * /jorvel/health probes, smoke tests, etc.
  */
 
 export interface BlueGreenRemote {
@@ -83,7 +83,7 @@ export class BlueGreenRegistry {
 
   async promote(slotId: string): Promise<void> {
     const candidate = this.staged.get(slotId);
-    if (!candidate) throw new Error(`[moxjs/runtime] blue-green: no staged slot "${slotId}"`);
+    if (!candidate) throw new Error(`[jorvel/runtime] blue-green: no staged slot "${slotId}"`);
     this.opts.onTransition?.({ type: 'promote-start', slotId });
 
     if (this.opts.healthCheck) {
@@ -93,12 +93,12 @@ export class BlueGreenRegistry {
       } catch (err) {
         const reason = err instanceof Error ? err.message : String(err);
         this.opts.onTransition?.({ type: 'promote-failed', slotId, reason });
-        throw new Error(`[moxjs/runtime] blue-green health check threw: ${reason}`);
+        throw new Error(`[jorvel/runtime] blue-green health check threw: ${reason}`);
       }
       if (!ok) {
         const reason = 'health check returned false';
         this.opts.onTransition?.({ type: 'promote-failed', slotId, reason });
-        throw new Error(`[moxjs/runtime] blue-green promote rejected: ${reason}`);
+        throw new Error(`[jorvel/runtime] blue-green promote rejected: ${reason}`);
       }
     }
 
@@ -111,7 +111,7 @@ export class BlueGreenRegistry {
   }
 
   rollback(): BlueGreenManifest {
-    if (!this.previousBlue) throw new Error('[moxjs/runtime] blue-green: nothing to rollback to');
+    if (!this.previousBlue) throw new Error('[jorvel/runtime] blue-green: nothing to rollback to');
     const from = this.blue;
     const to = this.previousBlue;
     this.blue = to;
@@ -148,7 +148,9 @@ export class BlueGreenRegistry {
 }
 
 function cloneManifest(m: BlueGreenManifest): BlueGreenManifest {
-  return { version: m.version, remotes: m.remotes.map((r) => ({ ...r })) };
+  const out: BlueGreenManifest = { remotes: m.remotes.map((r) => ({ ...r })) };
+  if (m.version !== undefined) out.version = m.version;
+  return out;
 }
 
 /**

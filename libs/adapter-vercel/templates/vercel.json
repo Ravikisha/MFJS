@@ -3,7 +3,7 @@
   "outputDirectory": "apps/shell/dist",
   "framework": null,
   "rewrites": [
-    { "source": "/moxjs/remotes/:name/:path*", "destination": "/:path*" }
+    { "source": "/jorvel/remotes/:name/:path*", "destination": "/:path*" }
   ],
   "headers": [
     {

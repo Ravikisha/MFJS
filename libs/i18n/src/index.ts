@@ -1,5 +1,5 @@
 /**
- * @moxjs/i18n — small MVP i18n primitives.
+ * @jorvel/i18n — small MVP i18n primitives.
  *
  * Surface:
  *   - `formatMessage(template, values, locale?)` — ICU-lite interpolation with
@@ -203,7 +203,7 @@ export function createI18n(opts: CreateI18nOptions): I18n {
       return state.locale;
     },
     set locale(_v: string) {
-      throw new Error('[moxjs/i18n] use setLocale(locale) instead of mutating directly.');
+      throw new Error('[jorvel/i18n] use setLocale(locale) instead of mutating directly.');
     },
     t(key, values) {
       const cur = state.catalogs[state.locale]?.[key];

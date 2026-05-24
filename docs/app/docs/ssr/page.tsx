@@ -7,7 +7,7 @@ import { ServerIcon } from '@/components/icons';
 export const metadata = {
   title: 'SSR & Static Export',
   description:
-    'Server-render a federated app with @moxjs/ssr. renderRouteToString, streaming, ETag-before-render cache, static export with content-hash manifests.',
+    'Server-render a federated app with @jorvel/ssr. renderRouteToString, streaming, ETag-before-render cache, static export with content-hash manifests.',
 };
 
 export default function SsrPage() {
@@ -18,17 +18,17 @@ export default function SsrPage() {
       </Badge>
       <h1>SSR &amp; static export</h1>
       <p>
-        <code>@moxjs/ssr</code> renders matched routes on the server, streams them to the browser,
+        <code>@jorvel/ssr</code> renders matched routes on the server, streams them to the browser,
         and hydrates with <code>renderToString</code> by default (so the React tree carries the
-        markers needed for hydration). Edge runtimes use <code>@moxjs/ssr/edge</code>; Node uses{' '}
-        <code>@moxjs/ssr/node</code>.
+        markers needed for hydration). Edge runtimes use <code>@jorvel/ssr/edge</code>; Node uses{' '}
+        <code>@jorvel/ssr/node</code>.
       </p>
 
       <h2 id="render-to-string">renderRouteToString</h2>
       <CodeBlock
         language="ts"
         filename="apps/shell/server/render.ts"
-        code={`import { renderRouteToString, injectIntoTemplate } from '@moxjs/ssr';
+        code={`import { renderRouteToString, injectIntoTemplate } from '@jorvel/ssr';
 import { App } from '../src/App';
 
 export async function renderShell(pathname: string, template: string) {
@@ -57,7 +57,7 @@ export async function renderShell(pathname: string, template: string) {
       <CodeBlock
         language="ts"
         filename="apps/shell/server/stream.ts"
-        code={`import { renderRouteToStream, type StreamRenderResult } from '@moxjs/ssr';
+        code={`import { renderRouteToStream, type StreamRenderResult } from '@jorvel/ssr';
 
 export async function streamShell(req, res) {
   const ac = new AbortController();
@@ -79,7 +79,7 @@ export async function streamShell(req, res) {
       <p>
         Cloudflare Workers, Vercel Edge, and Deno Deploy do not provide{' '}
         <code>node:stream</code>. Import <code>renderRouteToReadableStream</code> or{' '}
-        <code>renderRouteToResponse</code> from <code>@moxjs/ssr/edge</code> to get a Web{' '}
+        <code>renderRouteToResponse</code> from <code>@jorvel/ssr/edge</code> to get a Web{' '}
         <code>ReadableStream&lt;Uint8Array&gt;</code> backed by React 18&apos;s{' '}
         <code>renderToReadableStream</code>. Same options surface — <code>signal</code>,{' '}
         <code>timeoutMs</code>, <code>bootstrapScripts</code>, <code>nonce</code>,{' '}
@@ -90,7 +90,7 @@ export async function streamShell(req, res) {
       <CodeBlock
         language="ts"
         filename="apps/shell/worker.ts"
-        code={`import { renderRouteToResponse } from '@moxjs/ssr/edge';
+        code={`import { renderRouteToResponse } from '@jorvel/ssr/edge';
 
 export default {
   async fetch(req: Request) {
@@ -114,12 +114,12 @@ export default {
       <CodeBlock
         language="ts"
         filename="apps/shell/worker.ts"
-        code={`import { renderFragmentsToReadableStream } from '@moxjs/ssr/edge';
+        code={`import { renderFragmentsToReadableStream } from '@jorvel/ssr/edge';
 
 const shell = \`<!doctype html><html><body>
-  <header><moxjs-fragment name="nav" /></header>
-  <main><moxjs-fragment name="cart" /></main>
-  <footer><moxjs-fragment name="recs" /></footer>
+  <header><jorvel-fragment name="nav" /></header>
+  <main><jorvel-fragment name="cart" /></main>
+  <footer><jorvel-fragment name="recs" /></footer>
 </body></html>\`;
 
 const { stream, done } = renderFragmentsToReadableStream({
@@ -151,7 +151,7 @@ return new Response(stream, { headers: { 'content-type': 'text/html; charset=utf
       <CodeBlock
         language="ts"
         filename="worker.ts"
-        code={`import { createEdgeAdapter, LruHtmlCache } from '@moxjs/ssr/edge';
+        code={`import { createEdgeAdapter, LruHtmlCache } from '@jorvel/ssr/edge';
 
 const handler = createEdgeAdapter({
   App,
@@ -190,7 +190,7 @@ export default { fetch: (req: Request) => toResponse(handler(toEdgeRequest(req))
         <TabsContent value="basic">
           <CodeBlock
             language="ts"
-            code={`import { staticExport } from '@moxjs/ssr/node';
+            code={`import { staticExport } from '@jorvel/ssr/node';
 
 await staticExport({
   routes: [{ path: '/' }, { path: '/about' }],
@@ -247,7 +247,7 @@ if (result.failures.length > 0) {
 
       <CodeBlock
         language="tsx"
-        code={`import { redirect, json, notFound } from '@moxjs/ssr';
+        code={`import { redirect, json, notFound } from '@jorvel/ssr';
 
 export default function User({ params }: { params: { id: string } }) {
   if (!isLoggedIn()) throw redirect('/login', 302);
@@ -268,7 +268,7 @@ export default function User({ params }: { params: { id: string } }) {
       </p>
       <CodeBlock
         language="ts"
-        code={`import { defineLoader, runLoaders, useLoaderData, redirect } from '@moxjs/ssr';
+        code={`import { defineLoader, runLoaders, useLoaderData, redirect } from '@jorvel/ssr';
 
 export const userLoader = defineLoader({
   key: 'user',
@@ -303,7 +303,7 @@ function UserPage() {
       </p>
       <CodeBlock
         language="tsx"
-        code={`import { requireRequestContext } from '@moxjs/ssr';
+        code={`import { requireRequestContext } from '@jorvel/ssr';
 
 export default function Page() {
   const ctx = requireRequestContext();
@@ -357,16 +357,16 @@ export default function Page() {
 
       <h2 id="state-hydration">Safe state hydration</h2>
       <p>
-        Use <code>safeJsonForScript</code> from <code>@moxjs/security</code> to inject server state.
+        Use <code>safeJsonForScript</code> from <code>@jorvel/security</code> to inject server state.
         It escapes <code>&lt;/script&gt;</code> sequences and validates nonces against the base64url
         alphabet.
       </p>
 
       <CodeBlock
         language="ts"
-        code={`import { safeJsonForScript } from '@moxjs/security';
+        code={`import { safeJsonForScript } from '@jorvel/security';
 
-const head = \`<script id="__moxjs_state" type="application/json" nonce="\${nonce}">\${
+const head = \`<script id="__jorvel_state" type="application/json" nonce="\${nonce}">\${
   safeJsonForScript({ user, flags })
 }</script>\`;`}
       />

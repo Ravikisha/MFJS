@@ -1,11 +1,11 @@
-// moxjs typedoc — generate TypeDoc API reference from every libs/<name> and
+// jorvel typedoc — generate TypeDoc API reference from every libs/<name> and
 // write markdown into the docs site (or a custom output dir).
 //
 // Module is split into:
 //   - discoverPackages(cwd)  — scans libs and packages for entry points.
 //   - buildTypedocConfig(opts) — emits the JSON config object.
 //   - runTypedoc(opts)        — spawns the typedoc binary; injectable for tests.
-//   - typedocCommand          — CLI glue (moxjs typedoc).
+//   - typedocCommand          — CLI glue (jorvel typedoc).
 
 import { Command } from 'commander';
 import path from 'node:path';
@@ -13,7 +13,7 @@ import fs from 'fs-extra';
 import kleur from 'kleur';
 
 export interface TypedocPackage {
-  /** Workspace name from package.json (e.g. `@moxjs/runtime`). */
+  /** Workspace name from package.json (e.g. `@jorvel/runtime`). */
   name: string;
   /** Absolute path to the package root. */
   dir: string;
@@ -123,7 +123,9 @@ export async function runTypedoc(opts: RunTypedocOptions): Promise<RunTypedocRes
   const cwd = path.resolve(opts.cwd);
   const out = path.resolve(opts.out);
   const packages = await discoverPackages(cwd);
-  const config = buildTypedocConfig({ packages, out, markdown: opts.markdown });
+  const buildOpts: BuildConfigOptions = { packages, out };
+  if (opts.markdown !== undefined) buildOpts.markdown = opts.markdown;
+  const config = buildTypedocConfig(buildOpts);
   const configPath = path.join(cwd, 'typedoc.generated.json');
   if (!opts.dryRun) {
     await fs.writeJson(configPath, config, { spaces: 2 });
@@ -132,6 +134,7 @@ export async function runTypedoc(opts: RunTypedocOptions): Promise<RunTypedocRes
     return { configPath, config, packages, ran: false };
   }
   const spawn = opts.spawn ?? (await defaultSpawn());
+  if (!spawn) throw new Error('typedoc: no spawn implementation available');
   const result = await spawn('typedoc', ['--options', configPath], { cwd });
   return { configPath, config, packages, ran: true, exitCode: result.exitCode };
 }
@@ -162,7 +165,7 @@ export const typedocCommand = new Command('typedoc')
     if (opts.markdown === false) runOpts.markdown = false;
     if (opts.dryRun !== undefined) runOpts.dryRun = opts.dryRun;
     const r = await runTypedoc(runOpts);
-    console.log(kleur.bold(`moxjs typedoc — ${r.packages.length} package(s)`));
+    console.log(kleur.bold(`jorvel typedoc — ${r.packages.length} package(s)`));
     for (const p of r.packages) console.log(kleur.dim(`  ${p.name}`));
     console.log(kleur.dim(`  config: ${path.relative(process.cwd(), r.configPath)}`));
     if (!r.ran) {

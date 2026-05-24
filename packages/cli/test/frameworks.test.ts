@@ -8,10 +8,10 @@ import {
 } from '../src/commands/frameworks.js';
 
 describe('buildAdapterTemplate — Vue', () => {
-  it('emits bootstrap.ts + rspack config + moxjs.app.json + deps', () => {
+  it('emits bootstrap.ts + rspack config + jorvel.app.json + deps', () => {
     const t = buildAdapterTemplate('vue', 'profile', 3101);
     expect(Object.keys(t.files).sort()).toEqual([
-      'moxjs.app.json',
+      'jorvel.app.json',
       'package.json',
       'rspack.config.mjs',
       'src/bootstrap.ts',
@@ -44,19 +44,19 @@ describe('buildAdapterTemplate — Solid', () => {
 });
 
 describe('buildAdapterTemplate — common', () => {
-  it('moxjs.app.json includes framework + type=remote', () => {
+  it('jorvel.app.json includes framework + type=remote', () => {
     const t = buildAdapterTemplate('vue', 'profile', 4000);
-    const meta = JSON.parse(t.files['moxjs.app.json']!);
+    const meta = JSON.parse(t.files['jorvel.app.json']!);
     expect(meta).toMatchObject({ name: 'profile', type: 'remote', port: 4000, framework: 'vue' });
   });
 });
 
 describe('scaffoldFrameworkRemote', () => {
   it('writes all template files under apps/<name>/', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-fw-'));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-fw-'));
     const r = await scaffoldFrameworkRemote({ cwd: tmp, framework: 'vue', name: 'profile' });
     expect(r.appDir).toBe(path.join(tmp, 'apps', 'profile'));
-    for (const f of ['package.json', 'rspack.config.mjs', 'src/bootstrap.ts', 'moxjs.app.json']) {
+    for (const f of ['package.json', 'rspack.config.mjs', 'src/bootstrap.ts', 'jorvel.app.json']) {
       expect(await fs.pathExists(path.join(r.appDir, f))).toBe(true);
     }
     expect(r.skipped).toEqual([]);
@@ -64,7 +64,7 @@ describe('scaffoldFrameworkRemote', () => {
   });
 
   it('skips existing files without --force', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-fw-'));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-fw-'));
     const dir = path.join(tmp, 'apps', 'profile');
     await fs.outputFile(path.join(dir, 'package.json'), '{"user": true}');
     const r = await scaffoldFrameworkRemote({ cwd: tmp, framework: 'vue', name: 'profile' });
@@ -74,7 +74,7 @@ describe('scaffoldFrameworkRemote', () => {
   });
 
   it('--force overwrites pre-existing files', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-fw-'));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-fw-'));
     const dir = path.join(tmp, 'apps', 'profile');
     await fs.outputFile(path.join(dir, 'package.json'), '{"user": true}');
     const r = await scaffoldFrameworkRemote({ cwd: tmp, framework: 'svelte', name: 'profile', force: true });
@@ -84,7 +84,7 @@ describe('scaffoldFrameworkRemote', () => {
   });
 
   it('honors --port flag in rspack config', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-fw-'));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-fw-'));
     await scaffoldFrameworkRemote({ cwd: tmp, framework: 'solid', name: 'a', port: 5555 });
     const cfg = await fs.readFile(path.join(tmp, 'apps', 'a', 'rspack.config.mjs'), 'utf8');
     expect(cfg).toContain('port: 5555');

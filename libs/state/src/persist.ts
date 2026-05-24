@@ -1,5 +1,5 @@
 /**
- * @moxjs/state/persist
+ * @jorvel/state/persist
  *
  * Persistence middleware for `Store` and `SimpleStore`. Reads the saved value
  * on attach (synchronously when storage is sync) and writes back on every
@@ -49,7 +49,7 @@ function noop(): void {}
 
 function defaultOnError(err: unknown, phase: 'read' | 'write'): void {
   // eslint-disable-next-line no-console
-  console.warn(`[moxjs/state/persist] ${phase} failed:`, err);
+  console.warn(`[jorvel/state/persist] ${phase} failed:`, err);
 }
 
 interface Persistable<T> {

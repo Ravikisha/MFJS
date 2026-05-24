@@ -8,11 +8,11 @@ export type NavigateDetail = {
   state?: any;
 };
 
-export const MOXJS_NAVIGATE_EVENT = 'moxjs:navigate';
+export const JORVEL_NAVIGATE_EVENT = 'jorvel:navigate';
 
 function toUrlParts(to: string) {
   // new URL() needs an origin; we only care about path/search/hash.
-  const u = new URL(to, 'http://moxjs.local');
+  const u = new URL(to, 'http://jorvel.local');
   return { pathname: u.pathname, search: u.search, hash: u.hash };
 }
 
@@ -30,9 +30,9 @@ function currentPath() {
   return `${window.location.pathname}${window.location.search}${window.location.hash}`;
 }
 
-export function dispatchMoxjsNavigate(detail: NavigateDetail) {
-  assertBrowser('dispatchMoxjsNavigate');
-  window.dispatchEvent(new CustomEvent<NavigateDetail>(MOXJS_NAVIGATE_EVENT, { detail }));
+export function dispatchJorvelNavigate(detail: NavigateDetail) {
+  assertBrowser('dispatchJorvelNavigate');
+  window.dispatchEvent(new CustomEvent<NavigateDetail>(JORVEL_NAVIGATE_EVENT, { detail }));
 }
 
 export type Router = {
@@ -92,7 +92,7 @@ export function createRouter(opts: RouterOptions = {}): Router {
   };
 
   window.addEventListener('popstate', onPopState);
-  if (listenToNavigateEvents) window.addEventListener(MOXJS_NAVIGATE_EVENT, onNavigateEvent);
+  if (listenToNavigateEvents) window.addEventListener(JORVEL_NAVIGATE_EVENT, onNavigateEvent);
 
   // Initial emit so subscribers can render right away.
   queueMicrotask(() => emit());
@@ -112,19 +112,19 @@ export function createRouter(opts: RouterOptions = {}): Router {
     },
     destroy() {
       window.removeEventListener('popstate', onPopState);
-      if (listenToNavigateEvents) window.removeEventListener(MOXJS_NAVIGATE_EVENT, onNavigateEvent);
+      if (listenToNavigateEvents) window.removeEventListener(JORVEL_NAVIGATE_EVENT, onNavigateEvent);
       subs.clear();
     },
   };
 }
 
 /**
- * Convenience: attach a shell listener that converts moxjs:navigate events into history updates.
+ * Convenience: attach a shell listener that converts jorvel:navigate events into history updates.
  *
  * Use this in the host if you want remotes to be able to navigate without importing the router.
  */
-export function attachMoxjsNavigateListener() {
-  assertBrowser('attachMoxjsNavigateListener');
+export function attachJorvelNavigateListener() {
+  assertBrowser('attachJorvelNavigateListener');
   const onNavigateEvent = (e: Event) => {
     const ce = e as CustomEvent<NavigateDetail>;
     if (!ce.detail?.to) return;
@@ -140,6 +140,6 @@ export function attachMoxjsNavigateListener() {
     window.dispatchEvent(new PopStateEvent('popstate'));
   };
 
-  window.addEventListener(MOXJS_NAVIGATE_EVENT, onNavigateEvent);
-  return () => window.removeEventListener(MOXJS_NAVIGATE_EVENT, onNavigateEvent);
+  window.addEventListener(JORVEL_NAVIGATE_EVENT, onNavigateEvent);
+  return () => window.removeEventListener(JORVEL_NAVIGATE_EVENT, onNavigateEvent);
 }

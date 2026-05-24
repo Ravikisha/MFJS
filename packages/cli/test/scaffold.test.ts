@@ -20,27 +20,27 @@ async function run(argv: string[], cwd: string): Promise<void> {
 
 afterEach(() => vi.restoreAllMocks());
 
-describe('moxjs scaffold app --yes', () => {
-  it('generates host + remote with moxjs.app.json', async () => {
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-scaff-'))) as string;
+describe('jorvel scaffold app --yes', () => {
+  it('generates host + remote with jorvel.app.json', async () => {
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-scaff-'))) as string;
     vi.spyOn(console, 'log').mockImplementation(() => {});
     await run(['--dir', tmp, '--yes'], tmp);
 
-    expect(await fs.pathExists(path.join(tmp, 'apps', 'shell', 'moxjs.app.json'))).toBe(true);
-    expect(await fs.pathExists(path.join(tmp, 'apps', 'dashboard', 'moxjs.app.json'))).toBe(true);
+    expect(await fs.pathExists(path.join(tmp, 'apps', 'shell', 'jorvel.app.json'))).toBe(true);
+    expect(await fs.pathExists(path.join(tmp, 'apps', 'dashboard', 'jorvel.app.json'))).toBe(true);
   });
 
   it('writes federation config for host and remote', async () => {
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-scaff-'))) as string;
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-scaff-'))) as string;
     vi.spyOn(console, 'log').mockImplementation(() => {});
     await run(['--dir', tmp, '--yes'], tmp);
 
-    expect(await fs.pathExists(path.join(tmp, 'apps', 'shell', 'moxjs.federation.json'))).toBe(true);
-    expect(await fs.pathExists(path.join(tmp, 'apps', 'dashboard', 'moxjs.federation.json'))).toBe(true);
+    expect(await fs.pathExists(path.join(tmp, 'apps', 'shell', 'jorvel.federation.json'))).toBe(true);
+    expect(await fs.pathExists(path.join(tmp, 'apps', 'dashboard', 'jorvel.federation.json'))).toBe(true);
   });
 
   it('writes a smoke test under tests/', async () => {
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-scaff-'))) as string;
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-scaff-'))) as string;
     // Provide a package.json so the script-registration branch is exercised.
     await fs.writeJson(path.join(tmp, 'package.json'), { name: 'x', private: true });
     vi.spyOn(console, 'log').mockImplementation(() => {});
@@ -49,7 +49,7 @@ describe('moxjs scaffold app --yes', () => {
     const test = path.join(tmp, 'tests', 'mfe-smoke.test.ts');
     expect(await fs.pathExists(test)).toBe(true);
     const txt = await fs.readFile(test, 'utf8');
-    expect(txt).toContain('moxjs.app.json');
+    expect(txt).toContain('jorvel.app.json');
 
     const pkg = await fs.readJson(path.join(tmp, 'package.json'));
     expect(pkg.scripts['test:smoke']).toBeDefined();

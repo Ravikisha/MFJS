@@ -1,7 +1,7 @@
 /**
  * OpenTelemetry adapter.
  *
- * Wires MOXJS error + remote-load hooks into a duck-typed `Tracer` so callers
+ * Wires JORVEL error + remote-load hooks into a duck-typed `Tracer` so callers
  * can plug in whichever OTEL SDK they use (`@opentelemetry/api`, a worker-side
  * tracer, a test fake). Each remote-load lifecycle becomes a single span; each
  * `reportError` becomes a span event with `setStatus(error)`.
@@ -23,9 +23,9 @@ export interface OtelTracer {
 }
 
 export interface UseOtelAdapterOptions {
-  /** Span name for remote-load lifecycles. Default: `'moxjs.remote-load'`. */
+  /** Span name for remote-load lifecycles. Default: `'jorvel.remote-load'`. */
   remoteSpanName?: string;
-  /** Forward `onError` as a stand-alone span (`moxjs.error`). Default: true. */
+  /** Forward `onError` as a stand-alone span (`jorvel.error`). Default: true. */
   forwardErrors?: boolean;
   /** Stamp these attributes on every span (e.g. `service.name`). */
   baseAttributes?: Record<string, unknown>;
@@ -36,11 +36,11 @@ const STATUS_OK = 1;
 const STATUS_ERROR = 2;
 
 /**
- * Attach a tracer to MOXJS hooks. Returns a disposer that unregisters every
+ * Attach a tracer to JORVEL hooks. Returns a disposer that unregisters every
  * listener and closes any spans currently in flight.
  */
 export function useOtelAdapter(tracer: OtelTracer, opts: UseOtelAdapterOptions = {}): () => void {
-  const remoteSpanName = opts.remoteSpanName ?? 'moxjs.remote-load';
+  const remoteSpanName = opts.remoteSpanName ?? 'jorvel.remote-load';
   const baseAttrs = opts.baseAttributes ?? {};
   const open = new Map<string, OtelSpan>();
   const disposers: Array<() => void> = [];
@@ -59,8 +59,8 @@ export function useOtelAdapter(tracer: OtelTracer, opts: UseOtelAdapterOptions =
       if (e.phase === 'start') {
         const span = tracer.startSpan(remoteSpanName, {
           attributes: applyBase({
-            'moxjs.remote': e.remote,
-            'moxjs.url': e.url,
+            'jorvel.remote': e.remote,
+            'jorvel.url': e.url,
           }),
         });
         open.set(key, span);
@@ -68,8 +68,8 @@ export function useOtelAdapter(tracer: OtelTracer, opts: UseOtelAdapterOptions =
       }
       const span = open.get(key);
       if (!span) return;
-      if (typeof e.durationMs === 'number') span.setAttribute('moxjs.duration_ms', e.durationMs);
-      span.setAttribute('moxjs.phase', e.phase);
+      if (typeof e.durationMs === 'number') span.setAttribute('jorvel.duration_ms', e.durationMs);
+      span.setAttribute('jorvel.phase', e.phase);
       if (e.phase === 'success') {
         span.setStatus?.({ code: STATUS_OK });
       } else {
@@ -85,16 +85,16 @@ export function useOtelAdapter(tracer: OtelTracer, opts: UseOtelAdapterOptions =
   if (opts.forwardErrors !== false) {
     disposers.push(
       onError((e) => {
-        const span = tracer.startSpan('moxjs.error', {
+        const span = tracer.startSpan('jorvel.error', {
           attributes: applyBase({
-            'moxjs.source': e.source ?? 'runtime',
-            'moxjs.severity': e.severity ?? 'error',
+            'jorvel.source': e.source ?? 'runtime',
+            'jorvel.severity': e.severity ?? 'error',
           }),
         });
         if (e.context) {
           span.setAttributes
-            ? span.setAttributes(prefixKeys(e.context, 'moxjs.ctx.'))
-            : Object.entries(e.context).forEach(([k, v]) => span.setAttribute(`moxjs.ctx.${k}`, v));
+            ? span.setAttributes(prefixKeys(e.context, 'jorvel.ctx.'))
+            : Object.entries(e.context).forEach(([k, v]) => span.setAttribute(`jorvel.ctx.${k}`, v));
         }
         span.recordException?.(e.error);
         span.setStatus?.({ code: STATUS_ERROR });

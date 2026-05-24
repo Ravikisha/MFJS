@@ -1,5 +1,5 @@
 import React from 'react';
-import { dispatchMoxjsNavigate } from './router.js';
+import { dispatchJorvelNavigate } from './router.js';
 import { usePathname } from './routing.js';
 
 export function useSearchParams(): [URLSearchParams, (next: URLSearchParams | Record<string, string>, opts?: { replace?: boolean }) => void] {
@@ -16,7 +16,7 @@ export function useSearchParams(): [URLSearchParams, (next: URLSearchParams | Re
       const query = nextParams.toString();
       const { pathname, hash } = window.location;
       const to = `${pathname}${query ? `?${query}` : ''}${hash}`;
-      dispatchMoxjsNavigate({ to, mode: opts?.replace ? 'replace' : 'push' });
+      dispatchJorvelNavigate({ to, mode: opts?.replace ? 'replace' : 'push' });
     },
     [],
   );
@@ -59,7 +59,7 @@ export function useParams<T extends Record<string, string> = Record<string, stri
 export function useNavigate() {
   return React.useCallback(
     (to: string, opts?: { replace?: boolean; state?: unknown }) => {
-      dispatchMoxjsNavigate({
+      dispatchJorvelNavigate({
         to,
         mode: opts?.replace ? 'replace' : 'push',
         state: opts?.state,

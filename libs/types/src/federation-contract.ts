@@ -1,5 +1,5 @@
 /**
- * @moxjs/types — Typed federation contracts.
+ * @jorvel/types — Typed federation contracts.
  *
  * A "federation contract" is a compile-time description of what a remote
  * micro-frontend exposes and what event types it publishes/consumes.
@@ -7,7 +7,7 @@
  * @example
  * ```ts
  * // In the remote workspace (e.g. libs/contracts/dashboard.contract.ts)
- * import { defineFederationContract } from '@moxjs/types';
+ * import { defineFederationContract } from '@jorvel/types';
  *
  * export const dashboardContract = defineFederationContract({
  *   name: 'dashboard',

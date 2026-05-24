@@ -1,7 +1,7 @@
 /**
  * Stream remote fragments (Cloudflare Fragments pattern).
  *
- * Host emits a shell with `<moxjs-fragment name="...">` placeholders. Each
+ * Host emits a shell with `<jorvel-fragment name="...">` placeholders. Each
  * remote SSRs its own slice in parallel, and the host swaps the placeholder
  * for the streamed HTML. When a fragment fails / times out, its `fallback`
  * markup is used instead.
@@ -26,7 +26,7 @@ export interface FragmentSpec {
 }
 
 export interface RenderFragmentsOptions {
-  /** Shell HTML containing `<moxjs-fragment name="...">` placeholders. */
+  /** Shell HTML containing `<jorvel-fragment name="...">` placeholders. */
   shell: string;
   fragments: FragmentSpec[];
   /** Default timeout for every fragment. Default: 5_000. */
@@ -42,7 +42,7 @@ export type FragmentOutcome =
   | { name: string; phase: 'failed'; ms: number; error: Error }
   | { name: string; phase: 'timeout'; ms: number };
 
-const PLACEHOLDER_RE = /<moxjs-fragment\s+name=["']([^"']+)["']\s*\/?>(?:<\/moxjs-fragment>)?/g;
+const PLACEHOLDER_RE = /<jorvel-fragment\s+name=["']([^"']+)["']\s*\/?>(?:<\/jorvel-fragment>)?/g;
 
 export interface RenderFragmentsResult {
   html: string;
@@ -105,7 +105,7 @@ async function runFragments(
   return settled;
 }
 
-const RUNTIME_SCRIPT = `<script data-moxjs-fragments>(()=>{const r=window.__moxjsFragment||(window.__moxjsFragment=n=>{const s=document.getElementById('moxjs-frag-data-'+n);const t=document.querySelector('moxjs-fragment[name="'+n+'"]');if(s&&t){t.outerHTML=s.textContent||'';s.remove();}});})();</script>`;
+const RUNTIME_SCRIPT = `<script data-jorvel-fragments>(()=>{const r=window.__jorvelFragment||(window.__jorvelFragment=n=>{const s=document.getElementById('jorvel-frag-data-'+n);const t=document.querySelector('jorvel-fragment[name="'+n+'"]');if(s&&t){t.outerHTML=s.textContent||'';s.remove();}});})();</script>`;
 
 export interface RenderFragmentsStreamResult {
   stream: ReadableStream<Uint8Array>;
@@ -124,7 +124,7 @@ export function renderFragmentsToReadableStream(opts: RenderFragmentsOptions): R
     async start(controller) {
       // 1. Replace all placeholders with anchor markers; flush the shell.
       const shellPatched = opts.shell.replace(PLACEHOLDER_RE, (_full, name: string) =>
-        `<moxjs-fragment name="${name}">${renderFallbackInline(opts.fragments, name)}</moxjs-fragment>`,
+        `<jorvel-fragment name="${name}">${renderFallbackInline(opts.fragments, name)}</jorvel-fragment>`,
       );
       controller.enqueue(enc.encode(shellPatched));
       controller.enqueue(enc.encode(RUNTIME_SCRIPT));
@@ -193,7 +193,7 @@ function flushFragment(
   const safeId = name.replace(/[^a-zA-Z0-9_-]/g, '_');
   const safeHtml = html.replace(/<\/script/gi, '<\\/script');
   const chunk =
-    `<script id="moxjs-frag-data-${safeId}" type="text/template">${safeHtml}</script>` +
-    `<script>window.__moxjsFragment(${JSON.stringify(safeId)})</script>`;
+    `<script id="jorvel-frag-data-${safeId}" type="text/template">${safeHtml}</script>` +
+    `<script>window.__jorvelFragment(${JSON.stringify(safeId)})</script>`;
   controller.enqueue(enc.encode(chunk));
 }

@@ -1,13 +1,13 @@
 /**
- * @moxjs/types — Workspace-level configuration (`moxjs.config.ts`).
+ * @jorvel/types — Workspace-level configuration (`jorvel.config.ts`).
  *
  * This is intentionally a *small* contract so we can evolve it without
  * breaking early adopters.
  */
 
-export type MoxjsFramework = 'react';
+export type JorvelFramework = 'react';
 
-export type MoxjsRemoteConfig = {
+export type JorvelRemoteConfig = {
   /** Remote name / container global (for Module Federation). */
   name: string;
   /** Base path mounted by the host, e.g. "/dashboard/*". */
@@ -16,7 +16,7 @@ export type MoxjsRemoteConfig = {
   remoteEntry?: string;
 };
 
-export type MoxjsOrchestratorConfig = {
+export type JorvelOrchestratorConfig = {
   /** How the CLI should start dev servers. */
   mode?: 'parallel' | 'on-demand';
   /** Enable same-origin remote proxying in dev. */
@@ -25,7 +25,7 @@ export type MoxjsOrchestratorConfig = {
   hmrRemotes?: boolean;
 };
 
-export type MoxjsFederationConfig = {
+export type JorvelFederationConfig = {
   /**
    * Shared packages that should be configured as singletons by default.
    *
@@ -34,11 +34,11 @@ export type MoxjsFederationConfig = {
   shared?: string[];
 };
 
-export type MoxjsFeaturesConfig = {
+export type JorvelFeaturesConfig = {
   tailwind?: boolean;
 };
 
-export type MoxjsWorkspaceConfig = {
+export type JorvelWorkspaceConfig = {
   /** Workspace name. Optional but helpful in tooling output. */
   name?: string;
 
@@ -47,15 +47,15 @@ export type MoxjsWorkspaceConfig = {
   libsDir?: string;
 
   /** Primary UI framework used in generated templates. */
-  framework?: MoxjsFramework;
+  framework?: JorvelFramework;
 
   /** Remote catalog (optional). Can be used by dev/prod orchestration. */
-  remotes?: MoxjsRemoteConfig[];
+  remotes?: JorvelRemoteConfig[];
 
-  federation?: MoxjsFederationConfig;
-  orchestrator?: MoxjsOrchestratorConfig;
-  features?: MoxjsFeaturesConfig;
+  federation?: JorvelFederationConfig;
+  orchestrator?: JorvelOrchestratorConfig;
+  features?: JorvelFeaturesConfig;
 
   /** Plugins (either inline or imported). */
-  plugins?: import('./plugins.js').MoxjsPlugin[];
+  plugins?: import('./plugins.js').JorvelPlugin[];
 };

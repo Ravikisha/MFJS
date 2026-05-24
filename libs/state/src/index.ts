@@ -1,7 +1,7 @@
 /**
- * @moxjs/state
+ * @jorvel/state
  *
- * Lightweight shared-state primitives for MOXJS micro-frontends. Pinning the
+ * Lightweight shared-state primitives for JORVEL micro-frontends. Pinning the
  * registries to `globalThis` survives duplicate bundles when MF singleton
  * sharing fails — host/remote still see the same `Map` of stores.
  */
@@ -104,7 +104,7 @@ export function createStore<S, A>(initialState: S, reducer: Reducer<S, A>): Stor
   function dispatch(action: A): void {
     if (isDispatching) {
       throw new Error(
-        '[moxjs/state] Reducers may not dispatch actions. Defer the second dispatch with queueMicrotask or setTimeout.',
+        '[jorvel/state] Reducers may not dispatch actions. Defer the second dispatch with queueMicrotask or setTimeout.',
       );
     }
     let next: S;
@@ -132,7 +132,7 @@ export function createStore<S, A>(initialState: S, reducer: Reducer<S, A>): Stor
 
   function replaceState(next: S): void {
     if (isDispatching) {
-      throw new Error('[moxjs/state] replaceState() may not be called inside a reducer.');
+      throw new Error('[jorvel/state] replaceState() may not be called inside a reducer.');
     }
     if (next === state) return;
     state = next;
@@ -153,8 +153,8 @@ export function createStore<S, A>(initialState: S, reducer: Reducer<S, A>): Stor
 
 // ── Singleton store factory ────────────────────────────────────────────────
 
-const REGISTRY_KEY = '__MOXJS_STATE_REGISTRY__';
-const SIMPLE_REGISTRY_KEY = '__MOXJS_STATE_SIMPLE_REGISTRY__';
+const REGISTRY_KEY = '__JORVEL_STATE_REGISTRY__';
+const SIMPLE_REGISTRY_KEY = '__JORVEL_STATE_SIMPLE_REGISTRY__';
 
 type StoreRecord = { store: Store<unknown, unknown>; signature: string };
 type SimpleRecord = { store: SimpleStore<unknown>; signature: string };
@@ -195,7 +195,7 @@ function warnIfDifferent(key: string, prev: string, next: string): void {
   if (isProduction()) return;
   // eslint-disable-next-line no-console
   console.warn(
-    `[moxjs/state] getStore("${key}") called with different initialState/reducer than the existing instance. The first call wins; later args are ignored.`,
+    `[jorvel/state] getStore("${key}") called with different initialState/reducer than the existing instance. The first call wins; later args are ignored.`,
   );
 }
 

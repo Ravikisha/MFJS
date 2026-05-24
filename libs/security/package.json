@@ -1,28 +1,56 @@
 {
-  "name": "@moxjs/security",
-  "version": "0.1.0",
-  "description": "Security primitives for MOXJS: CSP builder, SRI hashes, remote allowlist, HTML/JSON sanitization.",
+  "name": "@jorvel/security",
+  "version": "0.2.0",
+  "description": "Security primitives for JORVEL: CSP builder, SRI hashes, remote allowlist, HTML/JSON sanitization.",
   "license": "MIT",
-  "homepage": "https://github.com/anthropics/MOXJS#readme",
+  "homepage": "https://github.com/Ravikisha/JorvelJS#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/anthropics/MOXJS.git",
+    "url": "https://github.com/Ravikisha/JorvelJS.git",
     "directory": "libs/security"
   },
-  "keywords": ["moxjs", "module-federation", "security", "csp", "sri", "allowlist"],
+  "keywords": [
+    "jorvel",
+    "module-federation",
+    "security",
+    "csp",
+    "sri",
+    "allowlist"
+  ],
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "publishConfig": { "access": "public" },
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
-    "./sanitize": { "types": "./dist/sanitize.d.ts", "import": "./dist/sanitize.js" },
-    "./csp": { "types": "./dist/csp.d.ts", "import": "./dist/csp.js" },
-    "./sri": { "types": "./dist/sri.d.ts", "import": "./dist/sri.js" },
-    "./allowlist": { "types": "./dist/allowlist.d.ts", "import": "./dist/allowlist.js" },
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./sanitize": {
+      "types": "./dist/sanitize.d.ts",
+      "import": "./dist/sanitize.js"
+    },
+    "./csp": {
+      "types": "./dist/csp.d.ts",
+      "import": "./dist/csp.js"
+    },
+    "./sri": {
+      "types": "./dist/sri.d.ts",
+      "import": "./dist/sri.js"
+    },
+    "./allowlist": {
+      "types": "./dist/allowlist.d.ts",
+      "import": "./dist/allowlist.js"
+    },
     "./package.json": "./package.json"
   },
-  "files": ["dist", "README.md", "LICENSE"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "sideEffects": false,
   "scripts": {
     "build": "tsc -p tsconfig.json",

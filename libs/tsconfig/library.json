@@ -1,5 +1,5 @@
 {
-  "display": "@moxjs/tsconfig/library",
+  "display": "@jorvel/tsconfig/library",
   "extends": "./base.json",
   "compilerOptions": {
     "declaration": true,

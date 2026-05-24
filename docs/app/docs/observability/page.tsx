@@ -4,7 +4,7 @@ import { Callout } from '@/components/docs/callout';
 export const metadata = {
   title: 'Observability',
   description:
-    'Three hooks (errors, metrics, remote loads) bridge MOXJS runtime events to Sentry / OTEL / any collector. Web Vitals + structured logger included.',
+    'Three hooks (errors, metrics, remote loads) bridge JORVEL runtime events to Sentry / OTEL / any collector. Web Vitals + structured logger included.',
 };
 
 export default function Observability() {
@@ -12,12 +12,12 @@ export default function Observability() {
     <>
       <h1>Observability</h1>
       <p>
-        <code>@moxjs/observability</code> exposes three hooks you wire to whatever backend your org
+        <code>@jorvel/observability</code> exposes three hooks you wire to whatever backend your org
         uses. Runtime code dispatches telemetry events; the package bridges them to Sentry / OTEL
         / your own collector. The library never sends anything by itself — you pick the adapter.
       </p>
       <Callout variant="info" title="Architecture">
-        Sources (<code>@moxjs/runtime</code>, your code) call{' '}
+        Sources (<code>@jorvel/runtime</code>, your code) call{' '}
         <code>reportError / reportMetric / reportRemoteLoad</code>. Subscribers (Sentry adapter,
         Console adapter, your code) receive every event. The bridge is in-memory; no
         cross-network hop until your adapter chooses to send.
@@ -26,7 +26,7 @@ export default function Observability() {
       <h2>Hooks</h2>
       <CodeBlock
         language="ts"
-        code={`import { onError, onMetric, onRemoteLoad } from '@moxjs/observability';
+        code={`import { onError, onMetric, onRemoteLoad } from '@jorvel/observability';
 
 const off = onError((e) => sendToBackend(e));
 onMetric((m) => statsd.gauge(m.name, m.value, m.tags));
@@ -36,7 +36,7 @@ onRemoteLoad((e) => console.log(e.remote, e.phase, e.durationMs));`}
       <h2>Web Vitals</h2>
       <CodeBlock
         language="ts"
-        code={`import { collectWebVitals, useConsoleAdapter } from '@moxjs/observability';
+        code={`import { collectWebVitals, useConsoleAdapter } from '@jorvel/observability';
 useConsoleAdapter();
 collectWebVitals();
 // Reports LCP / FID / CLS / TTFB / FCP as metrics`}
@@ -53,7 +53,7 @@ collectWebVitals();
 
       <CodeBlock
         language="ts"
-        code={`import { startRum } from '@moxjs/observability';
+        code={`import { startRum } from '@jorvel/observability';
 
 const rum = startRum({
   endpoint: 'https://rum.acme.dev/ingest',
@@ -78,7 +78,7 @@ window.addEventListener('beforeunload', () => rum.dispose());`}
       <CodeBlock
         language="ts"
         code={`import * as Sentry from '@sentry/browser';
-import { useSentryAdapter } from '@moxjs/observability';
+import { useSentryAdapter } from '@jorvel/observability';
 
 Sentry.init({ dsn: process.env.SENTRY_DSN });
 useSentryAdapter(Sentry);`}
@@ -93,9 +93,9 @@ useSentryAdapter(Sentry);`}
       <CodeBlock
         language="ts"
         code={`import { trace } from '@opentelemetry/api';
-import { useOtelAdapter } from '@moxjs/observability';
+import { useOtelAdapter } from '@jorvel/observability';
 
-const tracer = trace.getTracer('moxjs-shell');
+const tracer = trace.getTracer('jorvel-shell');
 
 const off = useOtelAdapter(tracer, {
   baseAttributes: { 'service.name': 'shell', 'service.version': '1.2.3' },
@@ -119,7 +119,7 @@ off();`}
       <CodeBlock
         language="ts"
         code={`import * as Sentry from '@sentry/browser';
-import { onError, groupBy } from '@moxjs/observability';
+import { onError, groupBy } from '@jorvel/observability';
 
 onError((e) => {
   Sentry.captureException(e.error, {
@@ -137,7 +137,7 @@ onError((e) => {
       <h2>Structured logger</h2>
       <CodeBlock
         language="ts"
-        code={`import { createLogger } from '@moxjs/observability';
+        code={`import { createLogger } from '@jorvel/observability';
 
 const log = createLogger({ name: 'shell', level: 'info' });
 log.info('boot', { region: 'us-east' });
@@ -146,8 +146,8 @@ log.info('boot', { region: 'us-east' });
 
       <h2>Runtime telemetry source</h2>
       <p>
-        <code>@moxjs/runtime</code> emits <code>moxjs:remote-load</code> and{' '}
-        <code>moxjs:error</code> DOM events for every remote load. Observability bridges them into
+        <code>@jorvel/runtime</code> emits <code>jorvel:remote-load</code> and{' '}
+        <code>jorvel:error</code> DOM events for every remote load. Observability bridges them into
         the hook registry automatically when you import the package.
       </p>
 
@@ -187,19 +187,19 @@ log.info('boot', { region: 'us-east' });
       <h2 id="recipe-otel">Recipe: OpenTelemetry bridge</h2>
       <CodeBlock
         language="ts"
-        code={`import { onError, onMetric, onRemoteLoad } from '@moxjs/observability';
+        code={`import { onError, onMetric, onRemoteLoad } from '@jorvel/observability';
 import { trace, metrics } from '@opentelemetry/api';
 
-const tracer = trace.getTracer('moxjs');
-const meter  = metrics.getMeter('moxjs');
-const navDuration = meter.createHistogram('moxjs.remote.load_ms');
+const tracer = trace.getTracer('jorvel');
+const meter  = metrics.getMeter('jorvel');
+const navDuration = meter.createHistogram('jorvel.remote.load_ms');
 
 onRemoteLoad((e) => {
   if (e.phase !== 'success') return;
   navDuration.record(e.durationMs, { remote: e.remote, cached: String(!!e.cached) });
 });
 
-onError((e) => tracer.startActiveSpan('moxjs.error', (span) => {
+onError((e) => tracer.startActiveSpan('jorvel.error', (span) => {
   span.recordException(e.error as Error);
   span.setAttributes({ source: e.source, ...(e.context ?? {}) });
   span.end();

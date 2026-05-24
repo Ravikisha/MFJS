@@ -1,5 +1,5 @@
 /**
- * Feature: @moxjs/state core + persist + devtools.
+ * Feature: @jorvel/state core + persist + devtools.
  */
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { createStore, SimpleStore, getStore, _resetStore } from '../../libs/state/dist/index.js';
@@ -66,7 +66,7 @@ describe('persistSimpleStore', () => {
 
 describe('connectDevtools', () => {
   it('returns a no-op when extension is absent', () => {
-    delete (globalThis as { __MOXJS_STATE_DEVTOOLS__?: unknown }).__MOXJS_STATE_DEVTOOLS__;
+    delete (globalThis as { __JORVEL_STATE_DEVTOOLS__?: unknown }).__JORVEL_STATE_DEVTOOLS__;
     delete (globalThis as { __REDUX_DEVTOOLS_EXTENSION__?: unknown }).__REDUX_DEVTOOLS_EXTENSION__;
     const store = createStore<{ n: number }, { type: 'inc' }>({ n: 0 }, (s) => s);
     const detach = connectDevtools(store);

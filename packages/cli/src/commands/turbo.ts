@@ -1,7 +1,7 @@
 /**
- * `moxjs turbo` — scaffold a `turbo.json` for the workspace.
+ * `jorvel turbo` — scaffold a `turbo.json` for the workspace.
  *
- * Wires the standard MOXJS task graph:
+ * Wires the standard JORVEL task graph:
  *   - `build` depends on upstream `^build`, caches `dist/**`
  *   - `typecheck` depends on upstream `^build`, no outputs
  *   - `test` depends on local `build`, no outputs, no cache for now

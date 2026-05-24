@@ -1,5 +1,5 @@
 /**
- * @moxjs/types — Module Federation config types (moxjs.federation.json shape).
+ * @jorvel/types — Module Federation config types (jorvel.federation.json shape).
  */
 
 // ── Shared dependency descriptor ─────────────────────────────────────────────
@@ -11,12 +11,12 @@ export type SharedDependency = {
   requiredVersion?: string | false;
 };
 
-// ── Federation config (written to moxjs.federation.json) ─────────────────────
+// ── Federation config (written to jorvel.federation.json) ─────────────────────
 
 /**
- * Full shape of `moxjs.federation.json`.
+ * Full shape of `jorvel.federation.json`.
  *
- * This is written by `moxjs federation` and consumed by `rspack.config.mjs`
+ * This is written by `jorvel federation` and consumed by `rspack.config.mjs`
  * via Rspack's `ModuleFederationPlugin`.
  */
 export type FederationConfig = {

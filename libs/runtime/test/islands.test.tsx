@@ -46,16 +46,16 @@ describe('Island — load strategy', () => {
     const { host, unmount } = mount(
       <Island load={load} fallback={<p data-testid="fallback">fallback</p>} />,
     );
-    await waitFor(() => !!host.querySelector('[data-moxjs-island]'));
+    await waitFor(() => !!host.querySelector('[data-jorvel-island]'));
     await waitFor(() => !!host.querySelector('[data-testid="hello"]'));
     expect(load).toHaveBeenCalledTimes(1);
     unmount();
   });
 
-  it('adds a data-moxjs-island attribute identifying the strategy', async () => {
+  it('adds a data-jorvel-island attribute identifying the strategy', async () => {
     const load = vi.fn(async () => HelloDefault);
     const { host, unmount } = mount(<Island load={load} strategy="load" />);
-    await waitFor(() => !!host.querySelector('[data-moxjs-island="load"]'));
+    await waitFor(() => !!host.querySelector('[data-jorvel-island="load"]'));
     unmount();
   });
 });
@@ -152,10 +152,10 @@ describe('Island — interaction strategy', () => {
     const load = vi.fn(async () => HelloDefault);
     const { host, unmount } = mount(<Island load={load} strategy="interaction" />);
 
-    await waitFor(() => !!host.querySelector('[data-moxjs-island="interaction"]'));
+    await waitFor(() => !!host.querySelector('[data-jorvel-island="interaction"]'));
     // Wait one more microtask so the useEffect has attached the listener.
     await new Promise((r) => setTimeout(r, 10));
-    const wrapper = host.querySelector('[data-moxjs-island="interaction"]') as HTMLDivElement;
+    const wrapper = host.querySelector('[data-jorvel-island="interaction"]') as HTMLDivElement;
     wrapper.dispatchEvent(new Event('click', { bubbles: true }));
 
     await waitFor(() => !!host.querySelector('[data-testid="hello"]'));
@@ -167,7 +167,7 @@ describe('clientBoundary', () => {
   it('marks the component for build-time scanning', () => {
     const C: React.FC = () => null;
     const wrapped = clientBoundary(C);
-    expect((wrapped as unknown as { __moxjsClient?: true }).__moxjsClient).toBe(true);
+    expect((wrapped as unknown as { __jorvelClient?: true }).__jorvelClient).toBe(true);
     expect(wrapped).toBe(C);
   });
 });

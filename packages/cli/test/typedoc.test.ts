@@ -9,7 +9,7 @@ import {
 } from '../src/commands/typedoc.js';
 
 async function makeWorkspace(name: string, layout: Record<string, string>): Promise<string> {
-  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), `moxjs-typedoc-${name}-`));
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), `jorvel-typedoc-${name}-`));
   for (const [rel, contents] of Object.entries(layout)) {
     await fs.outputFile(path.join(tmp, rel), contents);
   }
@@ -19,20 +19,20 @@ async function makeWorkspace(name: string, layout: Record<string, string>): Prom
 describe('discoverPackages', () => {
   it('finds libs/* with src/index.ts and a package.json name', async () => {
     const ws = await makeWorkspace('disc', {
-      'libs/a/package.json': JSON.stringify({ name: '@moxjs/a' }),
+      'libs/a/package.json': JSON.stringify({ name: '@jorvel/a' }),
       'libs/a/src/index.ts': '',
-      'libs/b/package.json': JSON.stringify({ name: '@moxjs/b' }),
+      'libs/b/package.json': JSON.stringify({ name: '@jorvel/b' }),
       'libs/b/src/index.tsx': '',
     });
     const pkgs = await discoverPackages(ws);
-    expect(pkgs.map((p) => p.name)).toEqual(['@moxjs/a', '@moxjs/b']);
+    expect(pkgs.map((p) => p.name)).toEqual(['@jorvel/a', '@jorvel/b']);
     expect(pkgs[1]!.entry).toBe('src/index.tsx');
     await fs.rm(ws, { recursive: true, force: true });
   });
 
   it('skips libs without an entry file', async () => {
     const ws = await makeWorkspace('no-entry', {
-      'libs/x/package.json': JSON.stringify({ name: '@moxjs/x' }),
+      'libs/x/package.json': JSON.stringify({ name: '@jorvel/x' }),
     });
     expect(await discoverPackages(ws)).toEqual([]);
     await fs.rm(ws, { recursive: true, force: true });
@@ -40,29 +40,29 @@ describe('discoverPackages', () => {
 
   it('also discovers packages/* (e.g. the CLI itself)', async () => {
     const ws = await makeWorkspace('cli', {
-      'packages/cli/package.json': JSON.stringify({ name: '@moxjs/cli' }),
+      'packages/cli/package.json': JSON.stringify({ name: 'jorvel' }),
       'packages/cli/src/index.ts': '',
     });
     const pkgs = await discoverPackages(ws);
-    expect(pkgs.map((p) => p.name)).toEqual(['@moxjs/cli']);
+    expect(pkgs.map((p) => p.name)).toEqual(['jorvel']);
     await fs.rm(ws, { recursive: true, force: true });
   });
 
   it('returns [] for a missing root', async () => {
-    const ws = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-typedoc-empty-'));
+    const ws = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-typedoc-empty-'));
     expect(await discoverPackages(ws)).toEqual([]);
     await fs.rm(ws, { recursive: true, force: true });
   });
 
   it('sorts by package name', async () => {
     const ws = await makeWorkspace('sort', {
-      'libs/z/package.json': JSON.stringify({ name: '@moxjs/z' }),
+      'libs/z/package.json': JSON.stringify({ name: '@jorvel/z' }),
       'libs/z/src/index.ts': '',
-      'libs/a/package.json': JSON.stringify({ name: '@moxjs/a' }),
+      'libs/a/package.json': JSON.stringify({ name: '@jorvel/a' }),
       'libs/a/src/index.ts': '',
     });
     const pkgs = await discoverPackages(ws);
-    expect(pkgs.map((p) => p.name)).toEqual(['@moxjs/a', '@moxjs/z']);
+    expect(pkgs.map((p) => p.name)).toEqual(['@jorvel/a', '@jorvel/z']);
     await fs.rm(ws, { recursive: true, force: true });
   });
 });
@@ -92,7 +92,7 @@ describe('buildTypedocConfig', () => {
 describe('runTypedoc', () => {
   it('writes the generated config + spawns typedoc with --options', async () => {
     const ws = await makeWorkspace('run', {
-      'libs/x/package.json': JSON.stringify({ name: '@moxjs/x' }),
+      'libs/x/package.json': JSON.stringify({ name: '@jorvel/x' }),
       'libs/x/src/index.ts': '',
     });
     const spawn = vi.fn(async () => ({ exitCode: 0 }));
@@ -106,7 +106,7 @@ describe('runTypedoc', () => {
 
   it('dryRun writes nothing and does not spawn', async () => {
     const ws = await makeWorkspace('dry', {
-      'libs/x/package.json': JSON.stringify({ name: '@moxjs/x' }),
+      'libs/x/package.json': JSON.stringify({ name: '@jorvel/x' }),
       'libs/x/src/index.ts': '',
     });
     const spawn = vi.fn();
@@ -118,7 +118,7 @@ describe('runTypedoc', () => {
   });
 
   it('skips spawn when no packages discovered', async () => {
-    const ws = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-typedoc-noop-'));
+    const ws = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-typedoc-noop-'));
     const spawn = vi.fn();
     const r = await runTypedoc({ cwd: ws, out: 'out', spawn });
     expect(r.packages).toEqual([]);
@@ -129,7 +129,7 @@ describe('runTypedoc', () => {
 
   it('propagates a non-zero exit code', async () => {
     const ws = await makeWorkspace('fail', {
-      'libs/x/package.json': JSON.stringify({ name: '@moxjs/x' }),
+      'libs/x/package.json': JSON.stringify({ name: '@jorvel/x' }),
       'libs/x/src/index.ts': '',
     });
     const spawn = vi.fn(async () => ({ exitCode: 2, stderr: 'bad' }));

@@ -11,44 +11,44 @@ interface TemplateOption {
 
 const TEMPLATES: TemplateOption[] = [
   {
-    id: 'moxjs',
+    id: 'jorvel',
     name: 'MoxJS App',
-    desc: 'The official way to build microfrontend applications with moxjs.',
+    desc: 'The official way to build microfrontend applications with jorvel.',
     tag: 'Recommended',
     recommended: true,
   },
   {
     id: 'react',
     name: 'MoxJS + React',
-    desc: 'Integrate React microfrontends with moxjs seamlessly.',
+    desc: 'Integrate React microfrontends with jorvel seamlessly.',
     tag: 'React',
     templateFlag: 'react',
   },
   {
     id: 'vue',
     name: 'MoxJS + Vue',
-    desc: 'Build microfrontends using Vue and moxjs.',
+    desc: 'Build microfrontends using Vue and jorvel.',
     tag: 'Vue',
     templateFlag: 'vue',
   },
   {
     id: 'svelte',
     name: 'MoxJS + Svelte',
-    desc: 'Create powerful microfrontends with Svelte and moxjs.',
+    desc: 'Create powerful microfrontends with Svelte and jorvel.',
     tag: 'Svelte',
     templateFlag: 'svelte',
   },
   {
     id: 'angular',
     name: 'MoxJS + Angular',
-    desc: 'Use Angular microfrontends with moxjs.',
+    desc: 'Use Angular microfrontends with jorvel.',
     tag: 'Angular',
     templateFlag: 'angular',
   },
   {
     id: 'blank',
     name: 'Custom (Blank)',
-    desc: 'Start with a minimal moxjs setup and add what you need.',
+    desc: 'Start with a minimal jorvel setup and add what you need.',
     tag: 'Vanilla',
     templateFlag: 'blank',
   },
@@ -59,7 +59,7 @@ export interface WelcomeProps {
 }
 
 export function Welcome({ defaultProjectName = 'my-mox-app' }: WelcomeProps) {
-  const [selected, setSelected] = useState<string>('moxjs');
+  const [selected, setSelected] = useState<string>('jorvel');
   const [projectName, setProjectName] = useState<string>(defaultProjectName);
   const [advancedOpen, setAdvancedOpen] = useState<boolean>(false);
   const [tailwind, setTailwind] = useState<boolean>(true);
@@ -78,7 +78,7 @@ export function Welcome({ defaultProjectName = 'my-mox-app' }: WelcomeProps) {
   if (ci) flags.push('--ci');
   if (exampleRemote) flags.push('--with-remote');
 
-  const cmd = `npx @moxjs/cli@latest init ${safeName}${flags.length ? ' ' + flags.join(' ') : ''}`;
+  const cmd = `npx jorvel@latest init ${safeName}${flags.length ? ' ' + flags.join(' ') : ''}`;
 
   function copyCmd() {
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
@@ -93,7 +93,7 @@ export function Welcome({ defaultProjectName = 'my-mox-app' }: WelcomeProps) {
       <style>{CSS}</style>
 
       <header className="mw-top">
-        <a className="mw-brand" href="/" aria-label="moxjs home">
+        <a className="mw-brand" href="/" aria-label="jorvel home">
           <Logo size={32} />
           <span className="mw-brand-word">
             mox<span className="mw-brand-accent">js</span>
@@ -101,7 +101,7 @@ export function Welcome({ defaultProjectName = 'my-mox-app' }: WelcomeProps) {
         </a>
         <a
           className="mw-doc"
-          href="https://moxjs.vercel.app/docs"
+          href="https://jorveljs.vercel.app/docs"
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -116,7 +116,7 @@ export function Welcome({ defaultProjectName = 'my-mox-app' }: WelcomeProps) {
           Project created successfully
         </span>
         <h1 className="mw-title">
-          Welcome to <span className="mw-title-accent">moxjs</span>
+          Welcome to <span className="mw-title-accent">jorvel</span>
         </h1>
         <p className="mw-subtitle">Let&apos;s build something amazing.</p>
 
@@ -230,7 +230,7 @@ export function Welcome({ defaultProjectName = 'my-mox-app' }: WelcomeProps) {
             <div className="mw-cmd-wrap">
               <code className="mw-cmd">
                 <span className="mw-cmd-tok mw-cmd-prog">npx</span>{' '}
-                <span className="mw-cmd-tok mw-cmd-pkg">@moxjs/cli@latest</span>{' '}
+                <span className="mw-cmd-tok mw-cmd-pkg">jorvel@latest</span>{' '}
                 <span className="mw-cmd-tok mw-cmd-sub">init</span>{' '}
                 <span className="mw-cmd-tok mw-cmd-arg">{safeName}</span>
                 {flags.length > 0 && (
@@ -256,7 +256,7 @@ export function Welcome({ defaultProjectName = 'my-mox-app' }: WelcomeProps) {
               type="button"
               className="mw-cta"
               onClick={() => {
-                window.open('https://moxjs.vercel.app/docs/getting-started', '_blank', 'noopener');
+                window.open('https://jorveljs.vercel.app/docs/getting-started', '_blank', 'noopener');
               }}
             >
               Let&apos;s build! <span aria-hidden>🚀</span>
@@ -273,13 +273,13 @@ export function Welcome({ defaultProjectName = 'my-mox-app' }: WelcomeProps) {
           </a>
         </span>
         <div className="mw-foot-links">
-          <a href="https://github.com/Ravikisha/MFJS" target="_blank" rel="noopener noreferrer">
+          <a href="https://github.com/Ravikisha/JorvelJS" target="_blank" rel="noopener noreferrer">
             <GitHubIcon /> GitHub
           </a>
-          <a href="https://moxjs.vercel.app/docs" target="_blank" rel="noopener noreferrer">
+          <a href="https://jorveljs.vercel.app/docs" target="_blank" rel="noopener noreferrer">
             <BookIcon /> Docs
           </a>
-          <a href="https://moxjs.vercel.app/" target="_blank" rel="noopener noreferrer">
+          <a href="https://jorveljs.vercel.app/" target="_blank" rel="noopener noreferrer">
             <DiscordIcon /> Live site
           </a>
         </div>
@@ -327,7 +327,7 @@ function Logo({ size = 32 }: { size?: number }) {
 }
 
 function TemplateIcon({ id }: { id: string }) {
-  if (id === 'moxjs') return <Logo size={42} />;
+  if (id === 'jorvel') return <Logo size={42} />;
   if (id === 'react')
     return (
       <svg viewBox="-12 -12 24 24" width={42} height={42} fill="none" aria-hidden>
@@ -539,7 +539,7 @@ const CSS = `
   background: rgba(255,255,255,0.04); border: 1px solid var(--mw-border);
   color: var(--mw-muted);
 }
-.mw-tag-moxjs { background: rgba(139,92,246,0.18); border-color: rgba(139,92,246,0.35); color: #c4b5fd; }
+.mw-tag-jorvel { background: rgba(139,92,246,0.18); border-color: rgba(139,92,246,0.35); color: #c4b5fd; }
 .mw-tag-react { background: rgba(34,211,238,0.12); border-color: rgba(34,211,238,0.32); color: #67e8f9; }
 .mw-tag-vue { background: rgba(66,184,131,0.12); border-color: rgba(66,184,131,0.30); color: #6ee7b7; }
 .mw-tag-svelte { background: rgba(255,62,0,0.12); border-color: rgba(255,62,0,0.30); color: #fdba74; }

@@ -98,7 +98,7 @@ describe('buildHealthDocument', () => {
 describe('createHealthHandler', () => {
   it('serves the doc with 200 + no-store at the configured path', async () => {
     const handler = createHealthHandler({ name: 'dashboard', version: '1.0.0', now: () => T0 });
-    const res = await handler({ url: 'https://x/moxjs/health' });
+    const res = await handler({ url: 'https://x/jorvel/health' });
     expect(res.status).toBe(200);
     expect(res.headers['content-type']).toBe('application/json; charset=utf-8');
     expect(res.headers['cache-control']).toBe('no-store');
@@ -113,7 +113,7 @@ describe('createHealthHandler', () => {
       now: () => T0,
       probes: { db: () => ({ ok: false }) },
     });
-    const res = await handler({ url: 'https://x/moxjs/health' });
+    const res = await handler({ url: 'https://x/jorvel/health' });
     expect(res.status).toBe(503);
     expect(JSON.parse(res.body).state).toBe('down');
   });
@@ -127,7 +127,7 @@ describe('createHealthHandler', () => {
   it('honors custom path', async () => {
     const handler = createHealthHandler({ name: 'a', version: '1', now: () => T0, path: '/_h' });
     expect((await handler({ url: 'https://x/_h' })).status).toBe(200);
-    expect((await handler({ url: 'https://x/moxjs/health' })).status).toBe(404);
+    expect((await handler({ url: 'https://x/jorvel/health' })).status).toBe(404);
   });
 });
 
@@ -135,7 +135,7 @@ describe('fetchHealth', () => {
   it('returns the doc on 200', async () => {
     const fakeDoc = { name: 'a', version: '1', state: 'up', uptimeMs: 0, timestamp: T0 };
     const fakeFetch = vi.fn(async () => new Response(JSON.stringify(fakeDoc), { status: 200 }));
-    const doc = await fetchHealth('https://x/moxjs/health', { fetch: fakeFetch as never });
+    const doc = await fetchHealth('https://x/jorvel/health', { fetch: fakeFetch as never });
     expect(doc).toEqual(fakeDoc);
   });
 

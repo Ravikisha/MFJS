@@ -1,5 +1,5 @@
 /**
- * @moxjs/ssr — request-keyed HTML cache for ETag-before-render.
+ * @jorvel/ssr — request-keyed HTML cache for ETag-before-render.
  *
  * The default `LruHtmlCache` is an in-memory map with insertion-order eviction
  * and an optional TTL. Replace with a Redis/KV-backed implementation in

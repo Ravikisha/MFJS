@@ -1,4 +1,4 @@
-# @moxjs/prettier-config
+# @jorvel/prettier-config
 
 Shared Prettier config.
 
@@ -6,6 +6,6 @@ Shared Prettier config.
 
 ```json
 {
-  "prettier": "@moxjs/prettier-config"
+  "prettier": "@jorvel/prettier-config"
 }
 ```

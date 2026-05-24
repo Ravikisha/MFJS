@@ -24,7 +24,7 @@ const TEMPLATE = `<!doctype html><html><body><div id="root"><!--ssr-outlet--></d
 // Cleanup helpers
 const tmpDirs: string[] = [];
 async function makeTmp() {
-  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-static-'));
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-static-'));
   tmpDirs.push(dir);
   return dir;
 }

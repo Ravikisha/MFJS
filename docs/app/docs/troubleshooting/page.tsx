@@ -4,7 +4,7 @@ import { Callout } from '@/components/docs/callout';
 export const metadata = {
   title: 'Troubleshooting',
   description:
-    'The fastest known fixes for the issues teams hit during MOXJS adoption — Invalid hook call, remote 404, hydration mismatch, CSP block, Rspack quirks.',
+    'The fastest known fixes for the issues teams hit during JORVEL adoption — Invalid hook call, remote 404, hydration mismatch, CSP block, Rspack quirks.',
 };
 
 export default function Troubleshooting() {
@@ -12,7 +12,7 @@ export default function Troubleshooting() {
     <>
       <h1>Troubleshooting</h1>
       <p>
-        Hit a wall? Run <code>moxjs diagnose</code> first — it inspects Node, pnpm, ports,
+        Hit a wall? Run <code>jorvel diagnose</code> first — it inspects Node, pnpm, ports,
         federation configs, and React-duplication risks. The issues below cover the rest.
       </p>
 
@@ -40,7 +40,7 @@ export default function Troubleshooting() {
           at build time.
         </li>
         <li>
-          Run <code>moxjs diagnose</code> — it will flag duplicate React versions discovered in{' '}
+          Run <code>jorvel diagnose</code> — it will flag duplicate React versions discovered in{' '}
           <code>node_modules</code>.
         </li>
       </ol>
@@ -54,20 +54,20 @@ export default function Troubleshooting() {
       <CodeBlock
         language="bash"
         code={`# Verify both sides
-cat apps/dashboard/moxjs.federation.json  | jq .name        # "dashboard"
+cat apps/dashboard/jorvel.federation.json  | jq .name        # "dashboard"
 cat apps/shell/rspack.config.mjs         | grep -A2 remotes # dashboard@...
 
 # Regenerate if you renamed
-moxjs federation`}
+jorvel federation`}
       />
 
       <h2 id="remote-404">Dev-time 404 for a remote split chunk</h2>
       <p>
         Cross-origin chunks require CORS or same-origin. The fix is one flag:
       </p>
-      <CodeBlock language="bash" code={`moxjs dev --proxy-remotes`} />
+      <CodeBlock language="bash" code={`jorvel dev --proxy-remotes`} />
       <p>
-        That proxies <code>/moxjs/remotes/&lt;name&gt;/*</code> on the host origin to{' '}
+        That proxies <code>/jorvel/remotes/&lt;name&gt;/*</code> on the host origin to{' '}
         <code>http://localhost:&lt;port&gt;/*</code> on the remote — no CORS dance required.
       </p>
 
@@ -75,15 +75,15 @@ moxjs federation`}
       <p>The file-based routes manifest is static. One of:</p>
       <ul>
         <li>
-          Run <code>moxjs routes</code> once after adding/renaming a file in{' '}
+          Run <code>jorvel routes</code> once after adding/renaming a file in{' '}
           <code>src/pages/</code>.
         </li>
         <li>
-          Run <code>moxjs routes --watch</code> in a second terminal during dev — it regenerates on
+          Run <code>jorvel routes --watch</code> in a second terminal during dev — it regenerates on
           every change.
         </li>
         <li>
-          Add it to your <code>pnpm dev</code> alongside <code>moxjs dev</code> via{' '}
+          Add it to your <code>pnpm dev</code> alongside <code>jorvel dev</code> via{' '}
           <code>concurrently</code> or <code>npm-run-all</code>.
         </li>
       </ul>
@@ -124,8 +124,8 @@ React.useEffect(() => {
       </p>
       <CodeBlock
         language="ts"
-        code={`import { buildCsp, generateNonce } from '@moxjs/security';
-import { serializeState } from '@moxjs/ssr';
+        code={`import { buildCsp, generateNonce } from '@jorvel/security';
+import { serializeState } from '@jorvel/ssr';
 
 const nonce = generateNonce();
 response.setHeader('Content-Security-Policy', buildCsp({ nonce, strictDynamic: true }));
@@ -153,7 +153,7 @@ html = html.replace('</head>', serializeState(state, { nonce }) + '</head>');`}
       <p>
         StrictMode double-invokes effects in dev. Calling <code>createRouter()</code> inside a{' '}
         <code>useEffect</code> creates two routers, two history subscriptions, and you&apos;ll see
-        duplicated <code>moxjs:navigate</code> handling.
+        duplicated <code>jorvel:navigate</code> handling.
       </p>
       <p>
         Fix: call <code>getRouter()</code> at <strong>module scope</strong> in{' '}
@@ -188,7 +188,7 @@ Get-NetTCPConnection -LocalPort 3000 | Select-Object -ExpandProperty OwningProce
 lsof -ti:3000 | xargs kill -9`}
       />
       <p>
-        Or change the port in <code>moxjs.app.json</code> and re-run <code>moxjs federation</code>{' '}
+        Or change the port in <code>jorvel.app.json</code> and re-run <code>jorvel federation</code>{' '}
         to update remote URLs in the host config.
       </p>
 
@@ -213,9 +213,9 @@ lsof -ti:3000 | xargs kill -9`}
       </ul>
 
       <Callout variant="info" title="Still stuck?">
-        Run <code>moxjs diagnose</code> for a full environment report, and set{' '}
-        <code>MOXJS_DEBUG=1</code> to surface stack traces. Open an issue at{' '}
-        <a href="https://github.com/Ravikisha/MFJS/issues">github.com/Ravikisha/MFJS/issues</a> with the{' '}
+        Run <code>jorvel diagnose</code> for a full environment report, and set{' '}
+        <code>JORVEL_DEBUG=1</code> to surface stack traces. Open an issue at{' '}
+        <a href="https://github.com/Ravikisha/JorvelJS/issues">github.com/Ravikisha/JorvelJS/issues</a> with the{' '}
         <code>diagnose</code> output attached.
       </Callout>
     </>

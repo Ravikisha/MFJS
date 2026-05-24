@@ -10,7 +10,7 @@ import {
   useOutletParams,
   type NestedRoute,
 } from '../src/nested-routes.js';
-import { dispatchMoxjsNavigate } from '../src/router.js';
+import { dispatchJorvelNavigate } from '../src/router.js';
 
 function mount(element: React.ReactElement) {
   const host = document.createElement('div');
@@ -95,7 +95,7 @@ describe('resolveChain', () => {
 describe('NestedRouter', () => {
   it('renders the matched leaf route', async () => {
     window.history.replaceState({}, '', '/about');
-    dispatchMoxjsNavigate({ to: '/about', mode: 'replace' });
+    dispatchJorvelNavigate({ to: '/about', mode: 'replace' });
     const routes: NestedRoute[] = [{ path: '/about', element: <p data-testid="about">about-page</p> }];
 
     const { host, unmount } = mount(<NestedRouter routes={routes} />);
@@ -114,7 +114,7 @@ describe('NestedRouter', () => {
     }
 
     window.history.replaceState({}, '', '/app/settings');
-    dispatchMoxjsNavigate({ to: '/app/settings', mode: 'replace' });
+    dispatchJorvelNavigate({ to: '/app/settings', mode: 'replace' });
 
     const routes: NestedRoute[] = [
       {
@@ -135,7 +135,7 @@ describe('NestedRouter', () => {
 
   it('renders the notFound element when nothing matches', async () => {
     window.history.replaceState({}, '', '/nope');
-    dispatchMoxjsNavigate({ to: '/nope', mode: 'replace' });
+    dispatchJorvelNavigate({ to: '/nope', mode: 'replace' });
     const routes: NestedRoute[] = [{ path: '/about', element: <p>about</p> }];
 
     const { host, unmount } = mount(
@@ -164,7 +164,7 @@ describe('NestedRouter', () => {
     }
 
     window.history.replaceState({}, '', '/users/42/posts/7');
-    dispatchMoxjsNavigate({ to: '/users/42/posts/7', mode: 'replace' });
+    dispatchJorvelNavigate({ to: '/users/42/posts/7', mode: 'replace' });
 
     const routes: NestedRoute[] = [
       {
@@ -185,7 +185,7 @@ describe('NestedRouter', () => {
     }
 
     window.history.replaceState({}, '', '/lazy');
-    dispatchMoxjsNavigate({ to: '/lazy', mode: 'replace' });
+    dispatchJorvelNavigate({ to: '/lazy', mode: 'replace' });
 
     const routes: NestedRoute[] = [
       { path: '/lazy', lazy: async () => ({ default: LazyLeaf }) },

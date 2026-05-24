@@ -113,7 +113,7 @@ export function Island({
   }, [strategy, media, visibleOptions, interactionEvents, load]);
 
   return (
-    <div ref={ref} data-moxjs-island={strategy}>
+    <div ref={ref} data-jorvel-island={strategy}>
       {Component ? <Component {...rest}>{children}</Component> : (fallback ?? children ?? null)}
     </div>
   );
@@ -121,6 +121,6 @@ export function Island({
 
 /** Marker for build-time scanning — indicates a component boundary should hydrate. */
 export function clientBoundary<T extends React.ComponentType<Record<string, unknown>>>(Component: T): T {
-  (Component as unknown as { __moxjsClient?: true }).__moxjsClient = true;
+  (Component as unknown as { __jorvelClient?: true }).__jorvelClient = true;
   return Component;
 }

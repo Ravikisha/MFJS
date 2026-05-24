@@ -1,10 +1,10 @@
-# MOXJS SaaS example
+# JORVEL SaaS example
 
-This example focuses on **SSR/SSG** using `moxjs ssr export`.
+This example focuses on **SSR/SSG** using `jorvel ssr export`.
 
 ## What it demonstrates
 
-- `moxjs ssr export` producing a static HTML output directory (`dist-ssg/`)
+- `jorvel ssr export` producing a static HTML output directory (`dist-ssg/`)
 - A small “marketing + app” route set
 
 ## Scripts

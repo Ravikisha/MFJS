@@ -1,5 +1,5 @@
 import React from 'react';
-import { MOXJS_NAVIGATE_EVENT, type NavigateDetail } from './router.js';
+import { JORVEL_NAVIGATE_EVENT, type NavigateDetail } from './router.js';
 import { usePathname } from './routing.js';
 
 export type NavigationPhase = 'start' | 'complete';
@@ -31,8 +31,8 @@ export function useNavigationEvents(handler: (e: NavigationEvent) => void): void
       });
     };
 
-    window.addEventListener(MOXJS_NAVIGATE_EVENT, onStart);
-    return () => window.removeEventListener(MOXJS_NAVIGATE_EVENT, onStart);
+    window.addEventListener(JORVEL_NAVIGATE_EVENT, onStart);
+    return () => window.removeEventListener(JORVEL_NAVIGATE_EVENT, onStart);
   }, []);
 
   const pathname = usePathname();

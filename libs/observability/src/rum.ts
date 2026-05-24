@@ -97,7 +97,7 @@ function makeSession(rng: () => number): string {
 
 export function startRum(opts: RumOptions = {}): RumCollector {
   const transport = opts.transport ?? (opts.endpoint ? defaultTransport(opts.endpoint) : null);
-  if (!transport) throw new Error('[moxjs/observability] startRum requires either `transport` or `endpoint`');
+  if (!transport) throw new Error('[jorvel/observability] startRum requires either `transport` or `endpoint`');
 
   const batchSize = Math.max(1, opts.batchSize ?? 20);
   const flushIntervalMs = opts.flushIntervalMs ?? 10_000;

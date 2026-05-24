@@ -2,7 +2,7 @@ import { CodeBlock } from '@/components/site/code-block';
 import { Callout } from '@/components/docs/callout';
 
 export const metadata = {
-  title: '@moxjs/ui',
+  title: '@jorvel/ui',
   description:
     'Headless-ish design system: Button, Input, Modal, Toast, Card, ThemeProvider — plus a Storybook scaffold.',
 };
@@ -10,7 +10,7 @@ export const metadata = {
 export default function UiPage() {
   return (
     <>
-      <h1>@moxjs/ui</h1>
+      <h1>@jorvel/ui</h1>
       <p>
         Lean component primitives styled with CSS variables, no runtime dependencies, and a
         Storybook scaffolder for the full design-system experience. The package solves the
@@ -34,7 +34,7 @@ export default function UiPage() {
       <h2 id="button">Button</h2>
       <CodeBlock
         language="tsx"
-        code={`import { Button } from '@moxjs/ui';
+        code={`import { Button } from '@jorvel/ui';
 
 <Button variant="primary" size="md" onClick={save}>Save</Button>
 <Button variant="secondary" size="sm">Cancel</Button>
@@ -56,7 +56,7 @@ export default function UiPage() {
       <h2 id="input">Input</h2>
       <CodeBlock
         language="tsx"
-        code={`import { Input } from '@moxjs/ui';
+        code={`import { Input } from '@jorvel/ui';
 
 <Input
   label="Email"
@@ -76,7 +76,7 @@ export default function UiPage() {
       </p>
       <CodeBlock
         language="tsx"
-        code={`import { Modal, Button } from '@moxjs/ui';
+        code={`import { Modal, Button } from '@jorvel/ui';
 
 const [open, setOpen] = useState(false);
 
@@ -106,7 +106,7 @@ const [open, setOpen] = useState(false);
       </p>
       <CodeBlock
         language="tsx"
-        code={`import { ThemeProvider, Button, Card } from '@moxjs/ui';
+        code={`import { ThemeProvider, Button, Card } from '@jorvel/ui';
 
 export default function App() {
   return (
@@ -123,13 +123,13 @@ export default function App() {
       <table>
         <thead><tr><th>Token</th><th>CSS variable</th><th>Default</th></tr></thead>
         <tbody>
-          <tr><td><code>colorPrimary</code></td><td><code>--moxjs-color-primary</code></td><td><code>#4f46e5</code></td></tr>
-          <tr><td><code>colorDanger</code></td><td><code>--moxjs-color-danger</code></td><td><code>#dc2626</code></td></tr>
-          <tr><td><code>colorBg</code></td><td><code>--moxjs-color-bg</code></td><td><code>#ffffff</code></td></tr>
-          <tr><td><code>colorText</code></td><td><code>--moxjs-color-text</code></td><td><code>#0f172a</code></td></tr>
-          <tr><td><code>radiusMd</code></td><td><code>--moxjs-radius-md</code></td><td><code>6px</code></td></tr>
-          <tr><td><code>shadowMd</code></td><td><code>--moxjs-shadow-md</code></td><td>shorthand</td></tr>
-          <tr><td><code>fontFamily</code></td><td><code>--moxjs-font-family</code></td><td>system stack</td></tr>
+          <tr><td><code>colorPrimary</code></td><td><code>--jorvel-color-primary</code></td><td><code>#4f46e5</code></td></tr>
+          <tr><td><code>colorDanger</code></td><td><code>--jorvel-color-danger</code></td><td><code>#dc2626</code></td></tr>
+          <tr><td><code>colorBg</code></td><td><code>--jorvel-color-bg</code></td><td><code>#ffffff</code></td></tr>
+          <tr><td><code>colorText</code></td><td><code>--jorvel-color-text</code></td><td><code>#0f172a</code></td></tr>
+          <tr><td><code>radiusMd</code></td><td><code>--jorvel-radius-md</code></td><td><code>6px</code></td></tr>
+          <tr><td><code>shadowMd</code></td><td><code>--jorvel-shadow-md</code></td><td>shorthand</td></tr>
+          <tr><td><code>fontFamily</code></td><td><code>--jorvel-font-family</code></td><td>system stack</td></tr>
         </tbody>
       </table>
 
@@ -140,8 +140,8 @@ export default function App() {
       </p>
       <CodeBlock
         language="tsx"
-        code={`import { ThemeProvider, defaultTheme } from '@moxjs/ui';
-import { withViewTransition } from '@moxjs/runtime';
+        code={`import { ThemeProvider, defaultTheme } from '@jorvel/ui';
+import { withViewTransition } from '@jorvel/runtime';
 
 const darkTheme = { ...defaultTheme, colorBg: '#0f172a', colorText: '#f8fafc' };
 
@@ -164,7 +164,7 @@ const toggle = () => withViewTransition(() => setMode((m) => m === 'dark' ? 'lig
       </p>
       <CodeBlock
         language="tsx"
-        code={`import { ToastProvider, useToast, Button } from '@moxjs/ui';
+        code={`import { ToastProvider, useToast, Button } from '@jorvel/ui';
 
 function Demo() {
   const toast = useToast();
@@ -206,7 +206,7 @@ export default function App() {
         language="ts"
         code={`import fs from 'node:fs/promises';
 import path from 'node:path';
-import { storybookFiles, storybookScripts, storybookDevDeps } from '@moxjs/ui';
+import { storybookFiles, storybookScripts, storybookDevDeps } from '@jorvel/ui';
 
 for (const f of storybookFiles()) {
   await fs.mkdir(path.dirname(f.path), { recursive: true });

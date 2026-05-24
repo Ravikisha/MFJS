@@ -1,5 +1,5 @@
 /**
- * @moxjs/ssr — renderToString
+ * @jorvel/ssr — renderToString
  *
  * Synchronously renders a React component tree to an HTML string for a given
  * server-side request path. Uses React 18's `renderToString` so the output is
@@ -10,7 +10,7 @@
 
 import { createElement } from 'react';
 import { renderToString as reactRenderToString, renderToStaticMarkup } from 'react-dom/server';
-import { escapeHtml } from '@moxjs/security';
+import { escapeHtml } from '@jorvel/security';
 import type { ComponentType } from 'react';
 import { isRedirect } from './redirect.js';
 import { isJsonResponse, isNotFound } from './response.js';
@@ -34,7 +34,7 @@ export interface RenderRouteOptions {
  *
  * @example
  * ```ts
- * import { renderRouteToString } from '@moxjs/ssr';
+ * import { renderRouteToString } from '@jorvel/ssr';
  *
  * const { html } = await renderRouteToString(App, { path: '/dashboard/settings' });
  * ```

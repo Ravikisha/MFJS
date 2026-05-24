@@ -2,7 +2,7 @@ import { CodeBlock } from '@/components/site/code-block';
 import { Callout } from '@/components/docs/callout';
 
 export const metadata = {
-  title: '@moxjs/state API',
+  title: '@jorvel/state API',
   description:
     'Singleton store registry, simple stores, Redux-style reducer stores, memoized selectors, structured selectors, middleware, devtools.',
 };
@@ -10,9 +10,9 @@ export const metadata = {
 export default function StateApi() {
   return (
     <>
-      <h1>@moxjs/state</h1>
+      <h1>@jorvel/state</h1>
       <p>
-        Lightweight shared-state primitives for MOXJS micro-frontends. Pins registries to{' '}
+        Lightweight shared-state primitives for JORVEL micro-frontends. Pins registries to{' '}
         <code>globalThis</code> so host + remote still observe the same store when MF singleton
         sharing fails. Federation share-scope is the fast path; <code>globalThis</code> is the
         safety net.
@@ -48,7 +48,7 @@ class SimpleStore<T> {
       <h3>Usage</h3>
       <CodeBlock
         language="ts"
-        code={`import { getSimpleStore } from '@moxjs/state';
+        code={`import { getSimpleStore } from '@jorvel/state';
 
 const theme = getSimpleStore<'light' | 'dark'>('theme', 'light');
 
@@ -83,7 +83,7 @@ interface Store<S, A> {
       <h3>Usage</h3>
       <CodeBlock
         language="ts"
-        code={`import { getStore } from '@moxjs/state';
+        code={`import { getStore } from '@jorvel/state';
 
 interface Cart { items: { sku: string; qty: number }[] }
 type Action =
@@ -137,7 +137,7 @@ interface MiddlewareApi<S, A> {
       <h3>Thunks</h3>
       <CodeBlock
         language="ts"
-        code={`import { createStoreWithMiddleware, thunkMiddleware } from '@moxjs/state';
+        code={`import { createStoreWithMiddleware, thunkMiddleware } from '@jorvel/state';
 
 const cart = createStoreWithMiddleware<Cart, Action>(initial, reducer, [thunkMiddleware()]);
 
@@ -153,10 +153,10 @@ cart.dispatch(fetchCart());`}
       <h3>Persistence</h3>
       <CodeBlock
         language="ts"
-        code={`import { persistenceMiddleware } from '@moxjs/state';
+        code={`import { persistenceMiddleware } from '@jorvel/state';
 
 const persisted = persistenceMiddleware<Cart, Action>({
-  key: 'moxjs:cart',
+  key: 'jorvel:cart',
   storage: typeof localStorage !== 'undefined' ? localStorage : undefined,
   serialize: JSON.stringify,
   deserialize: JSON.parse,
@@ -194,7 +194,7 @@ createStructuredSelector<S, M extends Record<string, Selector<S, any>>>(
       <h3>Examples</h3>
       <CodeBlock
         language="ts"
-        code={`import { createSelector, createStructuredSelector } from '@moxjs/state';
+        code={`import { createSelector, createStructuredSelector } from '@jorvel/state';
 
 const items = (s: Cart) => s.items;
 const total = createSelector(items, (xs) => xs.reduce((n, i) => n + i.qty, 0));
@@ -248,8 +248,8 @@ const store = getStore('cart', initial, reducer);   // first call wins — serve
 
       <h2 id="federation">Federation singleton</h2>
       <p>
-        <code>@moxjs/state</code> is declared as a singleton in the generated{' '}
-        <code>moxjs.federation.json</code>. Combined with the <code>globalThis</code> registry,
+        <code>@jorvel/state</code> is declared as a singleton in the generated{' '}
+        <code>jorvel.federation.json</code>. Combined with the <code>globalThis</code> registry,
         two bundles loading the package independently still write to the same store map.
       </p>
 
@@ -267,7 +267,7 @@ const store = getStore('cart', initial, reducer);   // first call wins — serve
 _resetStore(key?: string): void;
 _resetSimpleStore(key?: string): void;
 
-import { _resetStore } from '@moxjs/state';
+import { _resetStore } from '@jorvel/state';
 
 beforeEach(() => { _resetStore(); });`}
       />

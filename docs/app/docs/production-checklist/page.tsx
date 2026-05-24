@@ -4,7 +4,7 @@ import { Callout } from '@/components/docs/callout';
 export const metadata = {
   title: 'Production checklist',
   description:
-    'Pre-launch checklist for MOXJS apps. Security, observability, performance, reliability, deploy, release process.',
+    'Pre-launch checklist for JORVEL apps. Security, observability, performance, reliability, deploy, release process.',
 };
 
 interface CheckItem {
@@ -46,7 +46,7 @@ const groups: CheckGroup[] = [
       { task: 'HTTPS only — HSTS header emitted with includeSubDomains + preload' },
       { task: 'CORS restricted to known origins (no wildcard in prod)' },
       { task: 'Secrets stored in the platform secret manager — never in .env checked in' },
-      { task: 'Rate limiting on auth endpoints (@moxjs/security rate-limit)' },
+      { task: 'Rate limiting on auth endpoints (@jorvel/security rate-limit)' },
     ],
   },
   {
@@ -66,7 +66,7 @@ const groups: CheckGroup[] = [
       },
       { task: 'onRemoteLoad telemetry feeds the same RUM pipeline as page metrics' },
       { task: 'Source maps uploaded to the error tracker (gated behind the build hash)' },
-      { task: '@moxjs/cli version printed in every error report (audit trail)' },
+      { task: 'jorvel version printed in every error report (audit trail)' },
     ],
   },
   {
@@ -74,8 +74,8 @@ const groups: CheckGroup[] = [
     blurb:
       'Each remote pays a network round-trip on first load. Budget it, monitor it, and reject regressions in CI.',
     tasks: [
-      { task: 'moxjs perf budgets green in CI' },
-      { task: 'Bundle analyzer (moxjs analyze) reviewed before each release' },
+      { task: 'jorvel perf budgets green in CI' },
+      { task: 'Bundle analyzer (jorvel analyze) reviewed before each release' },
       {
         task: 'Remote preload tags in SSR head (remoteEntryPreloads)',
         href: '/docs/concurrent-preload',
@@ -86,7 +86,7 @@ const groups: CheckGroup[] = [
       },
       { task: 'Assets hashed and served with immutable cache-control' },
       { task: 'Compression (gzip + brotli) enabled at the edge' },
-      { task: 'Image derivatives generated for every breakpoint (moxjs image)' },
+      { task: 'Image derivatives generated for every breakpoint (jorvel image)' },
       { task: 'Fonts preloaded with crossorigin=anonymous' },
     ],
   },
@@ -116,8 +116,8 @@ const groups: CheckGroup[] = [
         task: 'Adapter scaffolded (Vercel / Cloudflare / Node / Docker)',
         href: '/docs/deployment',
       },
-      { task: 'CDN publicPath set in moxjs.config.ts' },
-      { task: 'Preview deploy per PR (moxjs ci affected)' },
+      { task: 'CDN publicPath set in jorvel.config.ts' },
+      { task: 'Preview deploy per PR (jorvel ci affected)' },
       { task: 'Rollback plan documented and rehearsed' },
       { task: 'Smoke tests run against the deploy URL before flipping DNS' },
       { task: 'CDN cache purged on release (or version-namespaced URLs)' },

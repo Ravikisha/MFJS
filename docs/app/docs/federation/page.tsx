@@ -7,7 +7,7 @@ import { NetworkIcon } from '@/components/icons';
 export const metadata = {
   title: 'Module Federation',
   description:
-    'How MOXJS configures Rspack Module Federation: shared deps, allowlists, SRI, CDN public-path, and the typed contract layer.',
+    'How JORVEL configures Rspack Module Federation: shared deps, allowlists, SRI, CDN public-path, and the typed contract layer.',
 };
 
 export default function FederationPage() {
@@ -18,56 +18,56 @@ export default function FederationPage() {
       </Badge>
       <h1>Module Federation</h1>
       <p>
-        MOXJS sits on top of Rspack&apos;s <code>ModuleFederationPlugin</code> and adds three things: a
+        JORVEL sits on top of Rspack&apos;s <code>ModuleFederationPlugin</code> and adds three things: a
         typed contract layer, a runtime origin allowlist, and a security profile (SRI + CSP) that
         actually works at the edge.
       </p>
 
       <h2 id="generated-config">The generated config</h2>
       <p>
-        <code>moxjs federation</code> reads each app&apos;s <code>moxjs.app.json</code> and writes a
-        per-app <code>moxjs.federation.json</code>. That JSON is plumbed straight into Rspack at build
+        <code>jorvel federation</code> reads each app&apos;s <code>jorvel.app.json</code> and writes a
+        per-app <code>jorvel.federation.json</code>. That JSON is plumbed straight into Rspack at build
         time.
       </p>
 
       <CodeBlock
         language="json"
-        filename="apps/dashboard/moxjs.federation.json"
+        filename="apps/dashboard/jorvel.federation.json"
         code={`{
-  "$schema": "../../node_modules/@moxjs/types/schemas/moxjs.federation.json",
+  "$schema": "../../node_modules/@jorvel/types/schemas/jorvel.federation.json",
   "name": "dashboard",
   "filename": "remoteEntry.js",
   "exposes": {
     "./App": "./src/remote.tsx",
-    "./pages": "./src/moxjs.routes"
+    "./pages": "./src/jorvel.routes"
   },
   "shared": {
     "react": { "singleton": true, "requiredVersion": "^18.0.0" },
     "react-dom": { "singleton": true, "requiredVersion": "^18.0.0" },
-    "@moxjs/runtime": { "singleton": true, "requiredVersion": false },
-    "@moxjs/event-bus": { "singleton": true, "requiredVersion": false }
+    "@jorvel/runtime": { "singleton": true, "requiredVersion": false },
+    "@jorvel/event-bus": { "singleton": true, "requiredVersion": false }
   }
 }`}
       />
 
       <Callout variant="info" title="Why no requiredVersion on framework packages?">
-        <code>@moxjs/runtime</code> and <code>@moxjs/event-bus</code> use a <code>globalThis</code>-pinned
+        <code>@jorvel/runtime</code> and <code>@jorvel/event-bus</code> use a <code>globalThis</code>-pinned
         registry to survive duplicate bundles. Disabling the version check keeps the runtime singleton
-        even if the host and remote ship slightly different MOXJS versions.
+        even if the host and remote ship slightly different JORVEL versions.
       </Callout>
 
       <h2 id="shared-deps">Shared dependencies</h2>
       <p>
-        MOXJS auto-detects <code>react</code>, <code>react-dom</code>, and the framework packages.
-        Anything else listed in <code>moxjs.config.ts:federation.shared</code> is added as a singleton.
+        JORVEL auto-detects <code>react</code>, <code>react-dom</code>, and the framework packages.
+        Anything else listed in <code>jorvel.config.ts:federation.shared</code> is added as a singleton.
       </p>
 
       <CodeBlock
         language="ts"
-        filename="moxjs.config.ts"
-        code={`import type { MoxjsWorkspaceConfig } from '@moxjs/types';
+        filename="jorvel.config.ts"
+        code={`import type { JorvelWorkspaceConfig } from '@jorvel/types';
 
-const config: MoxjsWorkspaceConfig = {
+const config: JorvelWorkspaceConfig = {
   federation: {
     shared: ['zustand', '@tanstack/react-query'],
     versionCheck: true,
@@ -121,7 +121,7 @@ export default config;`}
         <TabsContent value="runtime">
           <CodeBlock
             language="ts"
-            code={`import { loadRemoteEntry } from '@moxjs/runtime';
+            code={`import { loadRemoteEntry } from '@jorvel/runtime';
 
 await loadRemoteEntry({
   name: 'dashboard',
@@ -153,7 +153,7 @@ await loadRemoteEntry({
       </p>
       <CodeBlock
         language="ts"
-        code={`import { buildChunkNameTemplates, pickCacheControl } from '@moxjs/rspack-route-assets';
+        code={`import { buildChunkNameTemplates, pickCacheControl } from '@jorvel/rspack-route-assets';
 
 const names = buildChunkNameTemplates({ hashLength: 10 });
 // rspack.config.mjs
@@ -182,7 +182,7 @@ const header = pickCacheControl(url.pathname);
 
       <h2 id="contracts">Typed contracts</h2>
       <p>
-        <code>@moxjs/types</code> exports <code>defineFederationContract</code> +{' '}
+        <code>@jorvel/types</code> exports <code>defineFederationContract</code> +{' '}
         <code>InferExposed / InferEmits / InferListens</code>. Validation is async (it actually{' '}
         <code>await</code>s <code>container.get(key)</code>), so a missing exposure fails the build
         rather than the page.
@@ -191,7 +191,7 @@ const header = pickCacheControl(url.pathname);
       <CodeBlock
         language="ts"
         filename="libs/contracts/src/dashboard.ts"
-        code={`import { defineFederationContract, type InferExposed } from '@moxjs/types';
+        code={`import { defineFederationContract, type InferExposed } from '@jorvel/types';
 
 export const contract = defineFederationContract({
   name: 'dashboard',
@@ -204,16 +204,16 @@ export type DashboardExports = InferExposed<typeof contract>;
 
       <h2 id="contract-tests">Contract tests</h2>
       <p>
-        <code>@moxjs/types/testing</code> turns a contract into ready-to-run test cases. The host
+        <code>@jorvel/types/testing</code> turns a contract into ready-to-run test cases. The host
         loads the remote&apos;s container, the helper verifies every exposed key resolves.
       </p>
       <CodeBlock
         language="ts"
         filename="apps/shell/test/dashboard-contract.test.ts"
         code={`import { describe, it, expect } from 'vitest';
-import { contractChecks } from '@moxjs/types/testing';
+import { contractChecks } from '@jorvel/types/testing';
 import { dashboardContract } from '@app/contracts/dashboard';
-import { loadRemoteEntry, initRemoteContainer } from '@moxjs/runtime';
+import { loadRemoteEntry, initRemoteContainer } from '@jorvel/runtime';
 
 async function loadContainer() {
   await loadRemoteEntry({ name: 'dashboard', entryUrl: '/cdn/remoteEntry.js' });
@@ -229,7 +229,7 @@ describe('dashboardContract', () => {
 });`}
       />
       <p>
-        Use <code>generateContractTestSource(...)</code> from <code>@moxjs/types</code> if you want
+        Use <code>generateContractTestSource(...)</code> from <code>@jorvel/types</code> if you want
         to scaffold the file programmatically.
       </p>
 
@@ -247,7 +247,7 @@ describe('dashboardContract', () => {
   ResilientRemoteCache,
   loadWithFallback,
   loadRemoteEntry,
-} from '@moxjs/runtime';
+} from '@jorvel/runtime';
 
 const cache = new ResilientRemoteCache({ maxAgeMs: 7 * 24 * 60 * 60 * 1000 });
 
@@ -271,7 +271,7 @@ await loadWithFallback(
       </p>
       <CodeBlock
         language="ts"
-        code={`import { resolveWeightedRemotes } from '@moxjs/runtime';
+        code={`import { resolveWeightedRemotes } from '@jorvel/runtime';
 
 const ENTRIES = {
   dashboard: {
@@ -287,7 +287,7 @@ const ENTRIES = {
 const { remotes, picks } = resolveWeightedRemotes(ENTRIES, { key: user.id });
 
 // emit telemetry tag so dashboards can compare variants
-observability.reportMetric({ name: 'moxjs.variant', value: 1, tags: { variant: picks.dashboard.variant.label! } });
+observability.reportMetric({ name: 'jorvel.variant', value: 1, tags: { variant: picks.dashboard.variant.label! } });
 
 // pass \`remotes\` straight to <RemoteOutlet remotes={remotes} ... />`}
       />
@@ -296,13 +296,13 @@ observability.reportMetric({ name: 'moxjs.variant', value: 1, tags: { variant: p
       <p>
         For dynamic remote topologies (auto-scaling clusters, multi-region rollouts) the host can
         consult a manifest at runtime instead of compiling the remote map. The server side serves
-        the manifest at <code>/moxjs/registry</code>; the client side polls it on a schedule and
+        the manifest at <code>/jorvel/registry</code>; the client side polls it on a schedule and
         falls back to the last-known-good map when fetches fail.
       </p>
       <CodeBlock
         language="ts"
         code={`// Server (Worker / Vercel Edge / Node)
-import { createRegistryHandler } from '@moxjs/runtime';
+import { createRegistryHandler } from '@jorvel/runtime';
 
 const registry = createRegistryHandler({
   entries: () => loadFromDatabase(),     // refresh per request
@@ -310,29 +310,29 @@ const registry = createRegistryHandler({
 });
 
 // Client (host)
-import { ManifestRegistry } from '@moxjs/runtime';
+import { ManifestRegistry } from '@jorvel/runtime';
 
 const reg = new ManifestRegistry({
-  url: 'https://control-plane/moxjs/registry',
+  url: 'https://control-plane/jorvel/registry',
   pollIntervalMs: 30_000,
 });
 reg.start();
 const dashboard = reg.remote('dashboard');
 
-// Health-aware filtering — disable entries whose /moxjs/health returns 'down'
-await reg.withHealth((e) => \`https://\${e.name}.host/moxjs/health\`);`}
+// Health-aware filtering — disable entries whose /jorvel/health returns 'down'
+await reg.withHealth((e) => \`https://\${e.name}.host/jorvel/health\`);`}
       />
 
       <h2 id="health">Health endpoint</h2>
       <p>
-        Each remote can expose <code>/moxjs/health</code> so the host registry can mark it up,
+        Each remote can expose <code>/jorvel/health</code> so the host registry can mark it up,
         degraded, or down before loading <code>remoteEntry.js</code>. Probes run in parallel; a
         probe that throws is reported with <code>ok: false</code> + the error message.
       </p>
       <CodeBlock
         language="ts"
         filename="apps/dashboard/server/health.ts"
-        code={`import { createHealthHandler } from '@moxjs/runtime';
+        code={`import { createHealthHandler } from '@jorvel/runtime';
 
 export const health = createHealthHandler({
   name: 'dashboard',
@@ -345,7 +345,7 @@ export const health = createHealthHandler({
   },
 });
 
-// In a Worker: \`if (url.pathname.startsWith('/moxjs/health')) return toResponse(await health(req));\`
+// In a Worker: \`if (url.pathname.startsWith('/jorvel/health')) return toResponse(await health(req));\`
 `}
       />
       <p>
@@ -363,7 +363,7 @@ export const health = createHealthHandler({
       </p>
       <CodeBlock
         language="ts"
-        code={`import { BlueGreenRegistry, shapeHealthCheck } from '@moxjs/runtime';
+        code={`import { BlueGreenRegistry, shapeHealthCheck } from '@jorvel/runtime';
 
 const registry = new BlueGreenRegistry({
   initial: { remotes: currentRemotes },
@@ -391,13 +391,13 @@ registry.rollback();`}
       </p>
       <CodeBlock
         language="ts"
-        code={`import { getRemoteRegistry } from '@moxjs/runtime';
+        code={`import { getRemoteRegistry } from '@jorvel/runtime';
 
 const registry = getRemoteRegistry({
   allowedOrigins: ['https://cdn.acme.com'],
 });
 
-await registry.load('https://cdn.acme.com/moxjs/remotes.json');
+await registry.load('https://cdn.acme.com/jorvel/remotes.json');
 // remotes.json:
 // [
 //   { "name": "dashboard", "entryUrl": "https://cdn.acme.com/dashboard/remoteEntry.js", "integrity": "sha384-..." },
@@ -426,26 +426,26 @@ registry.list();            // → RemoteDescriptor[]`}
             <td><code>Container 'foo' was not found</code></td>
             <td>Remote loaded, but container name mismatched</td>
             <td>
-              The remote&apos;s <code>name</code> in <code>moxjs.federation.json</code> must match
+              The remote&apos;s <code>name</code> in <code>jorvel.federation.json</code> must match
               the key in the host&apos;s <code>remotes</code> map.
             </td>
           </tr>
           <tr>
             <td>404 on remote split chunk</td>
             <td>Cross-origin chunks without CORS</td>
-            <td>Use <code>moxjs dev --proxy-remotes</code> or configure CORS on the CDN.</td>
+            <td>Use <code>jorvel dev --proxy-remotes</code> or configure CORS on the CDN.</td>
           </tr>
           <tr>
             <td>SRI failure in console</td>
             <td>CDN cache served a stale <code>remoteEntry.js</code></td>
-            <td>Invalidate the cache; re-run <code>moxjs build --compute-sri</code>.</td>
+            <td>Invalidate the cache; re-run <code>jorvel build --compute-sri</code>.</td>
           </tr>
         </tbody>
       </table>
 
       <Callout variant="success" title="That's federation. The rest is plumbing.">
         Read <a href="/docs/security">Security</a> for the CSP/SRI/rate-limit/audit side, or{' '}
-        <a href="/docs/api/runtime">@moxjs/runtime API</a> for <code>loadRemoteEntry</code>,{' '}
+        <a href="/docs/api/runtime">@jorvel/runtime API</a> for <code>loadRemoteEntry</code>,{' '}
         <code>RemoteRegistry</code>, and the navigation primitives.
       </Callout>
     </>

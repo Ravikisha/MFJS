@@ -27,9 +27,9 @@ async function run(argv: string[], cwd: string): Promise<number> {
 
 afterEach(() => vi.restoreAllMocks());
 
-describe('moxjs env scaffold', () => {
+describe('jorvel env scaffold', () => {
   it('writes a starter .env.example', async () => {
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-env-'))) as string;
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-env-'))) as string;
     vi.spyOn(console, 'log').mockImplementation(() => {});
     await run(['--cwd', tmp, 'scaffold'], tmp);
     const txt = await fs.readFile(path.join(tmp, '.env.example'), 'utf8');
@@ -38,7 +38,7 @@ describe('moxjs env scaffold', () => {
   });
 
   it('skips when .env.example exists', async () => {
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-env-'))) as string;
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-env-'))) as string;
     await fs.writeFile(path.join(tmp, '.env.example'), 'KEEP=1');
     vi.spyOn(console, 'log').mockImplementation(() => {});
     await run(['--cwd', tmp, 'scaffold'], tmp);
@@ -46,16 +46,16 @@ describe('moxjs env scaffold', () => {
   });
 });
 
-describe('moxjs env check', () => {
+describe('jorvel env check', () => {
   it('exits 1 when .env.example missing', async () => {
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-env-'))) as string;
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-env-'))) as string;
     vi.spyOn(console, 'error').mockImplementation(() => {});
     const code = await run(['--cwd', tmp, 'check'], tmp);
     expect(code).toBe(1);
   });
 
   it('passes when all listed env vars present', async () => {
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-env-'))) as string;
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-env-'))) as string;
     await fs.writeFile(path.join(tmp, '.env.example'), '# comment\nFOO_X1=\n');
     process.env.FOO_X1 = 'set';
     vi.spyOn(console, 'log').mockImplementation(() => {});
@@ -68,7 +68,7 @@ describe('moxjs env check', () => {
   });
 
   it('exits 1 when required var missing', async () => {
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-env-'))) as string;
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-env-'))) as string;
     await fs.writeFile(path.join(tmp, '.env.example'), 'NOPE_X9=\n');
     vi.spyOn(console, 'error').mockImplementation(() => {});
     const code = await run(['--cwd', tmp, 'check'], tmp);

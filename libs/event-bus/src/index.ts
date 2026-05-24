@@ -144,12 +144,12 @@ export class EventBus<Events extends EventMap = EventMap> {
 
 function defaultErrorHandler(err: unknown, event: string): void {
   // eslint-disable-next-line no-console
-  console.error(`[moxjs/event-bus] handler for "${event}" threw:`, err);
+  console.error(`[jorvel/event-bus] handler for "${event}" threw:`, err);
 }
 
 // ── globalThis-pinned singleton ────────────────────────────────────────────
 
-const BUS_KEY = '__MOXJS_EVENT_BUS_SINGLETON__';
+const BUS_KEY = '__JORVEL_EVENT_BUS_SINGLETON__';
 type GlobalWithBus = typeof globalThis & { [BUS_KEY]?: EventBus<EventMap> };
 
 export function getEventBus<Events extends EventMap = EventMap>(): EventBus<Events> {

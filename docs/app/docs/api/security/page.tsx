@@ -2,7 +2,7 @@ import { CodeBlock } from '@/components/site/code-block';
 import { Callout } from '@/components/docs/callout';
 
 export const metadata = {
-  title: '@moxjs/security API',
+  title: '@jorvel/security API',
   description:
     'CSP builder, SRI helpers, origin allowlist, rate-limit guard, audit logger, sanitization helpers, OAuth helpers, sandbox bridge.',
 };
@@ -10,7 +10,7 @@ export const metadata = {
 export default function SecApi() {
   return (
     <>
-      <h1>@moxjs/security</h1>
+      <h1>@jorvel/security</h1>
       <p>
         Edge-runtime-safe primitives (Web Crypto, no <code>Buffer</code>, no{' '}
         <code>node:crypto</code>) for federation security. Every helper is tree-shakable and
@@ -55,7 +55,7 @@ cspHeaderFactory(opts): (req: { url: string }) => { header: string; nonce: strin
       <h3>Wiring a strict-dynamic CSP into an SSR response</h3>
       <CodeBlock
         language="ts"
-        code={`import { buildCsp, generateNonce, safeJsonForScript } from '@moxjs/security';
+        code={`import { buildCsp, generateNonce, safeJsonForScript } from '@jorvel/security';
 
 export async function handler(req: Request): Promise<Response> {
   const nonce = generateNonce();
@@ -93,7 +93,7 @@ sriHashFromUrl(url: string, opts?: { algo?: 'sha256' | 'sha384' | 'sha512'; allo
       <h3>Build-time manifest of remote SRI hashes</h3>
       <CodeBlock
         language="ts"
-        code={`import { sriHashFromUrl } from '@moxjs/security';
+        code={`import { sriHashFromUrl } from '@jorvel/security';
 
 const remotes = [
   'https://cdn.acme.com/dashboard/remoteEntry.js',
@@ -125,8 +125,8 @@ allow.isAllowed(url: string, name?: string): boolean;`}
 
       <CodeBlock
         language="ts"
-        code={`import { RemoteAllowlist } from '@moxjs/security';
-import { getRemoteRegistry } from '@moxjs/runtime';
+        code={`import { RemoteAllowlist } from '@jorvel/security';
+import { getRemoteRegistry } from '@jorvel/runtime';
 
 const allow = new RemoteAllowlist([
   'https://cdn.acme.com',

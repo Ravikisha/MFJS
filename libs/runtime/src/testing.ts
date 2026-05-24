@@ -41,7 +41,7 @@ function makeContainer(modules: MockRemoteModules, name: string): FakeContainer 
     get: async (module: string) => {
       if (!(module in modules)) {
         throw new Error(
-          `[moxjs/runtime/testing] Mock remote "${name}" does not expose module "${module}". ` +
+          `[jorvel/runtime/testing] Mock remote "${name}" does not expose module "${module}". ` +
             `Known modules: ${Object.keys(modules).join(', ') || '<none>'}`,
         );
       }
@@ -53,7 +53,7 @@ function makeContainer(modules: MockRemoteModules, name: string): FakeContainer 
 
 /**
  * Returns a drop-in `loadRemoteModule` replacement that consults the supplied
- * mock map. Use with `vi.mock('@moxjs/runtime', ...)` to short-circuit network
+ * mock map. Use with `vi.mock('@jorvel/runtime', ...)` to short-circuit network
  * loads in tests.
  */
 export function createMockRemoteLoader(
@@ -62,11 +62,11 @@ export function createMockRemoteLoader(
   return async <T>(remote: FederationRemote, exposedModule: string) => {
     const modules = mocks[remote.name];
     if (!modules) {
-      throw new Error(`[moxjs/runtime/testing] No mock registered for remote "${remote.name}"`);
+      throw new Error(`[jorvel/runtime/testing] No mock registered for remote "${remote.name}"`);
     }
     if (!(exposedModule in modules)) {
       throw new Error(
-        `[moxjs/runtime/testing] Mock remote "${remote.name}" missing module "${exposedModule}"`,
+        `[jorvel/runtime/testing] Mock remote "${remote.name}" missing module "${exposedModule}"`,
       );
     }
     return modules[exposedModule] as T;
@@ -86,7 +86,7 @@ export function createMockRemoteLoader(
 export function installMockRemote(spec: MockRemoteSpec): MockRemoteHandle {
   if (typeof document === 'undefined') {
     throw new Error(
-      '[moxjs/runtime/testing] installMockRemote requires a DOM env (jsdom). ' +
+      '[jorvel/runtime/testing] installMockRemote requires a DOM env (jsdom). ' +
         'Use createMockRemoteLoader for Node-only tests.',
     );
   }
@@ -94,15 +94,15 @@ export function installMockRemote(spec: MockRemoteSpec): MockRemoteHandle {
   const entryUrl = spec.entryUrl ?? `mock://${spec.name}/remoteEntry.js`;
 
   // Stub the script tag loadRemoteEntry expects to see when the remote already loaded.
-  const scriptId = `moxjs-remote-${spec.name}`;
+  const scriptId = `jorvel-remote-${spec.name}`;
   let script = document.getElementById(scriptId) as HTMLScriptElement | null;
   if (!script) {
     script = document.createElement('script');
     script.id = scriptId;
-    script.dataset['moxjsLoaded'] = '1';
+    script.dataset['jorvelLoaded'] = '1';
     document.head.appendChild(script);
   } else {
-    script.dataset['moxjsLoaded'] = '1';
+    script.dataset['jorvelLoaded'] = '1';
   }
 
   g[spec.name] = makeContainer(spec.modules, spec.name);

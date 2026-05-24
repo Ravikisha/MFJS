@@ -93,7 +93,7 @@ export async function runImageOptimizations(opts: ImageOptimizeOptions): Promise
   const jobs = await planImageOptimizations(opts);
   if (opts.dryRun) return jobs;
 
-  // Lazy import so @moxjs/cli doesn't hard-require sharp unless the command is used.
+  // Lazy import so jorvel doesn't hard-require sharp unless the command is used.
   const { default: sharp } = await import('sharp');
 
   for (const job of jobs) {

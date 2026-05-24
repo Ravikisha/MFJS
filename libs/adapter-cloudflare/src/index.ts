@@ -1,8 +1,8 @@
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
-import { createEdgeAdapter } from '@moxjs/ssr';
-import type { EdgeAdapterOptions, EdgeAdapterExtraOptions, EdgeRequest } from '@moxjs/ssr';
+import { createEdgeAdapter } from '@jorvel/ssr';
+import type { EdgeAdapterOptions, EdgeAdapterExtraOptions, EdgeRequest } from '@jorvel/ssr';
 
 export interface CloudflareAdapterOptions extends EdgeAdapterOptions, EdgeAdapterExtraOptions {}
 
@@ -54,7 +54,7 @@ export function createPagesFunction(options: CloudflareAdapterOptions) {
   };
 }
 
-// ── Deploy scaffold (used by `moxjs deploy --target cloudflare`) ──────────────
+// ── Deploy scaffold (used by `jorvel deploy --target cloudflare`) ──────────────
 
 export interface ScaffoldDeployOptions {
   cwd: string;

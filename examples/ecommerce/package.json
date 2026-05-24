@@ -1,5 +1,5 @@
 {
-  "name": "moxjs-example-ecommerce",
+  "name": "jorvel-example-ecommerce",
   "private": true,
   "type": "module",
   "dependencies": {
@@ -18,7 +18,7 @@
     "federation": "node ../../packages/cli/dist/index.js federation --dir .",
     "routes": "node ../../packages/cli/dist/index.js routes --dir .",
     "dev": "node ../../packages/cli/dist/index.js dev --dir .",
-    "ssr:export": "node ../../packages/cli/dist/index.js ssr export --dir . --config moxjs.ssr.json",
+    "ssr:export": "node ../../packages/cli/dist/index.js ssr export --dir . --config jorvel.ssr.json",
     "test": "vitest run"
   }
 }

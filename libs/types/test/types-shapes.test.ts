@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type {
-  MoxjsAppConfig,
+  JorvelAppConfig,
   FederationConfig,
   RouteTarget,
   RouteMatch,
@@ -9,17 +9,17 @@ import type {
   SharedDependency,
 } from '../src/index.js';
 
-// ── MoxjsAppConfig ─────────────────────────────────────────────────────────────
+// ── JorvelAppConfig ─────────────────────────────────────────────────────────────
 
-describe('MoxjsAppConfig shape', () => {
+describe('JorvelAppConfig shape', () => {
   it('accepts a minimal host config', () => {
-    const cfg: MoxjsAppConfig = { name: 'shell', type: 'host', port: 3000 };
+    const cfg: JorvelAppConfig = { name: 'shell', type: 'host', port: 3000 };
     expect(cfg.name).toBe('shell');
     expect(cfg.type).toBe('host');
   });
 
   it('accepts a remote config with exposes', () => {
-    const cfg: MoxjsAppConfig = {
+    const cfg: JorvelAppConfig = {
       name: 'dashboard',
       type: 'remote',
       port: 3001,
@@ -29,7 +29,7 @@ describe('MoxjsAppConfig shape', () => {
   });
 
   it('accepts optional shared list', () => {
-    const cfg: MoxjsAppConfig = {
+    const cfg: JorvelAppConfig = {
       name: 'payments',
       type: 'remote',
       port: 3002,

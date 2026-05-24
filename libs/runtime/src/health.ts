@@ -1,5 +1,5 @@
 /**
- * `/moxjs/health` response builder for remotes.
+ * `/jorvel/health` response builder for remotes.
  *
  * Each remote answers a tiny JSON document describing its name, version,
  * build sha, uptime, share-scope baseline, and a list of optional probes
@@ -22,7 +22,7 @@ export type Probe = () => Promise<Omit<ProbeResult, 'name'>> | Omit<ProbeResult,
 export interface HealthInput {
   /** Remote name. Must match the federation `name`. */
   name: string;
-  /** Semver — typically `process.env.MOXJS_VERSION` baked at build time. */
+  /** Semver — typically `process.env.JORVEL_VERSION` baked at build time. */
   version: string;
   /** Optional commit / build identifier. */
   build?: string;
@@ -114,13 +114,13 @@ export interface EdgeLikeResponse {
 }
 
 /**
- * Build a Web-style fetch handler that answers `/moxjs/health` (configurable).
+ * Build a Web-style fetch handler that answers `/jorvel/health` (configurable).
  * Drop into a Worker, Vercel Edge function, or Node SSR server.
  */
 export function createHealthHandler(
   input: HealthInput & { path?: string },
 ): (req: EdgeLikeRequest) => Promise<EdgeLikeResponse> {
-  const path = input.path ?? '/moxjs/health';
+  const path = input.path ?? '/jorvel/health';
   return async (req: EdgeLikeRequest): Promise<EdgeLikeResponse> => {
     const url = new URL(req.url);
     if (url.pathname !== path) {
@@ -143,7 +143,7 @@ export function createHealthHandler(
   };
 }
 
-// ── Client-side: poll a remote's /moxjs/health ──────────────────────────────
+// ── Client-side: poll a remote's /jorvel/health ──────────────────────────────
 
 export interface FetchHealthOptions {
   /** Override `fetch` for tests. */

@@ -1,29 +1,47 @@
 {
-  "name": "@moxjs/types",
-  "version": "0.1.0",
-  "description": "Shared TypeScript types and runtime helpers for MOXJS configs, plugins, and federation contracts.",
+  "name": "@jorvel/types",
+  "version": "0.2.0",
+  "description": "Shared TypeScript types and runtime helpers for JORVEL configs, plugins, and federation contracts.",
   "license": "MIT",
-  "homepage": "https://github.com/anthropics/MOXJS#readme",
+  "homepage": "https://github.com/Ravikisha/JorvelJS#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/anthropics/MOXJS.git",
+    "url": "https://github.com/Ravikisha/JorvelJS.git",
     "directory": "libs/types"
   },
-  "keywords": ["moxjs", "module-federation", "types", "config"],
+  "keywords": [
+    "jorvel",
+    "module-federation",
+    "types",
+    "config"
+  ],
   "private": false,
-  "publishConfig": { "access": "public" },
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
-    "./testing": { "types": "./dist/contract-test.d.ts", "import": "./dist/contract-test.js" },
-    "./schemas/moxjs.config.json": "./schemas/moxjs.config.json",
-    "./schemas/moxjs.app.json": "./schemas/moxjs.app.json",
-    "./schemas/moxjs.federation.json": "./schemas/moxjs.federation.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./testing": {
+      "types": "./dist/contract-test.d.ts",
+      "import": "./dist/contract-test.js"
+    },
+    "./schemas/jorvel.config.json": "./schemas/jorvel.config.json",
+    "./schemas/jorvel.app.json": "./schemas/jorvel.app.json",
+    "./schemas/jorvel.federation.json": "./schemas/jorvel.federation.json",
     "./package.json": "./package.json"
   },
-  "files": ["dist", "schemas", "README.md", "LICENSE"],
+  "files": [
+    "dist",
+    "schemas",
+    "README.md",
+    "LICENSE"
+  ],
   "sideEffects": false,
   "scripts": {
     "build": "tsc -p tsconfig.json",

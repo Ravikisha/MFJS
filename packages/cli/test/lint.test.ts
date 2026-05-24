@@ -25,7 +25,7 @@ async function run(argv: string[]): Promise<number> {
 
 afterEach(() => vi.resetAllMocks());
 
-describe('moxjs lint', () => {
+describe('jorvel lint', () => {
   it('invokes `pnpm -r lint`', async () => {
     const { execa } = await import('execa');
     (execa as unknown as ReturnType<typeof vi.fn>).mockResolvedValue({});

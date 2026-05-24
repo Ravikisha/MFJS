@@ -4,7 +4,7 @@
  * The SSR route table is a flat list of `SsrRoute` objects, each with a
  * pre-known path and optional params. For static export we match exact paths;
  * for the edge adapter we match patterns the same way `matchPath` does in
- * `@moxjs/runtime`.
+ * `@jorvel/runtime`.
  */
 
 import type { SsrRoute } from './types.js';

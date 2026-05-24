@@ -27,45 +27,45 @@ async function run(argv: string[], cwd: string): Promise<number | null> {
 
 afterEach(() => vi.restoreAllMocks());
 
-describe('moxjs deploy', () => {
+describe('jorvel deploy', () => {
   it('exits non-zero when no target supplied', async () => {
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-deploy-'))) as string;
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-deploy-'))) as string;
     const code = await run(['--cwd', tmp], tmp);
     expect(code).toBe(1);
   });
 
   it('writes vercel.json for --target vercel', async () => {
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-deploy-'))) as string;
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-deploy-'))) as string;
     await run(['--target', 'vercel', '--cwd', tmp], tmp);
     expect(await fs.pathExists(path.join(tmp, 'vercel.json'))).toBe(true);
   });
 
   it('writes wrangler.toml for --target cloudflare', async () => {
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-deploy-'))) as string;
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-deploy-'))) as string;
     await run(['--target', 'cloudflare', '--cwd', tmp], tmp);
     expect(await fs.pathExists(path.join(tmp, 'wrangler.toml'))).toBe(true);
   });
 
   it('writes netlify.toml for --target netlify (built-in inline scaffold)', async () => {
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-deploy-'))) as string;
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-deploy-'))) as string;
     await run(['--target', 'netlify', '--cwd', tmp], tmp);
     expect(await fs.pathExists(path.join(tmp, 'netlify.toml'))).toBe(true);
   });
 
   it('writes Dockerfile for --target node', async () => {
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-deploy-'))) as string;
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-deploy-'))) as string;
     await run(['--target', 'node', '--cwd', tmp], tmp);
     expect(await fs.pathExists(path.join(tmp, 'Dockerfile'))).toBe(true);
   });
 
   it('--dry-run does not write file', async () => {
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-deploy-'))) as string;
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-deploy-'))) as string;
     await run(['--target', 'netlify', '--cwd', tmp, '--dry-run'], tmp);
     expect(await fs.pathExists(path.join(tmp, 'netlify.toml'))).toBe(false);
   });
 
   it('skips when target file already exists', async () => {
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-deploy-'))) as string;
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-deploy-'))) as string;
     await fs.writeFile(path.join(tmp, 'netlify.toml'), 'pre-existing');
     await run(['--target', 'netlify', '--cwd', tmp], tmp);
     const txt = await fs.readFile(path.join(tmp, 'netlify.toml'), 'utf8');

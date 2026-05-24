@@ -14,7 +14,7 @@ envCommand
     const cwd = path.resolve((cmd.parent?.opts().cwd as string) ?? process.cwd());
     const example = path.join(cwd, '.env.example');
     if (!(await fs.pathExists(example))) {
-      console.error(kleur.red('env check: .env.example missing. Run `moxjs env scaffold`.'));
+      console.error(kleur.red('env check: .env.example missing. Run `jorvel env scaffold`.'));
       process.exit(1);
     }
     const raw = await fs.readFile(example, 'utf8');
@@ -47,8 +47,8 @@ envCommand
       `# Copy to .env and fill in values.
 PORT=3000
 NODE_ENV=development
-MOXJS_REMOTES_URL=
-MOXJS_CDN_URL=
+JORVEL_REMOTES_URL=
+JORVEL_CDN_URL=
 SENTRY_DSN=
 `,
       'utf8',

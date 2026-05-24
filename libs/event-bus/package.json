@@ -1,25 +1,40 @@
 {
-  "name": "@moxjs/event-bus",
-  "version": "0.1.0",
-  "description": "Typed pub/sub event bus for MOXJS micro-frontends with wildcard, replay, and cross-tab support.",
+  "name": "@jorvel/event-bus",
+  "version": "0.2.0",
+  "description": "Typed pub/sub event bus for JORVEL micro-frontends with wildcard, replay, and cross-tab support.",
   "license": "MIT",
-  "homepage": "https://github.com/anthropics/MOXJS#readme",
+  "homepage": "https://github.com/Ravikisha/JorvelJS#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/anthropics/MOXJS.git",
+    "url": "https://github.com/Ravikisha/JorvelJS.git",
     "directory": "libs/event-bus"
   },
-  "keywords": ["moxjs", "module-federation", "event-bus", "pubsub", "micro-frontend"],
+  "keywords": [
+    "jorvel",
+    "module-federation",
+    "event-bus",
+    "pubsub",
+    "micro-frontend"
+  ],
   "private": false,
-  "publishConfig": { "access": "public" },
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
     "./package.json": "./package.json"
   },
-  "files": ["dist", "README.md", "LICENSE"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "sideEffects": false,
   "scripts": {
     "build": "tsc -p tsconfig.json",

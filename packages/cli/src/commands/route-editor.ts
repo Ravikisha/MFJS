@@ -1,7 +1,7 @@
 /**
- * `moxjs route-editor` — emits a single self-contained HTML file that lets
+ * `jorvel route-editor` — emits a single self-contained HTML file that lets
  * users drag remotes onto a route tree and export an `mfjs.routes.host.json`
- * (or `moxjs.routes.host.json`) update.
+ * (or `jorvel.routes.host.json`) update.
  *
  * The transform layer is pure JS — testable without a browser. The HTML
  * shell embeds the same transform code so the editor and the CLI stay in sync.
@@ -15,7 +15,7 @@ import kleur from 'kleur';
 export interface HostRouteEntry {
   /** URL prefix (e.g. `/dashboard/*`). */
   path: string;
-  /** Remote name as in `moxjs.federation.json#remotes`. */
+  /** Remote name as in `jorvel.federation.json#remotes`. */
   remote: string;
   /** Exposed module. Default: `'./App'`. */
   module?: string;
@@ -54,7 +54,7 @@ export function manifestToTree(manifest: HostRoutesManifest): TreeNode {
     let acc = '';
     if (segs.length === 0) {
       node.remote = entry.remote;
-      node.module = entry.module;
+      if (entry.module !== undefined) node.module = entry.module;
       continue;
     }
     for (const seg of segs) {
@@ -117,7 +117,7 @@ export function buildEditorHtml(initial: HostRoutesManifest): string {
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>moxjs · route editor</title>
+  <title>jorvel · route editor</title>
   <style>
     body { font: 14px system-ui, sans-serif; padding: 24px; background: #0c0d10; color: #ddd }
     h1 { margin: 0 0 12px; font-weight: 600 }
@@ -135,7 +135,7 @@ export function buildEditorHtml(initial: HostRoutesManifest): string {
   </style>
 </head>
 <body>
-  <h1>moxjs · route editor</h1>
+  <h1>jorvel · route editor</h1>
   <p>Drag a route onto a parent to re-parent it. Copy the JSON when you're done.</p>
   <main>
     <section class="panel">
@@ -223,7 +223,7 @@ export async function scaffoldRouteEditor(opts: RouteEditorScaffoldOptions): Pro
   const cwd = path.resolve(opts.cwd);
   const manifestPath = path.resolve(
     cwd,
-    opts.manifest ?? path.join('apps', 'shell', 'moxjs.routes.host.json'),
+    opts.manifest ?? path.join('apps', 'shell', 'jorvel.routes.host.json'),
   );
   let manifest: HostRoutesManifest = { routes: [] };
   if (await fs.pathExists(manifestPath)) {

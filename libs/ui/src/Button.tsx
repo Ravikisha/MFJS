@@ -15,18 +15,18 @@ const sizeStyles: Record<NonNullable<ButtonProps['size']>, CSSProperties> = {
 
 const variantStyles: Record<NonNullable<ButtonProps['variant']>, CSSProperties> = {
   primary: {
-    background: 'var(--moxjs-color-primary, #4f46e5)',
-    color: 'var(--moxjs-color-on-primary, #fff)',
+    background: 'var(--jorvel-color-primary, #4f46e5)',
+    color: 'var(--jorvel-color-on-primary, #fff)',
     border: '1px solid transparent',
   },
   secondary: {
-    background: 'var(--moxjs-color-surface, #fff)',
-    color: 'var(--moxjs-color-on-surface, #111)',
-    border: '1px solid var(--moxjs-color-border, #d1d5db)',
+    background: 'var(--jorvel-color-surface, #fff)',
+    color: 'var(--jorvel-color-on-surface, #111)',
+    border: '1px solid var(--jorvel-color-border, #d1d5db)',
   },
   ghost: {
     background: 'transparent',
-    color: 'var(--moxjs-color-on-surface, #111)',
+    color: 'var(--jorvel-color-on-surface, #111)',
     border: '1px solid transparent',
   },
 };
@@ -39,7 +39,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 'var(--moxjs-radius-md, 6px)',
+    borderRadius: 'var(--jorvel-radius-md, 6px)',
     cursor: rest.disabled ? 'not-allowed' : 'pointer',
     opacity: rest.disabled ? 0.6 : 1,
     transition: 'background-color 120ms ease',

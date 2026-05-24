@@ -70,7 +70,7 @@ export function resetPrefetchCache(): void {
 }
 
 function ensurePreloadLink(href: string): void {
-  const id = `moxjs-prefetch-${hashCode(href)}`;
+  const id = `jorvel-prefetch-${hashCode(href)}`;
   if (document.getElementById(id)) return;
   const link = document.createElement('link');
   link.id = id;

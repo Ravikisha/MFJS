@@ -9,12 +9,12 @@ import {
 const T0 = Date.UTC(2030, 0, 1);
 
 describe('createRegistryHandler', () => {
-  it('serves the manifest JSON at /moxjs/registry', async () => {
+  it('serves the manifest JSON at /jorvel/registry', async () => {
     const entries: RegistryEntry[] = [
       { name: 'dashboard', entryUrl: 'https://cdn/x.js', version: '1.0.0' },
     ];
     const handler = createRegistryHandler({ entries: () => entries, now: () => T0 });
-    const res = await handler({ url: 'https://x/moxjs/registry' });
+    const res = await handler({ url: 'https://x/jorvel/registry' });
     expect(res.status).toBe(200);
     expect(res.headers['content-type']).toBe('application/json; charset=utf-8');
     expect(res.headers['cache-control']).toBe('no-store');
@@ -45,7 +45,7 @@ describe('createRegistryHandler', () => {
       entries: async () => [{ name: 'a', entryUrl: 'u' }],
       now: () => T0,
     });
-    const r = await handler({ url: 'https://x/moxjs/registry' });
+    const r = await handler({ url: 'https://x/jorvel/registry' });
     expect(JSON.parse(r.body).entries[0].name).toBe('a');
   });
 });

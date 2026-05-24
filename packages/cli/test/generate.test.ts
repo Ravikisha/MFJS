@@ -24,9 +24,9 @@ async function run(argv: string[], cwd: string) {
   }
 }
 
-describe('moxjs generate', () => {
-  it('remote includes src/remote.tsx and moxjs.app.json exposes ./App -> ./src/remote.tsx', async () => {
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-cli-'))) as string;
+describe('jorvel generate', () => {
+  it('remote includes src/remote.tsx and jorvel.app.json exposes ./App -> ./src/remote.tsx', async () => {
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-cli-'))) as string;
 
   await run(['remote', 'dashboard', '--dir', tmp, '--port', '3001'], tmp);
 
@@ -34,49 +34,49 @@ describe('moxjs generate', () => {
     expect(await fs.pathExists(entryFile)).toBe(true);
 
   expect(await fs.pathExists(path.join(tmp, 'apps', 'dashboard', 'src', 'pages', 'index.tsx'))).toBe(true);
-  expect(await fs.pathExists(path.join(tmp, 'apps', 'dashboard', 'src', 'moxjs.routes.ts'))).toBe(true);
+  expect(await fs.pathExists(path.join(tmp, 'apps', 'dashboard', 'src', 'jorvel.routes.ts'))).toBe(true);
 
-    const meta = await fs.readJson(path.join(tmp, 'apps', 'dashboard', 'moxjs.app.json'));
+    const meta = await fs.readJson(path.join(tmp, 'apps', 'dashboard', 'jorvel.app.json'));
     expect(meta.exposes).toEqual({ './App': './src/remote.tsx' });
   });
 
   it('remote template uses getFederatedRouter() so it can consume the host router when shared via federation', async () => {
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-cli-'))) as string;
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-cli-'))) as string;
 
     await run(['remote', 'dashboard', '--dir', tmp, '--port', '3001'], tmp);
 
     const remote = await fs.readFile(path.join(tmp, 'apps', 'dashboard', 'src', 'remote.tsx'), 'utf8');
-    expect(remote).toContain("from '@moxjs/runtime'");
+    expect(remote).toContain("from '@jorvel/runtime'");
     expect(remote).toContain('getFederatedRouter');
     expect(remote).toContain('getFederatedRouter()');
   expect(remote).toContain('RemoteApp');
-  expect(remote).toContain("from './moxjs.routes.js'");
+  expect(remote).toContain("from './jorvel.routes.js'");
     expect(remote).toContain('router.navigate');
   });
 
   it('host bootstrap.tsx uses RemoteOutlet + NavLink + usePathname (routing proof-of-life)', async () => {
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-cli-'))) as string;
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-cli-'))) as string;
 
   await run(['host', 'shell', '--dir', tmp, '--port', '3000'], tmp);
 
     // After introducing the async boundary, app code lives in bootstrap.tsx
     const bootstrap = await fs.readFile(path.join(tmp, 'apps', 'shell', 'src', 'bootstrap.tsx'), 'utf8');
-    expect(bootstrap).toContain("from '@moxjs/runtime'");
+    expect(bootstrap).toContain("from '@jorvel/runtime'");
   expect(bootstrap).toContain('RemoteOutlet');
   expect(bootstrap).toContain('NavLink');
   expect(bootstrap).toContain('usePathname');
-  expect(bootstrap).toContain('moxjs.routes.host.json');
-    expect(bootstrap).toContain('connectMoxjsDevReload');
-    expect(bootstrap).toContain('MOXJS_DEV_RELOAD_URL');
+  expect(bootstrap).toContain('jorvel.routes.host.json');
+    expect(bootstrap).toContain('connectJorvelDevReload');
+    expect(bootstrap).toContain('JORVEL_DEV_RELOAD_URL');
     expect(bootstrap).toContain('provideHostRouter');
     expect(bootstrap).toContain('getRouter');
     expect(bootstrap).toContain('provideHostRouter(getRouter())');
 
-  expect(await fs.pathExists(path.join(tmp, 'apps', 'shell', 'moxjs.routes.host.json'))).toBe(true);
+  expect(await fs.pathExists(path.join(tmp, 'apps', 'shell', 'jorvel.routes.host.json'))).toBe(true);
   });
 
-  test('host exposes MOXJS_DEV_RELOAD_URL to client and connects reload client when present', async () => {
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-cli-'))) as string;
+  test('host exposes JORVEL_DEV_RELOAD_URL to client and connects reload client when present', async () => {
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-cli-'))) as string;
 
     await run(['host', 'shell', '--dir', tmp, '--port', '3000'], tmp);
 
@@ -84,16 +84,16 @@ describe('moxjs generate', () => {
     // After introducing the async boundary, app code lives in bootstrap.tsx
     const hostBootstrap = await fs.readFile(path.join(tmp, 'apps', 'shell', 'src', 'bootstrap.tsx'), 'utf8');
 
-    // Assert rspack config exposes import.meta.env.MOXJS_DEV_RELOAD_URL
-    expect(rspackConfig).toContain('import.meta.env.MOXJS_DEV_RELOAD_URL');
+    // Assert rspack config exposes import.meta.env.JORVEL_DEV_RELOAD_URL
+    expect(rspackConfig).toContain('import.meta.env.JORVEL_DEV_RELOAD_URL');
 
     // Assert host wires the runtime reload client off import.meta.env
-    expect(hostBootstrap).toContain('connectMoxjsDevReload');
-    expect(hostBootstrap).toContain('MOXJS_DEV_RELOAD_URL');
+    expect(hostBootstrap).toContain('connectJorvelDevReload');
+    expect(hostBootstrap).toContain('JORVEL_DEV_RELOAD_URL');
   });
 
   test('rspack config enables source maps in dev by default', async () => {
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-cli-'))) as string;
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-cli-'))) as string;
 
     await run(['host', 'shell', '--dir', tmp, '--port', '3000'], tmp);
 
@@ -104,7 +104,7 @@ describe('moxjs generate', () => {
   });
   
   test('rspack config enables HMR + React Refresh in dev by default', async () => {
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-cli-'))) as string;
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-cli-'))) as string;
 
     await run(['host', 'shell', '--dir', tmp, '--port', '3000'], tmp);
 
@@ -121,7 +121,7 @@ describe('moxjs generate', () => {
   });
 
   it('rspack config wires on-demand starter URL into proxy (best-effort)', async () => {
-  const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-cli-'))) as string;
+  const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-cli-'))) as string;
 
   await run(['host', 'shell', '--dir', tmp, '--port', '3000'], tmp);
 
@@ -129,16 +129,16 @@ describe('moxjs generate', () => {
     const cfg = await fs.readFile(cfgPath, 'utf8');
 
     // Exposed to client for symmetry/debugging (and to keep templates consistent).
-    expect(cfg).toContain('import.meta.env.MOXJS_ON_DEMAND_STARTER_URL');
+    expect(cfg).toContain('import.meta.env.JORVEL_ON_DEMAND_STARTER_URL');
 
     // Used by proxy before proxying remote assets.
-    expect(cfg).toContain('process.env.MOXJS_ON_DEMAND_STARTER_URL');
-    expect(cfg).toContain('/__moxjs/start-remote?name=');
+    expect(cfg).toContain('process.env.JORVEL_ON_DEMAND_STARTER_URL');
+    expect(cfg).toContain('/__jorvel/start-remote?name=');
     expect(cfg).toContain('onProxyReq');
   });
 
   it('scaffolded app includes mf-shim.js as first entry and lazyCompilation: false', async () => {
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-cli-'))) as string;
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-cli-'))) as string;
     await run(['host', 'shell', '--dir', tmp, '--port', '3000'], tmp);
 
     const cfg = await fs.readFile(path.join(tmp, 'apps', 'shell', 'rspack.config.mjs'), 'utf8');
@@ -157,7 +157,7 @@ describe('moxjs generate', () => {
   });
 
   it('scaffolded app uses async boundary pattern: main.tsx imports bootstrap.tsx dynamically', async () => {
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-cli-'))) as string;
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-cli-'))) as string;
     await run(['host', 'shell', '--dir', tmp, '--port', '3000'], tmp);
 
     const main = await fs.readFile(path.join(tmp, 'apps', 'shell', 'src', 'main.tsx'), 'utf8');
@@ -175,7 +175,7 @@ describe('moxjs generate', () => {
   });
 
   it('tsconfig has allowImportingTsExtensions and noEmit for .tsx dynamic imports', async () => {
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-cli-'))) as string;
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-cli-'))) as string;
     await run(['remote', 'dashboard', '--dir', tmp, '--port', '3001'], tmp);
 
     const tsconfig = await fs.readJson(path.join(tmp, 'apps', 'dashboard', 'tsconfig.json'));

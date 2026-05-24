@@ -1,5 +1,5 @@
 /**
- * Feature: @moxjs/event-bus — onAny, replay, once, error handler.
+ * Feature: @jorvel/event-bus — onAny, replay, once, error handler.
  */
 import { describe, expect, it, vi } from 'vitest';
 import { EventBus } from '../../libs/event-bus/dist/index.js';

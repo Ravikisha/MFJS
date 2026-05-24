@@ -1,6 +1,6 @@
-# @moxjs/event-bus
+# @jorvel/event-bus
 
-Typed pub/sub event bus for MOXJS micro-frontends. Provides:
+Typed pub/sub event bus for JORVEL micro-frontends. Provides:
 
 - `EventBus<EventMap>` with `on`, `once`, `off`, `emit`.
 - `onAny(handler)` wildcard for logging / devtools.
@@ -10,14 +10,14 @@ Typed pub/sub event bus for MOXJS micro-frontends. Provides:
 ## Install
 
 ```sh
-pnpm add @moxjs/event-bus
+pnpm add @jorvel/event-bus
 ```
 
 ## Example
 
 ```ts
-import { getGlobalBus } from '@moxjs/event-bus';
-import type { MfAppEvents } from '@moxjs/events';
+import { getGlobalBus } from '@jorvel/event-bus';
+import type { MfAppEvents } from '@jorvel/events';
 
 const bus = getGlobalBus<MfAppEvents>();
 bus.on('shell:ready', payload => console.log('shell ready', payload));

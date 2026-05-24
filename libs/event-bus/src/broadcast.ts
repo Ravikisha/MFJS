@@ -1,5 +1,5 @@
 /**
- * Cross-tab sync for @moxjs/event-bus via the BroadcastChannel API.
+ * Cross-tab sync for @jorvel/event-bus via the BroadcastChannel API.
  *
  * Subscribing connects an `EventBus` instance to a named channel. Every local
  * `emit` is mirrored to other browsing contexts on the same origin; incoming
@@ -12,7 +12,7 @@
 
 import type { EventBus, EventMap } from './index.js';
 
-const ORIGIN_KEY = '__moxjs_origin__';
+const ORIGIN_KEY = '__jorvel_origin__';
 
 interface ChannelLike {
   postMessage(data: unknown): void;
@@ -22,7 +22,7 @@ interface ChannelLike {
 }
 
 export interface ConnectBroadcastOptions<Events extends EventMap> {
-  /** Channel name. Default: `'moxjs:event-bus'`. */
+  /** Channel name. Default: `'jorvel:event-bus'`. */
   channelName?: string;
   /**
    * Filter which events sync across tabs. Default: all. Return `false` to skip.
@@ -53,7 +53,7 @@ function defaultChannelFactory(name: string): ChannelLike {
   const Ctor = (globalThis as { BroadcastChannel?: new (n: string) => ChannelLike }).BroadcastChannel;
   if (!Ctor) {
     throw new Error(
-      '[moxjs/event-bus] BroadcastChannel is not available in this environment. ' +
+      '[jorvel/event-bus] BroadcastChannel is not available in this environment. ' +
         'Pass `channelFactory` for non-browser runtimes.',
     );
   }
@@ -83,7 +83,7 @@ export function connectBroadcast<Events extends EventMap>(
   bus: EventBus<Events>,
   opts: ConnectBroadcastOptions<Events> = {},
 ): BroadcastConnection {
-  const channelName = opts.channelName ?? 'moxjs:event-bus';
+  const channelName = opts.channelName ?? 'jorvel:event-bus';
   const channel = (opts.channelFactory ?? defaultChannelFactory)(channelName);
   const originId = randomId();
 

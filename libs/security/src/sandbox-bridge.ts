@@ -13,12 +13,12 @@
  * Window-shape), which is what makes it unit-testable without a real iframe.
  */
 
-const PROTOCOL = 'moxjs.sandbox.v1';
+const PROTOCOL = 'jorvel.sandbox.v1';
 
 type Direction = 'request' | 'response' | 'event';
 
 interface BridgeMessage<T = unknown> {
-  __moxjs: typeof PROTOCOL;
+  __jorvel: typeof PROTOCOL;
   dir: Direction;
   id?: number;
   method?: string;
@@ -61,7 +61,7 @@ export interface SandboxBridge {
 }
 
 export function createSandboxBridge(opts: CreateBridgeOptions): SandboxBridge {
-  if (!opts.expectedOrigin) throw new Error('[moxjs/security] createSandboxBridge requires expectedOrigin');
+  if (!opts.expectedOrigin) throw new Error('[jorvel/security] createSandboxBridge requires expectedOrigin');
   const handlers = { ...(opts.handlers ?? {}) };
   const expectedSource = opts.expectedSource === undefined ? (opts.target as unknown) : opts.expectedSource;
   const pending = new Map<number, { resolve: (v: unknown) => void; reject: (e: Error) => void; timer?: ReturnType<typeof setTimeout> }>();
@@ -79,7 +79,7 @@ export function createSandboxBridge(opts: CreateBridgeOptions): SandboxBridge {
       return;
     }
     const data = event.data as BridgeMessage | undefined;
-    if (!data || typeof data !== 'object' || data.__moxjs !== PROTOCOL) {
+    if (!data || typeof data !== 'object' || data.__jorvel !== PROTOCOL) {
       opts.onReject?.('not a bridge message', event);
       return;
     }
@@ -88,16 +88,16 @@ export function createSandboxBridge(opts: CreateBridgeOptions): SandboxBridge {
       const handler = handlers[data.method];
       const id = data.id;
       if (!handler) {
-        send({ __moxjs: PROTOCOL, dir: 'response', id, error: { message: `no handler for "${data.method}"` } });
+        send({ __jorvel: PROTOCOL, dir: 'response', id, error: { message: `no handler for "${data.method}"` } });
         return;
       }
       Promise.resolve()
         .then(() => handler(data.payload))
         .then(
-          (result) => send({ __moxjs: PROTOCOL, dir: 'response', id, payload: result }),
+          (result) => send({ __jorvel: PROTOCOL, dir: 'response', id, payload: result }),
           (err: unknown) => {
             const e = err instanceof Error ? err : new Error(String(err));
-            send({ __moxjs: PROTOCOL, dir: 'response', id, error: { message: e.message, name: e.name } });
+            send({ __jorvel: PROTOCOL, dir: 'response', id, error: { message: e.message, name: e.name } });
           },
         );
       return;
@@ -131,7 +131,7 @@ export function createSandboxBridge(opts: CreateBridgeOptions): SandboxBridge {
 
   return {
     request<Req, Res>(method: string, payload?: Req, timeoutMs?: number): Promise<Res> {
-      if (disposed) return Promise.reject(new Error('[moxjs/security] bridge disposed'));
+      if (disposed) return Promise.reject(new Error('[jorvel/security] bridge disposed'));
       const id = nextId++;
       return new Promise<Res>((resolve, reject) => {
         const slot: { resolve: (v: unknown) => void; reject: (e: Error) => void; timer?: ReturnType<typeof setTimeout> } = {
@@ -141,16 +141,16 @@ export function createSandboxBridge(opts: CreateBridgeOptions): SandboxBridge {
         if (timeoutMs && timeoutMs > 0) {
           slot.timer = setTimeout(() => {
             pending.delete(id);
-            reject(new Error(`[moxjs/security] bridge request "${method}" timed out after ${timeoutMs}ms`));
+            reject(new Error(`[jorvel/security] bridge request "${method}" timed out after ${timeoutMs}ms`));
           }, timeoutMs);
         }
         pending.set(id, slot);
-        send({ __moxjs: PROTOCOL, dir: 'request', id, method, payload });
+        send({ __jorvel: PROTOCOL, dir: 'request', id, method, payload });
       });
     },
     emit<T>(method: string, payload?: T): void {
       if (disposed) return;
-      send({ __moxjs: PROTOCOL, dir: 'event', method, payload });
+      send({ __jorvel: PROTOCOL, dir: 'event', method, payload });
     },
     dispose(): void {
       if (disposed) return;
@@ -158,7 +158,7 @@ export function createSandboxBridge(opts: CreateBridgeOptions): SandboxBridge {
       opts.host.removeEventListener('message', listener);
       for (const slot of pending.values()) {
         if (slot.timer) clearTimeout(slot.timer);
-        slot.reject(new Error('[moxjs/security] bridge disposed'));
+        slot.reject(new Error('[jorvel/security] bridge disposed'));
       }
       pending.clear();
     },
@@ -205,7 +205,7 @@ export function buildSandboxIframeAttrs(opts: BuildSandboxAttrsOptions): Sandbox
   for (const p of permissions) {
     if (!SAFE_PERMISSIONS.has(p)) {
       throw new Error(
-        `[moxjs/security] refusing sandbox permission "${p}" — defeats isolation. Allowed: ${[...SAFE_PERMISSIONS].join(', ')}`,
+        `[jorvel/security] refusing sandbox permission "${p}" — defeats isolation. Allowed: ${[...SAFE_PERMISSIONS].join(', ')}`,
       );
     }
   }

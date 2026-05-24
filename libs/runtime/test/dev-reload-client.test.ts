@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { connectMoxjsDevReload } from '../src/dev-reload-client.js';
+import { connectJorvelDevReload } from '../src/dev-reload-client.js';
 
 class FakeWS {
   static instances: FakeWS[] = [];
@@ -23,39 +23,39 @@ const origWS = globalThis.WebSocket;
 afterEach(() => {
   globalThis.WebSocket = origWS;
   FakeWS.instances = [];
-  delete (globalThis as any).__MOXJS_DEV_RELOAD_URL__;
+  delete (globalThis as any).__JORVEL_DEV_RELOAD_URL__;
 });
 
-describe('connectMoxjsDevReload', () => {
+describe('connectJorvelDevReload', () => {
   it('does nothing when no url provided and no global set', () => {
     (globalThis as any).WebSocket = vi.fn();
-    const r = connectMoxjsDevReload();
+    const r = connectJorvelDevReload();
     expect(r).toBeUndefined();
     expect((globalThis as any).WebSocket).not.toHaveBeenCalled();
   });
 
-  it('reads url from __MOXJS_DEV_RELOAD_URL__ global', () => {
+  it('reads url from __JORVEL_DEV_RELOAD_URL__ global', () => {
     (globalThis as any).WebSocket = FakeWS as any;
-    (globalThis as any).__MOXJS_DEV_RELOAD_URL__ = 'ws://localhost:9999/moxjs';
-    connectMoxjsDevReload();
-    expect(FakeWS.instances[0].url).toBe('ws://localhost:9999/moxjs');
+    (globalThis as any).__JORVEL_DEV_RELOAD_URL__ = 'ws://localhost:9999/jorvel';
+    connectJorvelDevReload();
+    expect(FakeWS.instances[0].url).toBe('ws://localhost:9999/jorvel');
   });
 
-  it('calls onReload when receiving moxjs:reload message', () => {
+  it('calls onReload when receiving jorvel:reload message', () => {
     (globalThis as any).WebSocket = FakeWS as any;
     const onReload = vi.fn();
-    connectMoxjsDevReload({ url: 'ws://x', onReload });
+    connectJorvelDevReload({ url: 'ws://x', onReload });
     const ws = FakeWS.instances[0];
-    ws.onmessage?.({ data: JSON.stringify({ type: 'moxjs:reload', reason: 'remote rebuilt' }) });
+    ws.onmessage?.({ data: JSON.stringify({ type: 'jorvel:reload', reason: 'remote rebuilt' }) });
     expect(onReload).toHaveBeenCalledWith('remote rebuilt');
   });
 
   it('ignores non-reload messages', () => {
     (globalThis as any).WebSocket = FakeWS as any;
     const onReload = vi.fn();
-    connectMoxjsDevReload({ url: 'ws://x', onReload });
+    connectJorvelDevReload({ url: 'ws://x', onReload });
     const ws = FakeWS.instances[0];
-    ws.onmessage?.({ data: JSON.stringify({ type: 'moxjs:ping' }) });
+    ws.onmessage?.({ data: JSON.stringify({ type: 'jorvel:ping' }) });
     ws.onmessage?.({ data: 'not json' });
     expect(onReload).not.toHaveBeenCalled();
   });
@@ -63,7 +63,7 @@ describe('connectMoxjsDevReload', () => {
   it('reconnects on close (until stop())', () => {
     vi.useFakeTimers();
     (globalThis as any).WebSocket = FakeWS as any;
-    const ctrl = connectMoxjsDevReload({ url: 'ws://x', onReload: () => {} });
+    const ctrl = connectJorvelDevReload({ url: 'ws://x', onReload: () => {} });
     const ws1 = FakeWS.instances[0];
     ws1.onclose?.();
     vi.advanceTimersByTime(1000);
@@ -83,7 +83,7 @@ describe('connectMoxjsDevReload', () => {
       if (calls === 1) throw new Error('blocked');
       return new FakeWS('ws://x');
     });
-    connectMoxjsDevReload({ url: 'ws://x', onReload: () => {} });
+    connectJorvelDevReload({ url: 'ws://x', onReload: () => {} });
     expect(calls).toBe(1);
     vi.advanceTimersByTime(1000);
     expect(calls).toBe(2);

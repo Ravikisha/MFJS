@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { Button, ThemeProvider } from '../src/index.js';
 
-describe('@moxjs/ui', () => {
+describe('@jorvel/ui', () => {
   it('renders a button with default type=button (no form-submit footgun)', () => {
     const html = renderToStaticMarkup(<Button>Hello</Button>);
     expect(html).toContain('<button');
@@ -28,6 +28,6 @@ describe('@moxjs/ui', () => {
         <Button>x</Button>
       </ThemeProvider>,
     );
-    expect(html).toContain('--moxjs-color-primary:#0ff');
+    expect(html).toContain('--jorvel-color-primary:#0ff');
   });
 });

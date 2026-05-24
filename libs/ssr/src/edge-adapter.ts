@@ -1,5 +1,5 @@
 /**
- * @moxjs/ssr — edge adapter
+ * @jorvel/ssr — edge adapter
  *
  * Framework-agnostic request/response bridge for edge runtimes (Cloudflare
  * Workers, Vercel Edge, Deno Deploy, AWS Lambda@Edge). Feeds an `EdgeRequest`
@@ -13,7 +13,7 @@ import { cacheControl, buildWeakEtag, ifNoneMatchHit, type CacheControlOptions }
 import { isRedirect } from './redirect.js';
 import { isJsonResponse, isNotFound } from './response.js';
 import { buildRequestContext, runWithRequestContext } from './request-context.js';
-import { escapeHtml } from '@moxjs/security';
+import { escapeHtml } from '@jorvel/security';
 import type { HtmlCache } from './html-cache.js';
 import type { EdgeAdapterHandler, EdgeAdapterOptions, EdgeRequest, EdgeResponse } from './types.js';
 
@@ -141,8 +141,8 @@ export function createEdgeAdapter(
           const responseHeaders: Record<string, string> = {
             ...baseExtra,
             'content-type': 'text/html; charset=utf-8',
-            'x-moxjs-ssr': '1',
-            'x-moxjs-ssr-cache': 'hit',
+            'x-jorvel-ssr': '1',
+            'x-jorvel-ssr-cache': 'hit',
             etag: cached.etag,
           };
           const cspValue = typeof csp === 'function' ? csp(request) : csp;
@@ -201,7 +201,7 @@ export function createEdgeAdapter(
     const responseHeaders: Record<string, string> = {
       ...baseExtra,
       'content-type': 'text/html; charset=utf-8',
-      'x-moxjs-ssr': '1',
+      'x-jorvel-ssr': '1',
     };
 
     const cspValue = typeof csp === 'function' ? csp(request) : csp;
@@ -221,7 +221,7 @@ export function createEdgeAdapter(
     }
 
     if (cacheEnabled && htmlCache && entryKey !== null && etagValue && result.statusCode < 400) {
-      responseHeaders['x-moxjs-ssr-cache'] = 'miss';
+      responseHeaders['x-jorvel-ssr-cache'] = 'miss';
       await htmlCache.set(entryKey, {
         html,
         etag: etagValue,

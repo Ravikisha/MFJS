@@ -3,7 +3,7 @@ import type { MfAppEvents } from '../src/index.js';
 
 // This test file just ensures the package exports the right shape.
 // Real type-safety is enforced at compile time by TypeScript.
-describe('@moxjs/events', () => {
+describe('@jorvel/events', () => {
   it('exports MfAppEvents type (runtime smoke)', () => {
     // Type-only import; no runtime value — just ensure the module loads.
     const check: MfAppEvents['shell:ready'] = { timestamp: 1 };

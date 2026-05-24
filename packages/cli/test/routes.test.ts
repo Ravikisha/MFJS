@@ -24,7 +24,7 @@ async function scaffoldWorkspace(tmp: string) {
   // Shell (host)
   const shellDir = path.join(appsDir, 'shell');
   await fs.ensureDir(shellDir);
-  await fs.writeJson(path.join(shellDir, 'moxjs.app.json'), {
+  await fs.writeJson(path.join(shellDir, 'jorvel.app.json'), {
     name: 'shell',
     type: 'host',
     port: 3000,
@@ -33,7 +33,7 @@ async function scaffoldWorkspace(tmp: string) {
   // Dashboard (remote) with pages
   const dashDir = path.join(appsDir, 'dashboard');
   await fs.ensureDir(path.join(dashDir, 'src', 'pages', 'users'));
-  await fs.writeJson(path.join(dashDir, 'moxjs.app.json'), {
+  await fs.writeJson(path.join(dashDir, 'jorvel.app.json'), {
     name: 'dashboard',
     type: 'remote',
     port: 3001,
@@ -45,14 +45,14 @@ async function scaffoldWorkspace(tmp: string) {
   return { shellDir, dashDir };
 }
 
-describe('moxjs routes', () => {
-  it('writes moxjs.routes.ts for remote apps with correct route paths', async () => {
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-routes-'))) as string;
+describe('jorvel routes', () => {
+  it('writes jorvel.routes.ts for remote apps with correct route paths', async () => {
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-routes-'))) as string;
     const { dashDir } = await scaffoldWorkspace(tmp);
 
     await runCommand(['--dir', tmp], tmp);
 
-    const outFile = path.join(dashDir, 'src', 'moxjs.routes.ts');
+    const outFile = path.join(dashDir, 'src', 'jorvel.routes.ts');
     expect(await fs.pathExists(outFile)).toBe(true);
 
     const content = await fs.readFile(outFile, 'utf8');
@@ -61,13 +61,13 @@ describe('moxjs routes', () => {
     expect(content).toMatch(/path:\s*["']\/users\/:id["']/);
   });
 
-  it('writes moxjs.routes.json manifest for remote app', async () => {
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-routes-'))) as string;
+  it('writes jorvel.routes.json manifest for remote app', async () => {
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-routes-'))) as string;
     const { dashDir } = await scaffoldWorkspace(tmp);
 
     await runCommand(['--dir', tmp], tmp);
 
-    const manifest = await fs.readJson(path.join(dashDir, 'moxjs.routes.json'));
+    const manifest = await fs.readJson(path.join(dashDir, 'jorvel.routes.json'));
     expect(manifest.app).toBe('dashboard');
     expect(Array.isArray(manifest.routes)).toBe(true);
     expect(manifest.routes.some((r: { path: string }) => r.path === '/')).toBe(true);
@@ -75,13 +75,13 @@ describe('moxjs routes', () => {
     expect(manifest.routes.some((r: { path: string }) => r.path === '/users/:id')).toBe(true);
   });
 
-  it('writes moxjs.routes.host.json for the host app with remote mounts', async () => {
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-routes-'))) as string;
+  it('writes jorvel.routes.host.json for the host app with remote mounts', async () => {
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-routes-'))) as string;
     const { shellDir } = await scaffoldWorkspace(tmp);
 
     await runCommand(['--dir', tmp], tmp);
 
-    const hostManifest = await fs.readJson(path.join(shellDir, 'moxjs.routes.host.json'));
+    const hostManifest = await fs.readJson(path.join(shellDir, 'jorvel.routes.host.json'));
     expect(hostManifest.host).toBe('shell');
     expect(Array.isArray(hostManifest.routes)).toBe(true);
     // Should include a wildcard mount for the dashboard remote
@@ -93,13 +93,13 @@ describe('moxjs routes', () => {
     ).toBe(true);
   });
 
-  it('generates correct import path inside moxjs.routes.ts', async () => {
-    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'moxjs-routes-'))) as string;
+  it('generates correct import path inside jorvel.routes.ts', async () => {
+    const tmp = (await fs.mkdtemp(path.join(os.tmpdir(), 'jorvel-routes-'))) as string;
     const { dashDir } = await scaffoldWorkspace(tmp);
 
     await runCommand(['--dir', tmp], tmp);
 
-    const content = await fs.readFile(path.join(dashDir, 'src', 'moxjs.routes.ts'), 'utf8');
+    const content = await fs.readFile(path.join(dashDir, 'src', 'jorvel.routes.ts'), 'utf8');
     // Import paths should be relative to src/ (i.e. './pages/...')
     expect(content).toMatch(/import\(["']\.\/pages\//);
   });

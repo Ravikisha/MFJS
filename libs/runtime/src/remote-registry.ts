@@ -67,14 +67,14 @@ export class RemoteRegistry {
 
   register(remote: RegisteredRemote): void {
     if (!remote || typeof remote !== 'object') {
-      throw new Error('[moxjs/runtime] RemoteRegistry.register: invalid remote.');
+      throw new Error('[jorvel/runtime] RemoteRegistry.register: invalid remote.');
     }
     if (FORBIDDEN_KEYS.has(remote.name)) {
-      throw new Error(`[moxjs/runtime] Forbidden remote name: ${remote.name}`);
+      throw new Error(`[jorvel/runtime] Forbidden remote name: ${remote.name}`);
     }
     if (!this.originAllowed(remote.entryUrl)) {
       throw new Error(
-        `[moxjs/runtime] RemoteRegistry: rejected remote "${remote.name}" with disallowed entryUrl "${remote.entryUrl}".`,
+        `[jorvel/runtime] RemoteRegistry: rejected remote "${remote.name}" with disallowed entryUrl "${remote.entryUrl}".`,
       );
     }
     this.opts.validate?.(remote);
@@ -104,14 +104,14 @@ export class RemoteRegistry {
   ): Promise<RegisteredRemote[]> {
     if (!this.originAllowed(manifestUrl)) {
       throw new Error(
-        `[moxjs/runtime] RemoteRegistry.load: manifest origin not in allowedOrigins: ${manifestUrl}`,
+        `[jorvel/runtime] RemoteRegistry.load: manifest origin not in allowedOrigins: ${manifestUrl}`,
       );
     }
     const res = await fetchImpl(manifestUrl);
     if (!res.ok) throw new Error(`RemoteRegistry: manifest fetch failed ${manifestUrl} (${res.status})`);
     const payload = (await res.json()) as { remotes?: RegisteredRemote[] };
     if (!payload || !Array.isArray(payload.remotes)) {
-      throw new Error(`[moxjs/runtime] RemoteRegistry.load: manifest must contain { remotes: [] }`);
+      throw new Error(`[jorvel/runtime] RemoteRegistry.load: manifest must contain { remotes: [] }`);
     }
     const before = new Map(this.remotes);
     const onChange = this.opts.onChange;
@@ -135,7 +135,7 @@ export class RemoteRegistry {
 }
 
 // Pin the singleton to globalThis so duplicate bundles still see the same registry.
-const REGISTRY_KEY = '__MOXJS_REMOTE_REGISTRY__';
+const REGISTRY_KEY = '__JORVEL_REMOTE_REGISTRY__';
 type GlobalWithRegistry = typeof globalThis & { [REGISTRY_KEY]?: RemoteRegistry };
 
 export function getRemoteRegistry(opts?: RemoteRegistryOptions): RemoteRegistry {
